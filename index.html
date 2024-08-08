@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HADES 100% Completion Checklist</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="localstorage.js"></script> <!-- Include your local storage script -->
+    <link href="https://fonts.googleapis.com/css2?family=Merriweather&display=swap" rel="stylesheet">
+    <style>
+        body {
+            background-color: #1A1A1A;
+            color: #FFFFFF;
+            font-family: 'Merriweather', serif;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            padding: 20px;
+        }
+        .container {
+            max-width: 600px;
+            width: 100%;
+        }
+        h1 {
+            color: #E63946;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .collapsible {
+            background-color: #E63946;
+            color: white;
+            padding: 15px;
+            border: none;
+            border-radius: 5px;
+            text-align: left;
+            outline: none;
+            font-size: 15px;
+            cursor: pointer;
+            width: 100%;
+            margin-bottom: 5px;
+        }
+        .collapsible:hover {
+            background-color: #D62828;
+        }
+        .content {
+            padding: 10px;
+            background-color: #2B2D42;
+            border: 1px solid #8D99AE;
+            border-radius: 5px;
+            margin-bottom: 10px;
+            display: none; /* Hidden by default */
+        }
+        .item {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            align-items: center;
+            margin-bottom: 5px;
+            gap: 10px;
+        }
+        .checkbox-container {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        input[type="checkbox"] {
+            margin-right: 5px;
+        }
+        label {
+            font-size: 14px;
+        }
+        .checkbox-number {
+            font-size: 12px;
+        }
+        #checklist-container {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        #total-completion {
+            margin-bottom: 20px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>HADES 100% Completion Checklist</h1>
+        <p id="total-completion">Total Completion: 0%</p>
+        <div id="checklist-container"></div>
+    </div>
+
+    <script src="script.js"></script> <!-- Include your main script -->
+</body>
+</html>
