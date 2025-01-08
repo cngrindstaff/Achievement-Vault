@@ -19,51 +19,53 @@ function processWorkbook(workbook) {
 }
 
 function generateChecklist(rows) {
-    const container = $('#checklist-container');
+    const container = $('#grid-checklist-container');
     container.empty();
     let sectionCount = 0;
     let totalSections = 0;
 
-    while (rows[0][sectionCount * 3] !== undefined) {
+    while (rows[0][sectionCount * 4] !== undefined) {
         totalSections++;
         sectionCount++;
     }
 
     sectionCount = 0;
 
-    while (rows[0][sectionCount * 3] !== undefined) {
-        console.log('rows[0][sectionCount * 3] - ' + rows[0][sectionCount * 3])
-        const sectionTitle = rows[0][sectionCount * 3];
+    while (rows[0][sectionCount * 4] !== undefined) {
+        console.log('rows[0][sectionCount * 4] - ' + rows[0][sectionCount * 4])
+        const sectionTitle = rows[0][sectionCount * 4];
         console.log('sectionTitle - ' + sectionTitle)
-        const sectionContent = $('<div class="content"></div>');
+        const sectionContent = $('<div class="section"></div>');
         const section = $('<button class="collapsible"></button>').text(`${sectionTitle} (0%)`);
         section.on('click', function() {
-            $(this).next('.content').toggle();
+            $(this).next('.section').toggle();
         });
 
         const items = {};
         for (let i = 1; i < rows.length; i++) {
-            const itemName = rows[i][sectionCount * 3];
+            const itemName = rows[i][sectionCount * 4];
 			console.log('itemName - ' + itemName);
-            const numOfCheckboxes = rows[i][sectionCount * 3 + 1];
-            const numAlreadyChecked = rows[i][sectionCount * 3 + 2];
+			const description = rows[i][sectionCount * 4 + 1];
+            const numOfCheckboxes = rows[i][sectionCount * 4 + 2];
+            const numAlreadyChecked = rows[i][sectionCount * 4 + 3];
             if(numAlreadyChecked === null) numAlreadyChecked = 0;
             if (!itemName) break;
             if (!items[itemName]) {
-                items[itemName] = numAlreadyChecked + "," + numOfCheckboxes;
+                items[itemName] = description + "," + numAlreadyChecked + "," + numOfCheckboxes;
             } else {
-                items[itemName] += numAlreadyChecked + "," + numOfCheckboxes;
+                items[itemName] += description + "," + numAlreadyChecked + "," + numOfCheckboxes;
             }
         }
 
         const itemContainer = $('<div></div>');
         Object.keys(items).forEach((itemName, index) => {
             const checks = items[itemName].split(",");
-            let numAlreadyChecked = checks[0];
-            let numOfCheckboxes = checks[1];
-            const itemDiv = $('<div class="item"></div>');
-            const itemLabel = $(`<label>${itemName}</label>`);
-            const checkboxContainer = $('<div class="checkbox-container"></div>');
+            let description = checks[1];
+            let numAlreadyChecked = checks[2];
+            let numOfCheckboxes = checks[3];
+            const gridItemDiv = $('<div class="grid-item"></div>');
+			const column1LabelAndDescriptionDiv = $(`<div class="column1"><div class="label">${itemName}</div><div class="description">${description}</div></div>`);
+            const checkboxContainer = $('<div class="column2 checkbox-container"></div>');
 
             for (let j = 1; j <= numOfCheckboxes; j++) {
                 let checkbox = "";
@@ -77,8 +79,8 @@ function generateChecklist(rows) {
                 checkboxContainer.append(checkbox);
             }
 
-            itemDiv.append(itemLabel).append(checkboxContainer);
-            itemContainer.append(itemDiv);
+            gridItemDiv.append(column1LabelAndDescriptionDiv).append(checkboxContainer);
+            itemContainer.append(gridItemDiv);
         });
 
         sectionContent.append(itemContainer);

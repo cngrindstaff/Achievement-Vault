@@ -32,7 +32,7 @@
         .collapsible:hover {
             background-color: #D62828;
         }
-        .content {
+        .section {
             padding: 10px;
             background-color: #2B2D42;
             border: 1px solid #8D99AE;
@@ -40,26 +40,23 @@
             margin-bottom: 10px;
             display: none; /* Hidden by default */
         }
-        .item {
+        .grid-item {
             display: grid;
-            grid-template-columns: 1fr auto;
-            align-items: center;
+            grid-template-columns: 1fr auto; /* Two columns, second one adjusts automatically*/
+			grid-template-rows: auto auto; /* Adjust rows automatically */
             margin-bottom: 5px;
             gap: 10px;
         }
-        .checkbox-container {
+        .grid-checkbox-container {
             display: flex;
             align-items: center;
             gap: 5px;
         }
         input[type="checkbox"] {
-            margin-right: 5px;
+			margin: auto 5px auto auto;
         }
-        label {
+        .label {
             font-size: 14px;
-        }
-        .checkbox-number {
-            font-size: 12px;
         }
         #checklist-container {
             display: flex;
@@ -70,3 +67,17 @@
             margin-bottom: 20px;
             text-align: center;
         }
+		.description {
+			font-size: 11px;
+		}
+		.column1
+		{
+		  display: grid;
+		  grid-template-rows: 1fr 1fr; /* Two rows inside the first column */
+		  gap: 0.5rem;
+		}
+		.label,
+		.description,
+		.column2 {
+		  padding: 0.5rem;
+		}
