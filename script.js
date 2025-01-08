@@ -155,8 +155,6 @@ function updateTotalCompletion() {
     const totalSections = sections.length;
 
     sections.each(function() {
-		string thisSectionText = $(this.text());
-		console.log('thisSectionText - ' + thisSectionText);
         const sectionCompletion = parseFloat($(this).text().match(/\(([^)]+)%\)/)[1]);
         totalCompletion += sectionCompletion / totalSections;
     });
