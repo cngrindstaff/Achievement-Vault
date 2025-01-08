@@ -81,6 +81,8 @@ function generateChecklist(rows) {
 				
 			}
 
+            const checkboxContainer = $('<div class="column2 checkbox-container"></div>');
+
 
             for (let j = 1; j <= numOfCheckboxes; j++) {
                 let checkbox = "";
