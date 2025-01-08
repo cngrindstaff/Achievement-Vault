@@ -40,13 +40,20 @@ h1 {
 	margin-bottom: 10px;
 	display: none; /* Hidden by default */
 }
-.grid-item {
+.grid-item-2-row {
 	display: grid;
 	grid-template-columns: 1fr auto; /* Two columns, second one adjusts automatically*/
 	grid-template-rows: auto auto; /* Adjust rows automatically */
 	margin-bottom: 5px;
 	gap: 15px;
 }
+.grid-item-1-row {
+	display: grid;
+	grid-template-columns: 1fr auto; /* Two columns, second one adjusts automatically*/
+	margin-bottom: 5px;
+	gap: 15px;
+}
+
 .grid-checkbox-container {
 	display: flex;
 	align-items: center;
@@ -70,7 +77,12 @@ input[type="checkbox"] {
 .description {
 	font-size: 11px;
 }
-.column1
+.column1-1-row
+{
+  display: grid;
+  gap: 0.5rem;
+}
+.column1-2-row
 {
   display: grid;
   grid-template-rows: 1fr 1fr; /* Two rows inside the first column */
