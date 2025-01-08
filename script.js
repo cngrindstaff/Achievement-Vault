@@ -158,8 +158,12 @@ function updateTotalCompletion() {
         const sectionCompletion = parseFloat($(this).text().match(/\(([^)]+)%\)/)[1]);
         totalCompletion += sectionCompletion / totalSections;
     });
+	var totalCompletionString = `Total Completion: ${totalCompletion.toFixed(2)}%`;
+	if(totalCompletionString === "NaN%"){
+		totalCompletionString = `Total Completion: 0.00%`;
+	}
 
-    $('#total-completion').text(`Total Completion: ${totalCompletion.toFixed(2)}%`);
+    $('#total-completion').text(`${totalCompletionString}`);
 }
 
 // Function to initialize checkboxes from local storage
