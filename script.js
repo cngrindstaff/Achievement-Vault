@@ -69,15 +69,18 @@ function generateChecklist(rows) {
             let description = checks[0];
             let numAlreadyChecked = checks[1];
             let numOfCheckboxes = checks[2];
-            const gridItemDiv = $('<div class="grid-item"></div>');
-			var column1LabelAndDescriptionDiv = $(`<div class="column1"><div class="label">${itemName}</div></div>`);
 			
-			//if there's a description, make sure it's there
+			
+            var gridItemDiv = $('<div class="grid-item-1-row"></div>');
+			var column1LabelAndDescriptionDiv = $(`<div class="column1-1-row"><div class="label">${itemName}</div></div>`);
+			
+			//if there's a description, make sure it's there, and change div classes to the 2-row versions
 			if(description != "undefined") {
-				column1LabelAndDescriptionDiv = $(`<div class="column1"><div class="label">${itemName}</div><div class="description">${description}</div></div>`);
+				gridItemDiv = $('<div class="grid-item-2-row"></div>');
+				column1LabelAndDescriptionDiv = $(`<div class="column1-2-row"><div class="label">${itemName}</div><div class="description">${description}</div></div>`);
+				
 			}
 
-            const checkboxContainer = $('<div class="column2 checkbox-container"></div>');
 
             for (let j = 1; j <= numOfCheckboxes; j++) {
                 let checkbox = "";
@@ -87,10 +90,10 @@ function generateChecklist(rows) {
                 else {
                     checkbox = $(`<input type="checkbox" class="checkbox-${sectionCount}-${index}-${j}" data-section="${sectionCount}" data-item="${index}" data-num="${j}">`);
                 }
-				console.log('checkbox html - ' + checkbox);
+				//console.log('checkbox html - ' + checkbox);
                 checkbox.on('change', updateCompletion);
                 checkboxContainer.append(checkbox);
-           		console.log('checkboxContainer html - ' + checkboxContainer);
+           		//console.log('checkboxContainer html - ' + checkboxContainer);
 }
 
             gridItemDiv.append(column1LabelAndDescriptionDiv).append(checkboxContainer);
