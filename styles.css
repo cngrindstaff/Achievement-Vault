@@ -45,7 +45,7 @@ h1 {
 	grid-template-columns: 1fr auto; /* Two columns, second one adjusts automatically*/
 	grid-template-rows: auto auto; /* Adjust rows automatically */
 	margin-bottom: 5px;
-	gap: 10px;
+	gap: 15px;
 }
 .grid-checkbox-container {
 	display: flex;
@@ -79,7 +79,7 @@ input[type="checkbox"] {
 .label,
 .description,
 .column2 {
-  padding: 0.5rem;
+  /*padding: 0.5rem;*/
 }
 .home-link {
 	background-color: #E63946;
