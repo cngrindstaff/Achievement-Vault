@@ -92,7 +92,12 @@ input[type="checkbox"] {
 	cursor: pointer;
 	width: auto;
 	margin-bottom: 15px;
+	height: 15px;
 }
 .home-link:hover {
 	background-color: #D62828;
+}
+.linkText {
+	color: white;
+	font-size: 10px;
 }

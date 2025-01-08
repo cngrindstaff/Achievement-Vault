@@ -70,13 +70,15 @@ function generateChecklist(rows) {
             let numAlreadyChecked = checks[1];
             let numOfCheckboxes = checks[2];
             const gridItemDiv = $('<div class="grid-item"></div>');
-			var column1LabelAndDescriptionDiv = $(`<div class="column1"><div class="label">${itemName}</div>`);
-			if(description != "undefined") {
-				column1LabelAndDescriptionDiv += $(`<div class="description">${description}</div></div>`);
-			}
-			else {
-				column1LabelAndDescriptionDiv += $(`</div>`);
-			}
+			//var column1LabelAndDescriptionDiv = $(`<div class="column1"><div class="label">${itemName}</div>`);
+			//if(description != "undefined") {
+				//column1LabelAndDescriptionDiv += $(`<div class="description">${description}</div></div>`);
+			//}
+			//else {
+				//column1LabelAndDescriptionDiv += $(`</div>`);
+			//}
+			const column1LabelAndDescriptionDiv = $(`<div class="column1"><div class="label">${itemName}</div><div class="description">${description}</div></div>`);
+
             const checkboxContainer = $('<div class="column2 checkbox-container"></div>');
 
             for (let j = 1; j <= numOfCheckboxes; j++) {
