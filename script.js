@@ -72,12 +72,12 @@ function generateChecklist(rows) {
 			
 			
             var gridItemDiv = $('<div class="grid-item-1-row"></div>');
-			var column1LabelAndDescriptionDiv = $(`<div class="column1-1-row"><div class="label">${itemName}</div></div>`);
+			var column1LabelAndDescriptionDiv = $(`<div class="column1"><div class="label">${itemName}</div></div>`);
 			
-			//if there's a description, make sure it's there, and change div classes to the 2-row versions
+			//if there's a description, make sure it's there, and change gridItemDiv class to the 2-row version
 			if(description != "undefined") {
 				gridItemDiv = $('<div class="grid-item-2-row"></div>');
-				column1LabelAndDescriptionDiv = $(`<div class="column1-2-row"><div class="label">${itemName}</div><div class="description">${description}</div></div>`);
+				column1LabelAndDescriptionDiv = $(`<div class="column1"><div class="label">${itemName}</div><div class="description">${description}</div></div>`);
 				
 			}
 

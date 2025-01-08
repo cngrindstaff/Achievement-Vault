@@ -77,15 +77,10 @@ input[type="checkbox"] {
 .description {
 	font-size: 11px;
 }
-.column1-1-row
+.column1
 {
   display: grid;
-  gap: 0.5rem;
-}
-.column1-2-row
-{
-  display: grid;
-  grid-template-rows: 1fr 1fr; /* Two rows inside the first column */
+  //grid-template-rows: 1fr 1fr; /* Two rows inside the first column */
   gap: 0.5rem;
 }
 .label,
