@@ -97,7 +97,7 @@ input[type="checkbox"] {
 	outline: none;
 	font-size: 10px;
 	cursor: pointer;
-	width: auto;
+	width: 30px;
 	margin-bottom: 15px;
 	height: 15px;
 }
@@ -107,4 +107,5 @@ input[type="checkbox"] {
 .linkText {
 	color: white;
 	font-size: 10px;
+
 }
