@@ -49,23 +49,23 @@ function generateChecklist(rows) {
         for (let i = 1; i < rows.length; i++) {
             const itemName = rows[i][sectionCount * 4];
 			//console.log('itemName - ' + itemName);
-			const description = rows[i][sectionCount * 4 + 1];
+			const description = rows[i][sectionCount * 4 + 1]; //todo, make html safe
 			//console.log('description - ' + description);
             const numOfCheckboxes = rows[i][sectionCount * 4 + 2];
             const numAlreadyChecked = rows[i][sectionCount * 4 + 3];
             if(numAlreadyChecked === null) numAlreadyChecked = 0;
             if (!itemName) break;
             if (!items[itemName]) {
-                items[itemName] = description + "," + numAlreadyChecked + "," + numOfCheckboxes;
+                items[itemName] = description + ";" + numAlreadyChecked + ";" + numOfCheckboxes;
             } else {
-                items[itemName] += description + "," + numAlreadyChecked + "," + numOfCheckboxes;
+                items[itemName] += description + ";" + numAlreadyChecked + ";" + numOfCheckboxes;
             }
         }
 
         const itemContainer = $('<div></div>');
 
         Object.keys(items).forEach((itemName, index) => {
-            const checks = items[itemName].split(",");
+            const checks = items[itemName].split(";");
             let description = checks[0];
             let numAlreadyChecked = checks[1];
             let numOfCheckboxes = checks[2];
