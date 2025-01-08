@@ -87,9 +87,11 @@ function generateChecklist(rows) {
                 else {
                     checkbox = $(`<input type="checkbox" class="checkbox-${sectionCount}-${index}-${j}" data-section="${sectionCount}" data-item="${index}" data-num="${j}">`);
                 }
+				console.log('checkbox html - ' + checkbox);
                 checkbox.on('change', updateCompletion);
                 checkboxContainer.append(checkbox);
-            }
+           		console.log('checkboxContainer html - ' + checkboxContainer);
+}
 
             gridItemDiv.append(column1LabelAndDescriptionDiv).append(checkboxContainer);
             itemContainer.append(gridItemDiv);
