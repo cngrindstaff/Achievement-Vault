@@ -46,7 +46,7 @@ function generateChecklist(rows) {
             const itemName = rows[i][sectionCount * 4];
 			console.log('itemName - ' + itemName);
 			const description = rows[i][sectionCount * 4 + 1];
-			console.log('description - ' + description);
+			//console.log('description - ' + description);
             const numOfCheckboxes = rows[i][sectionCount * 4 + 2];
             const numAlreadyChecked = rows[i][sectionCount * 4 + 3];
             if(numAlreadyChecked === null) numAlreadyChecked = 0;
@@ -58,14 +58,22 @@ function generateChecklist(rows) {
             }
         }
 
-        const itemContainer = $('<div></div>');
+        //const itemContainer = $('<div></div>');
+		const itemContainer = $('');
+
         Object.keys(items).forEach((itemName, index) => {
             const checks = items[itemName].split(",");
             let description = checks[0];
             let numAlreadyChecked = checks[1];
             let numOfCheckboxes = checks[2];
             const gridItemDiv = $('<div class="grid-item"></div>');
-			const column1LabelAndDescriptionDiv = $(`<div class="column1"><div class="label">${itemName}</div><div class="description">${description}</div></div>`);
+			const column1LabelAndDescriptionDiv = $(`<div class="column1"><div class="label">${itemName}</div>`);
+			if(description != "undefined") {
+				column1LabelAndDescriptionDiv += $(`<div class="description">${description}</div></div>`);
+			}
+			else {
+				column1LabelAndDescriptionDiv += $(`</div>`);
+			}
             const checkboxContainer = $('<div class="column2 checkbox-container"></div>');
 
             for (let j = 1; j <= numOfCheckboxes; j++) {
@@ -119,6 +127,7 @@ function updateCompletion() {
 }
 
 function updateSectionCompletion(sectionIndex) {
+	console.log("updateSectionCompletion");
     const sectionButton = $(`button[data-section="${sectionIndex}"]`);
     const checkboxes = $(`input[data-section="${sectionIndex}"]`);
     const checkedCheckboxes = checkboxes.filter(':checked').length;
@@ -130,6 +139,7 @@ function updateSectionCompletion(sectionIndex) {
 }
 
 function updateTotalCompletion() {
+	console.log("updateTotalCompletion");
     let totalCompletion = 0;
     const sections = $('button.collapsible');
     const totalSections = sections.length;
