@@ -32,9 +32,13 @@ function generateChecklist(rows) {
     sectionCount = 0;
 
     while (rows[0][sectionCount * 4] !== undefined) {
-        console.log('rows[0][sectionCount * 4] - ' + rows[0][sectionCount * 4])
+        //console.log('rows[0][sectionCount * 4] - ' + rows[0][sectionCount * 4])
         const sectionTitle = rows[0][sectionCount * 4];
-        console.log('sectionTitle - ' + sectionTitle)
+        //console.log('sectionTitle - ' + sectionTitle)
+		if(sectionTitle == "undefined"){
+			break;
+		}
+		
         const sectionContent = $('<div class="section"></div>');
         const section = $('<button class="collapsible"></button>').text(`${sectionTitle} (0%)`);
         section.on('click', function() {
@@ -44,7 +48,7 @@ function generateChecklist(rows) {
         const items = {};
         for (let i = 1; i < rows.length; i++) {
             const itemName = rows[i][sectionCount * 4];
-			console.log('itemName - ' + itemName);
+			//console.log('itemName - ' + itemName);
 			const description = rows[i][sectionCount * 4 + 1];
 			//console.log('description - ' + description);
             const numOfCheckboxes = rows[i][sectionCount * 4 + 2];
@@ -58,8 +62,7 @@ function generateChecklist(rows) {
             }
         }
 
-        //const itemContainer = $('<div></div>');
-		const itemContainer = $('');
+        const itemContainer = $('<div></div>');
 
         Object.keys(items).forEach((itemName, index) => {
             const checks = items[itemName].split(",");
@@ -127,7 +130,7 @@ function updateCompletion() {
 }
 
 function updateSectionCompletion(sectionIndex) {
-	console.log("updateSectionCompletion");
+	//console.log("updateSectionCompletion");
     const sectionButton = $(`button[data-section="${sectionIndex}"]`);
     const checkboxes = $(`input[data-section="${sectionIndex}"]`);
     const checkedCheckboxes = checkboxes.filter(':checked').length;
@@ -139,7 +142,7 @@ function updateSectionCompletion(sectionIndex) {
 }
 
 function updateTotalCompletion() {
-	console.log("updateTotalCompletion");
+	//console.log("updateTotalCompletion");
     let totalCompletion = 0;
     const sections = $('button.collapsible');
     const totalSections = sections.length;
