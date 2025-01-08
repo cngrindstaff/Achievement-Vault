@@ -67,7 +67,7 @@ function generateChecklist(rows) {
             let numAlreadyChecked = checks[1];
             let numOfCheckboxes = checks[2];
             const gridItemDiv = $('<div class="grid-item"></div>');
-			const column1LabelAndDescriptionDiv = $(`<div class="column1"><div class="label">${itemName}</div>`);
+			var column1LabelAndDescriptionDiv = $(`<div class="column1"><div class="label">${itemName}</div>`);
 			if(description != "undefined") {
 				column1LabelAndDescriptionDiv += $(`<div class="description">${description}</div></div>`);
 			}
