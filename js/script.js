@@ -40,7 +40,7 @@ function generateChecklist(rows) {
 		}
 		
         const sectionContent = $('<div class="section"></div>');
-        const section = $('<button class="section-header"></button>').text(`${sectionTitle} (0%)`);
+        const section = $('<div class="section-header"></div>').text(`${sectionTitle} (0%)`);
         section.on('click', function() {
             $(this).next('.section').toggle();
         });
@@ -138,21 +138,21 @@ function updateCompletion() {
 
 function updateSectionCompletion(sectionIndex) {
 	//console.log("updateSectionCompletion");
-    const sectionButton = $(`button[data-section="${sectionIndex}"]`);
+    const sectionDiv = $(`.section-header[data-section="${sectionIndex}"]`);
     const checkboxes = $(`input[data-section="${sectionIndex}"]`);
     const checkedCheckboxes = checkboxes.filter(':checked').length;
     const totalCheckboxes = checkboxes.length;
     const sectionCompletion = ((checkedCheckboxes / totalCheckboxes) * 100).toFixed(2);
-    var lastIndex = sectionButton.text().lastIndexOf(' ');
-    const sectionTitle = sectionButton.text().substr(0, lastIndex);
-    sectionButton.text(`${sectionTitle} (${sectionCompletion}%)`);
+    var lastIndex = sectionDiv.text().lastIndexOf(' ');
+    const sectionTitle = sectionDiv.text().substr(0, lastIndex);
+    sectionDiv.text(`${sectionTitle} (${sectionCompletion}%)`);
 }
 
 function updateTotalCompletion() {
 	try
 	{
 		let totalCompletion = 0;
-		const sections = $('button.section-header');
+		const sections = $('div.section-header');
 		const totalSections = sections.length;
 
 		sections.each(function() {
@@ -184,7 +184,7 @@ function initializeCheckboxes() {
 
 // Function to update all sections' completion percentages
 function updateAllSectionsCompletion() {
-    $('button.section-header').each(function() {
+    $('div.section-header').each(function() {
         const sectionIndex = $(this).data('section');
         updateSectionCompletion(sectionIndex);
     });
