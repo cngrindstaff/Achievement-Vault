@@ -144,7 +144,7 @@ function updateCompletion() {
 
 function updateSectionCompletion(sectionIndex) {
 	//console.log("updateSectionCompletion");
-    const sectionHeaderTextDiv = $(`.section-header-text[data-section="${sectionIndex}"]`);
+    const sectionHeaderTextDiv = $(`span.section-header-text[data-section="${sectionIndex}"]`);
     console.log('sectionHeaderTextDiv - ' + sectionHeaderTextDiv.text());
     const checkboxes = $(`input[data-section="${sectionIndex}"]`);
     const checkedCheckboxes = checkboxes.filter(':checked').length;
