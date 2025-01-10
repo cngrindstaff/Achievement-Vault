@@ -92,10 +92,10 @@ function generateChecklist(rows) {
             for (let j = 1; j <= numOfCheckboxes; j++) {
                 let checkbox = "";
                 if(j <= numAlreadyChecked) {
-                    checkbox = $(`<label class="modern-checkbox"><input type="checkbox" class="checkbox-${sectionCount}-${index}-${j}" data-section="${sectionCount}" data-item="${index}" data-num="${j}" checked><span class="checkmark"></span>`);
+                    checkbox = $(`<label class="modern-checkbox" data-section="${sectionCount}" data-item="${index}" data-num="${j}"><input type="checkbox" class="checkbox-${sectionCount}-${index}-${j}" data-section="${sectionCount}" data-item="${index}" data-num="${j}" checked><span class="checkmark" data-section="${sectionCount}" data-item="${index}" data-num="${j}"></span>`);
                 }
                 else {
-                    checkbox = $(`<label class="modern-checkbox"><input type="checkbox" class="checkbox-${sectionCount}-${index}-${j}" data-section="${sectionCount}" data-item="${index}" data-num="${j}"><span class="checkmark"></span>`);
+                    checkbox = $(`<label class="modern-checkbox" data-section="${sectionCount}" data-item="${index}" data-num="${j}"<input type="checkbox" class="checkbox-${sectionCount}-${index}-${j}" data-section="${sectionCount}" data-item="${index}" data-num="${j}"><span class="checkmark" data-section="${sectionCount}" data-item="${index}" data-num="${j}"></span>`);
                 }
 				//console.log('checkbox html - ' + checkbox);
                 checkbox.on('change', updateCompletion);
