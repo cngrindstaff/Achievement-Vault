@@ -121,7 +121,7 @@ function generateChecklist(rows) {
 
 function updateCompletion() {
     const sectionIndex = $(this).data('section');
-    console.log('sectionIndex - ' + sectionIndex);
+    console.log('updateCompletion - sectionIndex - ' + sectionIndex);
     const itemIndex = $(this).data('item');
     const checkboxNum = $(this).data('num');
 
@@ -144,7 +144,7 @@ function updateCompletion() {
 }
 
 function updateSectionCompletion(sectionIndex) {
-    console.log('sectionIndex - ' + sectionIndex);
+    console.log('updateSectionCompletion - sectionIndex - ' + sectionIndex);
     const sectionHeaderTextDiv = $(`span.section-header-text[data-section="${sectionIndex}"]`);
     console.log('sectionHeaderTextDiv - ' + sectionHeaderTextDiv.text());
     const checkboxes = $(`input[data-section="${sectionIndex}"]`);
