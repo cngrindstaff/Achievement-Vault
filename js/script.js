@@ -122,7 +122,7 @@ function generateChecklist(rows) {
 function updateCompletion() {
     const sectionIndex = $(this).data('section');
     console.log('updateCompletion - sectionIndex - ' + sectionIndex);
-    console.log('updateCompletion - this - ' + $(this));
+    console.log('updateCompletion - this - ' + JSON.stringify($(this)));
 
     const itemIndex = $(this).data('item');
     const checkboxNum = $(this).data('num');
