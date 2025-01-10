@@ -143,7 +143,7 @@ function updateCompletion() {
 }
 
 function updateSectionCompletion(sectionIndex) {
-	//console.log("updateSectionCompletion");
+    console.log('sectionIndex - ' + sectionIndex);
     const sectionHeaderTextDiv = $(`span.section-header-text[data-section="${sectionIndex}"]`);
     console.log('sectionHeaderTextDiv - ' + sectionHeaderTextDiv.text());
     const checkboxes = $(`input[data-section="${sectionIndex}"]`);
