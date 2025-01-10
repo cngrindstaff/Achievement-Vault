@@ -151,11 +151,11 @@ function updateSectionCompletion(sectionIndex) {
     console.log('sectionHeaderTextDiv - ' + sectionHeaderTextDiv.text());
     const checkboxes = $(`input[data-section="${sectionIndex}"]`);
     const checkedCheckboxes = checkboxes.filter(':checked').length;
-    console.log('checkedCheckboxes - ' + checkedCheckboxes);
+    //console.log('checkedCheckboxes - ' + checkedCheckboxes);
     const totalCheckboxes = checkboxes.length;
-    console.log('totalCheckboxes - ' + totalCheckboxes);
+    //console.log('totalCheckboxes - ' + totalCheckboxes);
     const sectionCompletion = ((checkedCheckboxes / totalCheckboxes) * 100).toFixed(2);
-    console.log('sectionCompletion - ' + sectionCompletion);
+    //console.log('sectionCompletion - ' + sectionCompletion);
     var lastIndex = sectionHeaderTextDiv.text().lastIndexOf(' ');
     const sectionTitle = sectionHeaderTextDiv.text().substr(0, lastIndex);
     sectionHeaderTextDiv.text(`${sectionTitle} (${sectionCompletion}%)`);
@@ -199,6 +199,7 @@ function initializeCheckboxes() {
 function updateAllSectionsCompletion() {
     $('div.section-header-text').each(function() {
         const sectionIndex = $(this).data('section');
+        console.log('updateAllSectionsCompletion - sectionIndex - ' + sectionIndex);
         updateSectionCompletion(sectionIndex);
     });
 }
