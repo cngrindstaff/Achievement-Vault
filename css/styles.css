@@ -105,9 +105,6 @@ input[type="checkbox"] {
   display: grid;
   gap: 0.5rem;
 }
-.label, .description, .column2 {
-  /*padding: 0.5rem;*/
-}
 .home-link {
   background-color: #6AD6DC;
   padding: 8px;
@@ -118,12 +115,17 @@ input[type="checkbox"] {
   width: fit-content;
   margin-bottom: 15px;
   height: 15px;
+  display: flex;
+  /* Supports vertical centering */
+  align-items: center;
+  /* Supports vertical centering */
 }
 .home-link:hover {
   background-color: #2FBFC6;
 }
 a {
   color: #104042;
+  text-decoration: none;
 }
 /*************************************** NEW CHECKBOX *******************************/
 .modern-checkbox {

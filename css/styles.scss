@@ -154,12 +154,15 @@ input[type="checkbox"] {
 	width: fit-content;
 	margin-bottom: 15px;
 	height: 15px;
+	display: flex; /* Supports vertical centering */
+	align-items: center;/* Supports vertical centering */
 }
 .home-link:hover {
 	background-color: $teal_bck_color-3;
 }
 a {
 	color: $teal_font_dark;
+	text-decoration: none;
 }
 /*************************************** NEW CHECKBOX *******************************/
 .modern-checkbox {
