@@ -123,7 +123,7 @@ input[type="checkbox"] {
 }
 .label {
 	font-size: 14px;
-	color: $teal_font_dark;
+	color: $teal_font_light;
 }
 #checklist-container {
 	display: flex;
@@ -143,11 +143,7 @@ input[type="checkbox"] {
 	//grid-template-rows: 1fr 1fr; /* Two rows inside the first column */
 	gap: 0.5rem;
 }
-.label,
-.description,
-.column2 {
-  /*padding: 0.5rem;*/
-}
+
 .home-link {
 	background-color: $teal_bck_color-2;
 	padding: 8px;
