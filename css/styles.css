@@ -18,7 +18,7 @@
 body {
   background-color: #97a1aa;
   color: #104042;
-  font-family: 'Merriweather', serif;
+  font-family: 'Roboto', serif;
   margin: 0;
   display: flex;
   justify-content: center;
@@ -33,9 +33,9 @@ h1 {
   text-align: center;
   margin-bottom: 20px;
 }
-.collapsible {
+.section-header, .game-list-item {
   background-color: #6AD6DC;
-  color: #104042;
+  color: #CEF2F3;
   padding: 15px;
   border: none;
   border-radius: 5px;
@@ -46,17 +46,17 @@ h1 {
   width: 100%;
   margin-bottom: 5px;
 }
-.collapsible:hover {
+.game-list-item:hover, .section-header:hover {
   background-color: #2FBFC6;
 }
 .section {
   padding: 10px;
+  color: #CEF2F3;
   background-color: #1F7F84;
   border: 1px solid #104042;
   border-radius: 5px;
   margin-bottom: 10px;
   display: none;
-  color: #CEF2F3;
   /* Hidden by default */
 }
 .grid-item-2-row {
@@ -108,21 +108,19 @@ input[type="checkbox"] {
 }
 .home-link {
   background-color: #6AD6DC;
-  color: #104042;
   padding: 8px;
   border: none;
   border-radius: 5px;
   outline: none;
-  font-size: 10px;
   cursor: pointer;
-  width: 30px;
+  width: fit-content;
   margin-bottom: 15px;
   height: 15px;
 }
 .home-link:hover {
   background-color: #2FBFC6;
 }
-.linkText {
+a {
   color: #104042;
-  font-size: 10px;
 }
+
