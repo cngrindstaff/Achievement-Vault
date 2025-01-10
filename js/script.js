@@ -41,7 +41,7 @@ function generateChecklist(rows) {
 		
         const sectionContent = $('<div class="section"></div>');
         const sectionHeader = $('<div class="section-header"></div>');
-        const sectionHeaderText = $('<span="section-header-text"></div>').text(`${sectionTitle} (0%)`);
+        const sectionHeaderText = $('<span class="section-header-text"></div>').text(`${sectionTitle} (0%)`);
         sectionHeader.append(sectionHeaderText);
         const sectionHeaderIcon = $('<span class="section-header-icon">▼</span>');
         sectionHeader.append(sectionHeaderIcon);
@@ -109,8 +109,8 @@ function generateChecklist(rows) {
 
         sectionContent.append(itemContainer);
         const sectionPercentage = (100 / Object.keys(items).length).toFixed(2);
-        sectionHeader.attr('data-percentage', sectionPercentage);
-        sectionHeader.attr('data-section', sectionCount);
+        sectionHeaderText.attr('data-percentage', sectionPercentage);
+        sectionHeaderText.attr('data-section', sectionCount);
         container.append(sectionHeader);
         container.append(sectionContent);
 
@@ -143,14 +143,14 @@ function updateCompletion() {
 
 function updateSectionCompletion(sectionIndex) {
 	//console.log("updateSectionCompletion");
-    const sectionDiv = $(`.section-header[data-section="${sectionIndex}"]`);
+    const sectionHeaderTextDiv = $(`.section-header-text[data-section="${sectionIndex}"]`);
     const checkboxes = $(`input[data-section="${sectionIndex}"]`);
     const checkedCheckboxes = checkboxes.filter(':checked').length;
     const totalCheckboxes = checkboxes.length;
     const sectionCompletion = ((checkedCheckboxes / totalCheckboxes) * 100).toFixed(2);
     var lastIndex = sectionDiv.text().lastIndexOf(' ');
-    const sectionTitle = sectionDiv.text().substr(0, lastIndex);
-    sectionDiv.text(`${sectionTitle} (${sectionCompletion}%)`);
+    const sectionTitle = sectionHeaderTextDiv.text().substr(0, lastIndex);
+    sectionHeaderTextDiv.text(`${sectionTitle} (${sectionCompletion}%)`);
 }
 
 function updateTotalCompletion() {
