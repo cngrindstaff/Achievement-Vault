@@ -88,7 +88,7 @@ input[type="checkbox"] {
   margin: auto 5px auto auto;
 }
 .label {
-  font-size: 14px;
+  font-size: 16px;
   color: #CEF2F3;
 }
 #checklist-container {
@@ -102,7 +102,7 @@ input[type="checkbox"] {
   color: #104042;
 }
 .description {
-  font-size: 11px;
+  font-size: 12px;
 }
 .column1 {
   display: grid;
@@ -183,3 +183,7 @@ a {
   opacity: 1;
 }
 /*************************************** END NEW CHECKBOX *******************************/
+.section-header-icon {
+  font-size: 14px;
+  display: inline-block;
+}
