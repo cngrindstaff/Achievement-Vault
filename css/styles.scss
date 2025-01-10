@@ -1,4 +1,4 @@
-
+/* compile using https://www.cssportal.com/scss-to-css/ */
 @mixin createCorners($gradientColor){
 	background: 
 		linear-gradient(to right, $gradientColor 4px, transparent 4px) 0 0, 
@@ -76,7 +76,7 @@ h1 {
 .section-header, .game-list-item
  {
 	background-color: $teal_bck_color-2;
-	color: $teal_font_light;
+	color: $teal_font_dark;
 	padding: 15px;
 	border: none;
 	border-radius: 5px;
@@ -123,6 +123,7 @@ input[type="checkbox"] {
 }
 .label {
 	font-size: 14px;
+	color: $teal_font_dark;
 }
 #checklist-container {
 	display: flex;
