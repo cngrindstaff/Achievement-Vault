@@ -40,8 +40,13 @@ function generateChecklist(rows) {
 		}
 		
         const sectionContent = $('<div class="section"></div>');
-        const section = $('<div class="section-header"></div>').text(`${sectionTitle} (0%)`);
-        section.on('click', function() {
+        const sectionHeader = $('<div class="section-header"></div>');
+        const sectionHeaderText = $('<span="section-header-text"></div>').text(`${sectionTitle} (0%)`);
+        sectionHeader.append(sectionHeaderText);
+        const sectionHeaderIcon = $('<span class="section-header-icon">▼</span>');
+        sectionHeader.append(sectionHeaderIcon);
+
+        sectionHeader.on('click', function() {
             $(this).next('.section').toggle();
         });
 
@@ -104,9 +109,9 @@ function generateChecklist(rows) {
 
         sectionContent.append(itemContainer);
         const sectionPercentage = (100 / Object.keys(items).length).toFixed(2);
-        section.attr('data-percentage', sectionPercentage);
-        section.attr('data-section', sectionCount);
-        container.append(section);
+        sectionHeader.attr('data-percentage', sectionPercentage);
+        sectionHeader.attr('data-section', sectionCount);
+        container.append(sectionHeader);
         container.append(sectionContent);
 
         sectionCount++;
