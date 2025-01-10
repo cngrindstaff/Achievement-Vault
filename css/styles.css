@@ -49,9 +49,13 @@ h1 {
 }
 .section-header {
   justify-content: space-between;
+  display: flex;
 }
 .game-list-item:hover, .section-header:hover {
   background-color: #2FBFC6;
+}
+.section-header-text {
+  flex-grow: 1;
 }
 .section {
   padding: 10px;
