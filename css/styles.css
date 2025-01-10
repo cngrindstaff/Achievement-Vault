@@ -1,3 +1,4 @@
+/* compile using https://www.cssportal.com/scss-to-css/ */
 /******************************************* COLORS **********************************/
 .light-gray {
   color: #97a1aa;
@@ -35,7 +36,7 @@ h1 {
 }
 .section-header, .game-list-item {
   background-color: #6AD6DC;
-  color: #CEF2F3;
+  color: #104042;
   padding: 15px;
   border: none;
   border-radius: 5px;
@@ -85,6 +86,7 @@ input[type="checkbox"] {
 }
 .label {
   font-size: 14px;
+  color: #104042;
 }
 #checklist-container {
   display: flex;
@@ -123,4 +125,3 @@ input[type="checkbox"] {
 a {
   color: #104042;
 }
-
