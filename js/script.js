@@ -43,7 +43,7 @@ function generateChecklist(rows) {
         const sectionHeader = $('<div class="section-header"></div>');
         const sectionHeaderText = $('<span class="section-header-text"></div>').text(`${sectionTitle} (0%)`);
         sectionHeader.append(sectionHeaderText);
-        const sectionHeaderIcon = $('<span class="section-header-icon">▼</span>');
+        const sectionHeaderIcon = $('<span class="section-header-icon"><i class="fas fa-chevron-down"></i></span>');
         sectionHeader.append(sectionHeaderIcon);
 
         sectionHeader.on('click', function() {
