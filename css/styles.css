@@ -49,7 +49,7 @@ h1 {
   outline: none;
   font-size: 15px;
   cursor: pointer;
-  width: 100%;
+  /*width: 100%;*/ /*I don't know why, but if this is set to 100%, then the dropdown icon on the section headers ends up going past the 100% width area*/
   margin-bottom: 5px;
 }
 
