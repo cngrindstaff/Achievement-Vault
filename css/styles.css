@@ -164,7 +164,7 @@ a {
   display: none;
 }
 
-.modern-checkbox, .checkmark {
+.modern-checkbox .checkmark {
   width: 20px;
   height: 20px;
   background-color: #f0f0f0;
@@ -176,7 +176,7 @@ a {
 }
 
 /* Hover effect */
-.modern-checkbox:hover, .checkmark {
+.modern-checkbox:hover .checkmark {
   background-color: #e0e0e0;
   border-color: #888;
 }
