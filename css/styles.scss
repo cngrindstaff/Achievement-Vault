@@ -58,7 +58,7 @@ $teal_font_dark: #104042;
 body {
 	background-color: $light-gray;
 	color: $teal_font_dark;
-	font-family: 'Merriweather', serif;
+	font-family: 'Roboto', serif;
 	margin: 0;
 	display: flex;
 	justify-content: center;
@@ -73,9 +73,10 @@ h1 {
 	text-align: center;
 	margin-bottom: 20px;
 }
-.collapsible {
+.section-header, .game-list-item
+ {
 	background-color: $teal_bck_color-2;
-	color: $teal_font_dark;
+	color: $teal_font_light;
 	padding: 15px;
 	border: none;
 	border-radius: 5px;
@@ -86,11 +87,12 @@ h1 {
 	width: 100%;
 	margin-bottom: 5px;
 }
-.collapsible:hover {
+.game-list-item:hover, .section-header:hover {
 	background-color: $teal_bck_color-3;
 }
 .section {
 	padding: 10px;
+	color: $teal_font_light;
 	background-color: $teal_bck_color-5;
 	border: 1px solid $teal_font_dark; 
 	border-radius: 5px;
@@ -147,23 +149,18 @@ input[type="checkbox"] {
 }
 .home-link {
 	background-color: $teal_bck_color-2;
-	color: $teal_font_dark;
 	padding: 8px;
 	border: none;
 	border-radius: 5px;
 	outline: none;
-	font-size: 10px;
 	cursor: pointer;
-	width: 30px;
+	width: fit-content;
 	margin-bottom: 15px;
 	height: 15px;
 }
 .home-link:hover {
 	background-color: $teal_bck_color-3;
 }
-.linkText {
+a {
 	color: $teal_font_dark;
-	font-size: 10px;
-
 }
-

@@ -40,7 +40,7 @@ function generateChecklist(rows) {
 		}
 		
         const sectionContent = $('<div class="section"></div>');
-        const section = $('<button class="collapsible"></button>').text(`${sectionTitle} (0%)`);
+        const section = $('<button class="section-header"></button>').text(`${sectionTitle} (0%)`);
         section.on('click', function() {
             $(this).next('.section').toggle();
         });
@@ -152,7 +152,7 @@ function updateTotalCompletion() {
 	try
 	{
 		let totalCompletion = 0;
-		const sections = $('button.collapsible');
+		const sections = $('button.section-header');
 		const totalSections = sections.length;
 
 		sections.each(function() {
@@ -184,7 +184,7 @@ function initializeCheckboxes() {
 
 // Function to update all sections' completion percentages
 function updateAllSectionsCompletion() {
-    $('button.collapsible').each(function() {
+    $('button.section-header').each(function() {
         const sectionIndex = $(this).data('section');
         updateSectionCompletion(sectionIndex);
     });
