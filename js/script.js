@@ -14,7 +14,6 @@ $(document).ready(function() {
 function processWorkbook(workbook) {
     const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
     const rows = XLSX.utils.sheet_to_json(firstSheet, {header: 1});
-    //console.log('rows - ' + rows);
     generateChecklist(rows);
 }
 
@@ -32,9 +31,7 @@ function generateChecklist(rows) {
     sectionCount = 0;
 
     while (rows[0][sectionCount * 4] !== undefined) {
-        //console.log('rows[0][sectionCount * 4] - ' + rows[0][sectionCount * 4])
         const sectionTitle = rows[0][sectionCount * 4];
-        //console.log('sectionTitle - ' + sectionTitle)
 		if(sectionTitle == "undefined"){
 			break;
 		}
@@ -53,9 +50,7 @@ function generateChecklist(rows) {
         const items = {};
         for (let i = 1; i < rows.length; i++) {
             const itemName = rows[i][sectionCount * 4];
-			//console.log('itemName - ' + itemName);
 			const description = rows[i][sectionCount * 4 + 1]; //todo, make html safe
-			//console.log('description - ' + description);
             const numOfCheckboxes = rows[i][sectionCount * 4 + 2];
             const numAlreadyChecked = rows[i][sectionCount * 4 + 3];
             if(numAlreadyChecked === null) numAlreadyChecked = 0;
@@ -97,10 +92,8 @@ function generateChecklist(rows) {
                 else {
                     checkbox = $(`<label class="modern-checkbox" data-section="${sectionCount}" data-item="${index}" data-num="${j}"></label><input type="checkbox" class="checkbox-${sectionCount}-${index}-${j}" data-section="${sectionCount}" data-item="${index}" data-num="${j}"><span class="checkmark" data-section="${sectionCount}" data-item="${index}" data-num="${j}"></span>`);
                 }
-				//console.log('checkbox html - ' + checkbox);
                 checkbox.on('change', updateCompletion);
                 checkboxContainer.append(checkbox);
-           		//console.log('checkboxContainer html - ' + checkboxContainer);
 }
 
             gridItemDiv.append(column1LabelAndDescriptionDiv).append(checkboxContainer);
@@ -109,7 +102,6 @@ function generateChecklist(rows) {
 
         sectionContent.append(itemContainer);
         const sectionPercentage = (100 / Object.keys(items).length).toFixed(2);
-        console.log('sectionPercentage - ' + sectionPercentage);
         sectionHeaderText.attr('data-percentage', sectionPercentage);
         sectionHeaderText.attr('data-section', sectionCount);
         container.append(sectionHeader);
@@ -121,8 +113,6 @@ function generateChecklist(rows) {
 
 function updateCompletion() {
     const sectionIndex = $(this).data('section');
-    console.log('updateCompletion - sectionIndex - ' + sectionIndex);
-    console.log('updateCompletion - this - ' + JSON.stringify($(this)));
 
     const itemIndex = $(this).data('item');
     const checkboxNum = $(this).data('num');
@@ -146,7 +136,7 @@ function updateCompletion() {
 }
 
 function updateSectionCompletion(sectionIndex) {
-    console.log('updateSectionCompletion - sectionIndex - ' + sectionIndex);
+    //console.log('updateSectionCompletion - sectionIndex - ' + sectionIndex);
     const sectionHeaderTextDiv = $(`span.section-header-text[data-section="${sectionIndex}"]`);
     console.log('sectionHeaderTextDiv - ' + sectionHeaderTextDiv.text());
     const checkboxes = $(`input[data-section="${sectionIndex}"]`);
@@ -197,10 +187,10 @@ function initializeCheckboxes() {
 
 // Function to update all sections' completion percentages
 function updateAllSectionsCompletion() {
-    console.log('updateAllSectionsCompletion - made it here');
+    //og('updateAllSectionsCompletion - made it here');
     $('span.section-header-text').each(function() {
         const sectionIndex = $(this).data('section');
-        console.log('updateAllSectionsCompletion - sectionIndex - ' + sectionIndex);
+        //console.log('updateAllSectionsCompletion - sectionIndex - ' + sectionIndex);
         updateSectionCompletion(sectionIndex);
     });
 }
