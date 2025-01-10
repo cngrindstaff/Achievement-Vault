@@ -1,0 +1,169 @@
+
+@mixin createCorners($gradientColor){
+	background: 
+		linear-gradient(to right, $gradientColor 4px, transparent 4px) 0 0, 
+		linear-gradient(to right, $gradientColor 4px, transparent 4px) 0 100%,
+		linear-gradient(to left, $gradientColor 4px, transparent 4px) 100% 0,
+		linear-gradient(to left, $gradientColor 4px, transparent 4px) 100% 100%,
+		linear-gradient(to bottom, $gradientColor 4px, transparent 4px) 0 0,
+		linear-gradient(to bottom, $gradientColor 4px, transparent 4px) 100% 0,
+		linear-gradient(to top, $gradientColor 4px, transparent 4px) 0 100%,
+		linear-gradient(to top, $gradientColor 4px, transparent 4px) 100% 100%;
+	background-repeat: no-repeat;
+	background-size: 20px 20px;
+}
+
+
+@mixin createLinearGradient($direction, $start_color, $end_color) {
+	//background: $start_color;
+	background: linear-gradient($direction, $start_color 40%, $end_color 100%);
+}
+
+/******************************************* COLORS **********************************/
+$light_gray: #97a1aa;
+$dark_gray: #5e6870;
+
+.light-gray {
+  color: $light_gray;
+}
+
+.dark-gray {
+  color: $dark_gray;
+}
+
+/* https://coolors.co/9ce4e8-6ad6dc-2fbfc6-28a2a8-1f7f84 */
+/* Teal color scheme, light to dark */
+
+$teal_bck_color_1: #9CE4E8;
+$teal_bck_color_2: #6AD6DC;
+$teal_bck_color_3: #2FBFC6;
+$teal_bck_color_4: #28A2A8;
+$teal_bck_color_5: #1F7F84;
+$teal_bck_color_6: #175F63;
+$teal_font_light: #CEF2F3;
+$teal_font_medium: #238F95;
+$teal_font_dark: #104042;
+
+.teal-background-gradient{
+	@include createCorners($teal_bck_color_6);
+	@include createLinearGradient(45deg, $teal_bck_color_1, $teal_bck_color_3);
+
+}
+/******************************************* END COLORS **********************************/
+
+/*******************************************  ELEMENTS **********************************/
+
+
+
+body {
+	background-color: $light-gray;
+	color: $teal_font_dark;
+	font-family: 'Merriweather', serif;
+	margin: 0;
+	display: flex;
+	justify-content: center;
+	padding: 20px;
+}
+.container {
+	max-width: 700px;
+	width: 100%;
+}
+h1 {
+	color: $teal_font_dark;
+	text-align: center;
+	margin-bottom: 20px;
+}
+.collapsible {
+	background-color: $teal_bck_color-2;
+	color: $teal_font_dark;
+	padding: 15px;
+	border: none;
+	border-radius: 5px;
+	text-align: left;
+	outline: none;
+	font-size: 15px;
+	cursor: pointer;
+	width: 100%;
+	margin-bottom: 5px;
+}
+.collapsible:hover {
+	background-color: $teal_bck_color-3;
+}
+.section {
+	padding: 10px;
+	background-color: $teal_bck_color-5;
+	border: 1px solid $teal_font_dark; 
+	border-radius: 5px;
+	margin-bottom: 10px;
+	display: none; /* Hidden by default */
+}
+.grid-item-2-row {
+	display: grid;
+	grid-template-columns: 1fr auto; /* Two columns, second one adjusts automatically*/
+	grid-template-rows: auto auto; /* Adjust rows automatically */
+	margin-bottom: 5px;
+	gap: 15px;
+}
+.grid-item-1-row {
+	display: grid;
+	grid-template-columns: 1fr auto; /* Two columns, second one adjusts automatically*/
+	margin-bottom: 5px;
+	gap: 15px;
+}
+
+.grid-checkbox-container {
+	display: flex;
+	align-items: center;
+	gap: 5px;
+}
+input[type="checkbox"] {
+	margin: auto 5px auto auto;
+}
+.label {
+	font-size: 14px;
+}
+#checklist-container {
+	display: flex;
+	flex-direction: column;
+	gap: 10px;
+}
+#total-completion {
+	margin-bottom: 20px;
+	text-align: center;
+	color: $teal_font_dark;
+}
+.description {
+	font-size: 11px;
+}
+.column1 {
+	display: grid;
+	//grid-template-rows: 1fr 1fr; /* Two rows inside the first column */
+	gap: 0.5rem;
+}
+.label,
+.description,
+.column2 {
+  /*padding: 0.5rem;*/
+}
+.home-link {
+	background-color: $teal_bck_color-2;
+	color: $teal_font_dark;
+	padding: 8px;
+	border: none;
+	border-radius: 5px;
+	outline: none;
+	font-size: 10px;
+	cursor: pointer;
+	width: 30px;
+	margin-bottom: 15px;
+	height: 15px;
+}
+.home-link:hover {
+	background-color: $teal_bck_color-3;
+}
+.linkText {
+	color: $teal_font_dark;
+	font-size: 10px;
+
+}
+
