@@ -1,11 +1,12 @@
-/* compile using https://www.cssportal.com/scss-to-css/ */
 /******************************************* COLORS **********************************/
 .light-gray {
   color: #97a1aa;
 }
+
 .dark-gray {
   color: #5e6870;
 }
+
 /* https://coolors.co/9ce4e8-6ad6dc-2fbfc6-28a2a8-1f7f84 */
 /* Teal color scheme, light to dark */
 .teal-background-gradient {
@@ -14,26 +15,30 @@
   background-size: 20px 20px;
   background: linear-gradient(45deg, #9CE4E8 40%, #2FBFC6 100%);
 }
+
 /******************************************* END COLORS **********************************/
 /*******************************************  ELEMENTS **********************************/
 body {
   background-color: #97a1aa;
   color: #104042;
-  font-family: 'Roboto', serif;
+  font-family: "Roboto", serif;
   margin: 0;
   display: flex;
   justify-content: center;
   padding: 20px;
 }
+
 .container {
   max-width: 700px;
   width: 100%;
 }
+
 h1 {
   color: #104042;
   text-align: center;
   margin-bottom: 20px;
 }
+
 .section-header, .game-list-item {
   background-color: #6AD6DC;
   color: #104042;
@@ -47,16 +52,20 @@ h1 {
   width: 100%;
   margin-bottom: 5px;
 }
+
 .section-header {
   justify-content: space-between;
   display: flex;
 }
+
 .game-list-item:hover, .section-header:hover {
   background-color: #2FBFC6;
 }
+
 .section-header-text {
   flex-grow: 1;
 }
+
 .section {
   padding: 10px;
   color: #CEF2F3;
@@ -64,54 +73,59 @@ h1 {
   border: 1px solid #104042;
   border-radius: 5px;
   margin-bottom: 10px;
-  display: none;
-  /* Hidden by default */
+  display: none; /* Hidden by default */
 }
+
 .grid-item-2-row {
   display: grid;
-  grid-template-columns: 1fr auto;
-  /* Two columns, second one adjusts automatically*/
-  grid-template-rows: auto auto;
-  /* Adjust rows automatically */
+  grid-template-columns: 1fr auto; /* Two columns, second one adjusts automatically*/
+  grid-template-rows: auto auto; /* Adjust rows automatically */
   margin-bottom: 5px;
   gap: 15px;
 }
+
 .grid-item-1-row {
   display: grid;
-  grid-template-columns: 1fr auto;
-  /* Two columns, second one adjusts automatically*/
+  grid-template-columns: 1fr auto; /* Two columns, second one adjusts automatically*/
   margin-bottom: 5px;
   gap: 15px;
 }
+
 /*.grid-checkbox-container {
- display: flex;
- align-items: center;
- gap: 5px;
- }*/
-input[type="checkbox"] {
+	display: flex;
+	align-items: center;
+	gap: 5px;
+}*/
+input[type=checkbox] {
   margin: auto 5px auto auto;
 }
+
 .label {
   font-size: 16px;
   color: #CEF2F3;
 }
+
 #checklist-container {
   display: flex;
   flex-direction: column;
   gap: 10px;
 }
+
 #total-completion {
   margin-bottom: 20px;
   text-align: center;
   color: #104042;
 }
+
 .description {
   font-size: 12px;
 }
+
 .column1 {
   display: grid;
   gap: 0.5rem;
 }
+
 .home-link {
   background-color: #6AD6DC;
   padding: 8px;
@@ -122,18 +136,19 @@ input[type="checkbox"] {
   width: fit-content;
   margin-bottom: 15px;
   height: 15px;
-  display: flex;
-  /* Supports vertical centering */
-  align-items: center;
-  /* Supports vertical centering */
+  display: flex; /* Supports vertical centering */
+  align-items: center; /* Supports vertical centering */
 }
+
 .home-link:hover {
   background-color: #2FBFC6;
 }
+
 a {
   color: #104042;
   text-decoration: none;
 }
+
 /*************************************** NEW CHECKBOX *******************************/
 .modern-checkbox {
   display: flex;
@@ -143,34 +158,38 @@ a {
   /*font-size: 15px;*/
   margin: 8px 0;
 }
+
 /* Hide the native checkbox */
 .modern-checkbox input {
   display: none;
 }
+
 .modern-checkbox .checkmark {
   width: 20px;
   height: 20px;
   background-color: #f0f0f0;
   border: 2px solid #ccc;
-  border-radius: 4px;
-  /* Rounded corners for a modern look */
+  border-radius: 4px; /* Rounded corners for a modern look */
   margin-right: 10px;
   position: relative;
   transition: all 0.3s ease;
 }
+
 /* Hover effect */
 .modern-checkbox:hover .checkmark {
   background-color: #e0e0e0;
   border-color: #888;
 }
+
 /* Checked state */
 .modern-checkbox input:checked + .checkmark {
   background-color: #6AD6DC;
   border-color: #2FBFC6;
 }
+
 /* Checkmark icon */
 .modern-checkbox .checkmark::after {
-  content: '';
+  content: "";
   position: absolute;
   width: 6px;
   height: 12px;
@@ -182,12 +201,16 @@ a {
   opacity: 0;
   transition: opacity 0.3s ease;
 }
+
 /* Show checkmark when checked */
 .modern-checkbox input:checked + .checkmark::after {
   opacity: 1;
 }
+
 /*************************************** END NEW CHECKBOX *******************************/
 .section-header-icon {
   font-size: 14px;
   display: inline-block;
 }
+
+/*# sourceMappingURL=styles.css.map */
