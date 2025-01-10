@@ -81,16 +81,16 @@ function generateChecklist(rows) {
 				
 			}
 
-            const checkboxContainer = $('<div class="column2 checkbox-container"></div>');
+            const checkboxContainer = $('<div class="column2"></div>');
 
 
             for (let j = 1; j <= numOfCheckboxes; j++) {
                 let checkbox = "";
                 if(j <= numAlreadyChecked) {
-                    checkbox = $(`<input type="checkbox" class="checkbox-${sectionCount}-${index}-${j}" data-section="${sectionCount}" data-item="${index}" data-num="${j}" checked>`);
+                    checkbox = $(`<label class="modern-checkbox"><input type="checkbox" class="checkbox-${sectionCount}-${index}-${j}" data-section="${sectionCount}" data-item="${index}" data-num="${j}" checked><span class="checkmark"></span>`);
                 }
                 else {
-                    checkbox = $(`<input type="checkbox" class="checkbox-${sectionCount}-${index}-${j}" data-section="${sectionCount}" data-item="${index}" data-num="${j}">`);
+                    checkbox = $(`<label class="modern-checkbox"><input type="checkbox" class="checkbox-${sectionCount}-${index}-${j}" data-section="${sectionCount}" data-item="${index}" data-num="${j}"><span class="checkmark"></span>`);
                 }
 				//console.log('checkbox html - ' + checkbox);
                 checkbox.on('change', updateCompletion);
