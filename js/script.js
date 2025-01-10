@@ -197,7 +197,7 @@ function initializeCheckboxes() {
 
 // Function to update all sections' completion percentages
 function updateAllSectionsCompletion() {
-    $('div.section-header').each(function() {
+    $('div.section-header-text').each(function() {
         const sectionIndex = $(this).data('section');
         updateSectionCompletion(sectionIndex);
     });
