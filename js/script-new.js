@@ -1,6 +1,6 @@
 $(document).ready(function() {
     //set this to "true" when running locally, so the correct paths are retrieved
-    var isRunningLocally = true;
+    var isRunningLocally = false;
 
     //set the title field that's in the head, from the game's HTML
     const titleElement = document.querySelector('title');
