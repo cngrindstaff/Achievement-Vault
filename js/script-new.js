@@ -6,11 +6,11 @@ $(document).ready(function() {
     const titleElement = document.querySelector('title');
     titleElement.textContent = gameNameFriendly + ' 100% Completion Checklist';
     
-    var file = '/games/' + gameName + '/' + gameName + '_data.xlsx';
+    var file = '/Achievement-Vault/games/' + gameName + '/' + gameName + '_data.xlsx';
     var linkToHomePage = '../../';
     if(isRunningLocally) 
     {
-        file = 'http://localhost:8080' + file;
+        file = 'http://localhost:8080/games/' + gameName + '/' + gameName + '_data.xlsx';
         linkToHomePage = '../../index.html';
     }
     //console.log('file: ' + file);
