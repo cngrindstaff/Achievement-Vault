@@ -1,5 +1,7 @@
 $(document).ready(function() {
-	var file = 'data.xlsx';
+    //var file = '/games/' + 'gameName}' + data.xlsx'
+    var file = 'http://localhost:8080/games/' + gameName + '/data.xlsx';
+    console.log('file: ' + file); 
     fetch(file).then(response => response.arrayBuffer()).then(data => {
         const workbook = XLSX.read(data, {type: 'array'});
         processWorkbook(workbook);
