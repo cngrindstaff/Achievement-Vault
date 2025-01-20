@@ -151,7 +151,7 @@ input[type="checkbox"] {
 }
 
 .home-link {
-	background-color: $teal_bck_color-2;
+	//background-color: $teal_bck_color-2;
 	padding: 8px;
 	border: none;
 	border-radius: 5px;
@@ -231,4 +231,8 @@ a {
 .section-header-icon { 
 	font-size: 14px;
 	display: inline-block; 
+}
+
+.fa-house {
+	color: $teal_bck_color_2;
 }
