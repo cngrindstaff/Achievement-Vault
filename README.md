@@ -18,9 +18,14 @@ npm install http-server
 ```
 Navigate to your project directory and run:
 ```
-npm install http-server --cors
+npm install http-server
 ```
 *By default, `http-server` doesn’t enable CORS headers. You need to explicitly allow them by running the server with the `--cors` flag*
+
+Run with 
+```
+http-server --cors
+```
 Access your files at `http://localhost:8080`
 
 
