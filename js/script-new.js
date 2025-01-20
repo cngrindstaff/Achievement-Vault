@@ -152,8 +152,8 @@ function updateSectionCompletion(sectionIndex) {
     const checkboxes = $(`input[data-section="${sectionIndex}"]`);
     const checkedCheckboxes = checkboxes.filter(':checked').length;
     const totalCheckboxes = checkboxes.length;
-    const sectionCompletion = ((checkedCheckboxes / totalCheckboxes) * 100).toFixed(2);
-
+    const sectionCompletion = checkedCheckboxes + '/' + totalCheckboxes;
+    const sectionCompletionPercent = ((checkedCheckboxes / totalCheckboxes) * 100).toFixed(2);
     var sectionHeaderText = sectionHeaderTextDiv.text();
     if(sectionHeaderText.endsWith(" ")){
         console.log('trimming end space')
@@ -161,20 +161,35 @@ function updateSectionCompletion(sectionIndex) {
     }    
     var lastIndex = sectionHeaderText.lastIndexOf(' ');
     const sectionTitle = sectionHeaderText.substr(0, lastIndex);
-    sectionHeaderTextDiv.text(`${sectionTitle} (${sectionCompletion}%)`);
+    sectionHeaderTextDiv.text(`${sectionTitle} (${sectionCompletion}) (${sectionCompletionPercent}%)`);
+    
+    //get the header, add the # of checkboxes for that section
+    const sectionHeaderDiv = $(`div.section-header[data-section="${sectionIndex}"]`);
+    sectionHeaderDiv.attr("data-checkedCheckboxes",checkedCheckboxes);
+    sectionHeaderDiv.attr("data-totalCheckboxes",totalCheckboxes);
+
 }
 
 function updateTotalCompletion() {
     try {
-        let totalCompletion = 0;
+        let totalCompletionPercent = 0;
+        var totalCompletionText = '';
         const sections = $('div.section-header');
         const totalSections = sections.length;
 
+        var totalCheckedCheckboxes = 0;
+        var totalCheckboxes = 0;
         sections.each(function() {
-            const sectionCompletion = parseFloat($(this).text().match(/\(([^)]+)%\)/)[1]);
-            totalCompletion += sectionCompletion / totalSections;
+            //const sectionCompletion = parseFloat($(this).text().match(/\(([^)]+)%\)/)[1]); //this gets the percentage from the header, ex: 58.47%
+            const sectionCheckedCheckboxesInt = parseInt($(this).data('checkedcheckboxes'));
+            const sectionTotalCheckboxesInt = parseInt($(this).data('totalcheckboxes'));
+
+            totalCheckedCheckboxes = totalCheckedCheckboxes + sectionCheckedCheckboxesInt;
+            totalCheckboxes = totalCheckboxes + sectionTotalCheckboxesInt;
         });
-        $('#total-completion').text(`Total Completion: ${totalCompletion.toFixed(2)}%`);
+        totalCompletionText = totalCheckedCheckboxes + '/' + totalCheckboxes;
+        totalCompletionPercent = ((totalCheckedCheckboxes / totalCheckboxes) * 100).toFixed(2);
+        $('#total-completion').text(`Total Completion: (${totalCompletionText}) ${totalCompletionPercent}%`);
     } catch (error) {
         console.error(error);
         $('#total-completion').text(`Total Completion: 0.00%`);
@@ -193,6 +208,15 @@ function initializeCheckboxes() {
     });
 }
 
+//log all attributes of an element.
+function logAllAttributes(thisElement){
+    const attributes = {};
+    $.each(thisElement[0].attributes, function() {
+        attributes[this.name] = this.value;
+    });
+    console.log('attributes');
+    console.log(attributes);
+}
 function updateAllSectionsCompletion() {
     $('span.section-header-text').each(function() {
         const sectionIndex = $(this).data('section');
