@@ -1,7 +1,7 @@
 
 # Achievement Vault
-This program achievements in video games. 
-Supports multiple games. Just add a new folder, html file, and excel sheet, then add a link to it on the main page.
+This program allows you to achievements in video games. 
+It supports multiple games. Just add a new folder, html file, and excel sheet, then add a link to it on the main page.
 
 ## How it works
 You can have an excel file for each game. In it, list the achievements (and descriptions if you want). 
