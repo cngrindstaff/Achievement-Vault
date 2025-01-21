@@ -1,9 +1,15 @@
 
 # Achievement Vault
+Tracks achievements in video games. 
 
+## How it works
+You can have an excel file for each game. In it, list the achievements (and descriptions if you want). 
+Achievements/trackable items can be separated into sections. Each section will expand into a different area 
+on the page, for organization's sake. As items are checked off, they will be stored in local storage. To prevent loss 
+of data, the excel file is also set up to support having items already marked as checked. 
+For trackable items that have degrees, more than one checkbox can be added per item. For example, the Keepsakes items in 
+Hades increase in level up to 3 times, so for each of these, there are 3 checkboxes next to the item. 
 
-
-Initially based on [this](https://github.com/jcguigue/HadesCompletion), but highly modified to support multiple games, changes in excel, and more.
 
 
 
