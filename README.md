@@ -1,6 +1,6 @@
 
 # Achievement Vault
-This program allows you to achievements in video games. 
+This program allows you to track achievements in video games. 
 It supports multiple games. Just add a new folder, html file, and excel sheet, then add a link to it on the main page.
 
 ## How it works
