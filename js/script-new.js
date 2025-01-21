@@ -1,6 +1,10 @@
 $(document).ready(function() {
-    //set this to "true" when running locally, so the correct paths are retrieved
+    //Paths are different when running locally. Check if it's local by whether or not it's loaded with a "file" path
     var isRunningLocally = false;
+    if(location.href.startsWith('file:')){
+        //alert("It's a local server!");
+        isRunningLocally = true;
+    }
 
     //set the title field that's in the head, from the game's HTML
     const titleElement = document.querySelector('title');
@@ -85,7 +89,10 @@ function generateChecklist(rows) {
                     </div>
                 </div>
             `;
+            //console.log('made it here - after calling generateCheckboxes');
             sectionContent.append(itemTemplate);
+            // Attach the event listener to the checkboxes within the newly appended content
+            sectionContent.find(`input[type="checkbox"][data-section="${sectionIndex}"]`).on('change', updateCompletion);
         });
 
         // Add toggle functionality to section header
@@ -111,42 +118,60 @@ function extractItems(rows, sectionIndex) {
 
 // Helper function to generate checkboxes
 function generateCheckboxes(sectionIndex, itemIndex, total, checked) {
-    let checkboxes = '';
+    const checkboxes = [];
     for (let i = 1; i <= total; i++) {
         const isChecked = i <= checked ? 'checked' : '';
-        checkboxes += `
+        checkboxes.push(`
             <input type="checkbox" 
                 class="checkbox-${sectionIndex}-${itemIndex}-${i}" 
                 data-section="${sectionIndex}" 
                 data-item="${itemIndex}" 
                 data-num="${i}" 
                 ${isChecked}>
-        `;
+        `);
     }
-    return checkboxes;
+    return checkboxes.join('');
 }
 
 function updateCompletion() {
+    console.log('updatecompletion - made it here');
     const sectionIndex = $(this).data('section');
     const itemIndex = $(this).data('item');
     const checkboxNum = $(this).data('num');
-
+    //console.log("updateCompletion called - sectionIndex " + sectionIndex + "itemIndex " + itemIndex + "checkboxNum " + checkboxNum)
     if ($(this).is(':checked')) {
+        //console.log('this item is checked');
         for (let i = 1; i <= checkboxNum; i++) {
             $(`.checkbox-${sectionIndex}-${itemIndex}-${i}`).prop('checked', true);
-            localStorage.setItem(`checkbox-${sectionIndex}-${itemIndex}-${i}`, 'checked');
+            localStorage.setItem(`${gameName}-checkbox-${sectionIndex}-${itemIndex}-${i}`, 'checked');
+            //console.log('checked item in local storage');
         }
     } else {
+        //console.log('this item is not checked');
         for (let i = checkboxNum; i <= $(`input[data-section="${sectionIndex}"][data-item="${itemIndex}"]`).length; i++) {
             $(`.checkbox-${sectionIndex}-${itemIndex}-${i}`).prop('checked', false);
-            localStorage.removeItem(`checkbox-${sectionIndex}-${itemIndex}-${i}`);
+            localStorage.removeItem(`${gameName}-checkbox-${sectionIndex}-${itemIndex}-${i}`);
+            //console.log('removed item from local storage');
         }
     }
 
     updateSectionCompletion(sectionIndex);
     updateTotalCompletion();
 }
-
+function trimBeforeParenthesis(str) {
+    const index = str.indexOf('('); // Find the first index of '('
+    if (index === -1) {
+        return str; // Return the original string if '(' is not found
+    }
+    return str.substring(0, index).trim(); // Trim and return everything before '('
+}
+function removeTrailingSpace (str){
+    if(str.endsWith(" ")){
+        console.log('trimming end space')
+        str = str.trimEnd();
+    }
+    return str;
+}
 function updateSectionCompletion(sectionIndex) {
     const sectionHeaderTextDiv = $(`span.section-header-text[data-section="${sectionIndex}"]`);
     const checkboxes = $(`input[data-section="${sectionIndex}"]`);
@@ -155,37 +180,45 @@ function updateSectionCompletion(sectionIndex) {
     const sectionCompletion = checkedCheckboxes + '/' + totalCheckboxes;
     const sectionCompletionPercent = ((checkedCheckboxes / totalCheckboxes) * 100).toFixed(2);
     var sectionHeaderText = sectionHeaderTextDiv.text();
-    if(sectionHeaderText.endsWith(" ")){
-        console.log('trimming end space')
-        sectionHeaderText = sectionHeaderText.trimEnd();
-    }    
-    var lastIndex = sectionHeaderText.lastIndexOf(' ');
-    const sectionTitle = sectionHeaderText.substr(0, lastIndex);
+    sectionTitle = trimBeforeParenthesis(sectionHeaderText);
+    sectionTitle = removeTrailingSpace(sectionTitle);
+    
+    //var lastIndex = sectionHeaderText.lastIndexOf(' ');
+    //const sectionTitle = sectionHeaderText.substr(0, lastIndex);
     sectionHeaderTextDiv.text(`${sectionTitle} (${sectionCompletion}) (${sectionCompletionPercent}%)`);
     
     //get the header, add the # of checkboxes for that section
     const sectionHeaderDiv = $(`div.section-header[data-section="${sectionIndex}"]`);
-    sectionHeaderDiv.attr("data-checkedCheckboxes",checkedCheckboxes);
-    sectionHeaderDiv.attr("data-totalCheckboxes",totalCheckboxes);
+    sectionHeaderDiv.attr("checked-checkboxes",checkedCheckboxes);
+    sectionHeaderDiv.attr("total-checkboxes",totalCheckboxes);
 
 }
 
 function updateTotalCompletion() {
     try {
+        //console.log('updateTotalCompletion - made it here')
         let totalCompletionPercent = 0;
         var totalCompletionText = '';
         const sections = $('div.section-header');
         const totalSections = sections.length;
+        //console.log('updateTotalCompletion - totalSections ' + totalSections)
 
         var totalCheckedCheckboxes = 0;
         var totalCheckboxes = 0;
         sections.each(function() {
             //const sectionCompletion = parseFloat($(this).text().match(/\(([^)]+)%\)/)[1]); //this gets the percentage from the header, ex: 58.47%
-            const sectionCheckedCheckboxesInt = parseInt($(this).data('checkedcheckboxes'));
-            const sectionTotalCheckboxesInt = parseInt($(this).data('totalcheckboxes'));
+            var thisSectionTitle = $(this).text();
+            //logAllAttributes($(this));
+            //console.log('updateTotalCompletion sectiontitle ' + thisSectionTitle);
+            var sectionCheckedCheckboxesInt = parseInt($(this).attr('checked-checkboxes'));
+            var sectionTotalCheckboxesInt = parseInt($(this).attr('total-checkboxes'));
+            //console.log('sectionCheckedCheckboxesInt ' + sectionCheckedCheckboxesInt);
+            //console.log('sectionTotalCheckboxesInt ' + sectionTotalCheckboxesInt);
 
             totalCheckedCheckboxes = totalCheckedCheckboxes + sectionCheckedCheckboxesInt;
             totalCheckboxes = totalCheckboxes + sectionTotalCheckboxesInt;
+            //console.log('totalCheckedCheckboxes ' + totalCheckedCheckboxes);
+            //console.log('totalCheckboxes ' + totalCheckboxes);
         });
         totalCompletionText = totalCheckedCheckboxes + '/' + totalCheckboxes;
         totalCompletionPercent = ((totalCheckedCheckboxes / totalCheckboxes) * 100).toFixed(2);
@@ -202,7 +235,7 @@ function initializeCheckboxes() {
         const itemIndex = $(this).data('item');
         const checkboxNum = $(this).data('num');
 
-        if (localStorage.getItem(`checkbox-${sectionIndex}-${itemIndex}-${checkboxNum}`) === 'checked') {
+        if (localStorage.getItem(`${gameName}-checkbox-${sectionIndex}-${itemIndex}-${checkboxNum}`) === 'checked') {
             $(this).prop('checked', true);
         }
     });
