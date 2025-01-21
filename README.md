@@ -1,6 +1,7 @@
 
 # Achievement Vault
-Tracks achievements in video games. 
+This program achievements in video games. 
+Supports multiple games. Just add a new folder, html file, and excel sheet, then add a link to it on the main page.
 
 ## How it works
 You can have an excel file for each game. In it, list the achievements (and descriptions if you want). 
@@ -45,4 +46,4 @@ Auto-compile SASS to CSS using a [FileWatch in Jetbrains]( https://www.jetbrains
 If sass isn't installed, run
 ```npm install -g sass```
 
-Bug: Must set FileWatch Scope to "Current File". [Fix ](https://youtrack.jetbrains.com/issue/RIDER-55683/Unknown-scope-sign-for-Project-scope-in-SCSS-new-file-watcher)
+Bug: Must set FileWatch Scope to "Current File". [Bug info](https://youtrack.jetbrains.com/issue/RIDER-55683/Unknown-scope-sign-for-Project-scope-in-SCSS-new-file-watcher)
