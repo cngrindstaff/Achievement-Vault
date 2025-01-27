@@ -21,18 +21,14 @@ Install node.js
 
 Install http-server (use command line/bash):
 ```
-npm install http-server
+npm install -g http-server
 ```
 Navigate to your project directory and run:
 ```
-npm install http-server
+http-server --cors
 ```
 *By default, `http-server` doesn’t enable CORS headers. You need to explicitly allow them by running the server with the `--cors` flag*
 
-Run with 
-```
-http-server --cors
-```
 Access your files at `http://localhost:8080`
 
 
