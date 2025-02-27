@@ -10,7 +10,7 @@ $(document).ready(function() {
     const titleElement = document.querySelector('title');
     titleElement.textContent = gameNameFriendly + ' 100% Completion Checklist';
     
-    var file = '/Achievement-Vault/games/' + gameName + '/' + gameName + '_data.xlsx';
+    var file = '/games/' + gameName + '/' + gameName + '_data.xlsx';
     var linkToHomePage = '../../';
     if(isRunningLocally) 
     {
