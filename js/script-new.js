@@ -1,3 +1,5 @@
+var sendGridUrl = '/js/send-email';
+
 $(document).ready(function() {
     //Paths are different when running locally. Check if it's local by whether or not it's loaded with a "file" path
     var isRunningLocally = false;
@@ -16,8 +18,9 @@ $(document).ready(function() {
     {
         file = 'http://localhost:8080/games/' + gameName + '/' + gameName + '_data.xlsx';
         linkToHomePage = '../../index.html';
+        sendGridUrl = 'http://localhost:3000/send-email'
     }
-    //console.log('file: ' + file);
+    console.log('sendGridUrl: ' + sendGridUrl);
 
 
 
@@ -26,7 +29,8 @@ $(document).ready(function() {
     const containerParent = $('#grid-checklist-container').parent();
     containerParent.prepend('<p id="total-completion">Total Completion: 0%</p>');
     containerParent.prepend('<h1>' + gameNameFriendly + ' 100% Completion Checklist</h1>');
-    containerParent.prepend('<div class="home-link"><a href="' + linkToHomePage + '" class="home-link-text"><i class="fa-solid fa-house fa-lg"></i></a></div>');
+    containerParent.prepend('<div class="home-link"><a href="' + linkToHomePage + '" class="home-link-text"><i class="fa-solid fa-house fa-lg" ></i></a></div>');
+    //containerParent.prepend('<div class="home-link"><i class="fa-solid fa-house fa-lg" onclick="sendEmail(\'test\',\'added\',)"></i></div>');
 
     fetch(file).then(response => response.arrayBuffer()).then(data => {
         const workbook = XLSX.read(data, {type: 'array'});
@@ -37,7 +41,56 @@ $(document).ready(function() {
     }).catch(error => {
         console.error('Error fetching the Excel file:', error);
     });
+    
+    //https://chatgpt.com/share/67c0f24e-db90-8004-be01-0dec495fc388
+    // 🔥 This line prevents multiple event bindings by using event delegation
+    //Previously, I was using Direct Binding, and every time new elements were added dynamically (i.e., checkboxes were added inside generateChecklist), the listener got 
+    //reattached.
+    //This line changes from Direct Binding to Event Delegation. 
+    //The event is attached to the parent element, and the event is delegated to the children.
+    //It needs to be inside the document ready function, so it's only called once. And it needs to happen after generateChecklist() is defined, but before any 
+    //checkboxes are clicked.
+    $('#grid-checklist-container').on('change', 'input[type="checkbox"]', updateCompletion);
+
 });
+
+async function sendEmail(thisSubject, thisText) {
+    try {
+        console.log('sendGridUrl: ' + sendGridUrl);
+        const response = await fetch(sendGridUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                subject: thisSubject,
+                text: thisText
+            })
+        });
+
+        const data = await response.json();
+        console.log("Response:", data);
+    } catch (error) {
+        console.error("Error:", error);
+    }
+}
+
+/*async function sendEmail2(addedOrRemoved, thisSection, thisItem) {
+    try {
+        console.log('sendGridUrl: ' + sendGridUrl);
+        const response = await fetch(sendGridUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                subject: 'Record updated',
+                text: `Record ${addedOrRemoved} for Game ${gameNameFriendly}, Section ${thisSection}, Item ${thisItem}`
+            })
+        });
+
+        const data = await response.json();
+        console.log("Response:", data);
+    } catch (error) {
+        console.error("Error:", error);
+    }
+}*/
 
 function processWorkbook(workbook) {
     const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
@@ -91,14 +144,18 @@ function generateChecklist(rows) {
             `;
             //console.log('made it here - after calling generateCheckboxes');
             sectionContent.append(itemTemplate);
+            
+            //THIS IS THE OLD METHOD! See the comment regarding Event Delegation in the document.ready for more information.    
             // Attach the event listener to the checkboxes within the newly appended content
-            sectionContent.find(`input[type="checkbox"][data-section="${sectionIndex}"]`).on('change', updateCompletion);
+            //sectionContent.find(`input[type="checkbox"][data-section="${sectionIndex}"]`).on('change', updateCompletion);
         });
 
         // Add toggle functionality to section header
         $(`.section-header[data-section="${sectionIndex}"]`).on('click', function () {
             $(this).next('.section').toggle();
         });
+        
+        
     }
 }
 
@@ -138,14 +195,29 @@ function updateCompletion() {
     const sectionIndex = $(this).data('section');
     const itemIndex = $(this).data('item');
     const checkboxNum = $(this).data('num');
-    //console.log("updateCompletion called - sectionIndex " + sectionIndex + "itemIndex " + itemIndex + "checkboxNum " + checkboxNum)
+    
+    
+    console.log("updateCompletion called - sectionIndex " + sectionIndex + "itemIndex " + itemIndex + "checkboxNum " + checkboxNum)
+
+    // 1️⃣ Get the text inside the parent "section-header-text" element
+    const sectionHeaderText = $(`span.section-header-text[data-section="${sectionIndex}"]`).text().trim();
+    console.log("Section Header Text:", sectionHeaderText);
+
+    // 2️⃣ Get the text inside the sibling element's label
+    const labelText = $(this).closest('.grid-item-2-row, .grid-item-1-row').find('.label').text().trim();
+    console.log("Label Text:", labelText);
+    
+    let action = ''; // Will be either "added" or "removed"
+    
+    
     if ($(this).is(':checked')) {
         //console.log('this item is checked');
         for (let i = 1; i <= checkboxNum; i++) {
             $(`.checkbox-${sectionIndex}-${itemIndex}-${i}`).prop('checked', true);
             localStorage.setItem(`${gameName}-checkbox-${sectionIndex}-${itemIndex}-${i}`, 'checked');
-            //console.log('checked item in local storage');
+            console.log('checked item in local storage');
         }
+        action = 'added';
     } else {
         //console.log('this item is not checked');
         for (let i = checkboxNum; i <= $(`input[data-section="${sectionIndex}"][data-item="${itemIndex}"]`).length; i++) {
@@ -153,6 +225,15 @@ function updateCompletion() {
             localStorage.removeItem(`${gameName}-checkbox-${sectionIndex}-${itemIndex}-${i}`);
             //console.log('removed item from local storage');
         }
+        action = 'removed';
+    }
+
+    var subject = `Record updated for ${gameNameFriendly}`
+    var emailText = `A record was ${action} for ${gameNameFriendly}.\nSection: ${sectionHeaderText}\nItem: ${labelText}`
+
+    // Call sendEmail function after updating localStorage
+    if (action) {
+        sendEmail(subject, emailText);
     }
 
     updateSectionCompletion(sectionIndex);
