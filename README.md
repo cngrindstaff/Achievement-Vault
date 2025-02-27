@@ -51,6 +51,8 @@ digital ocean > Settings > Components > Commands > Build Command > npm install
 
 Digital Ocean needs an Output Directory. It atomatically scans for _static, dist, public, and build. Because there is no build process for this, we need to define it as "/". This is in the same place as the Command from above
 
-sendgrid api key 
-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
+sender email
+chelseagrindstaff+av@gmail.com
+
+
 

@@ -40,7 +40,7 @@ $(document).ready(function() {
 });
 
 const sgMail = require('@sendgrid/mail');
-sgMail.setApiKey("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");
+sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
 function sendEmail(addedOrRemoved, assetUpdated) {
     var msg = {
