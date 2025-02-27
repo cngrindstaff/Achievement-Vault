@@ -1,3 +1,5 @@
+var sendGridUrl = '/js/send-email';
+
 $(document).ready(function() {
     //Paths are different when running locally. Check if it's local by whether or not it's loaded with a "file" path
     var isRunningLocally = false;
@@ -16,8 +18,9 @@ $(document).ready(function() {
     {
         file = 'http://localhost:8080/games/' + gameName + '/' + gameName + '_data.xlsx';
         linkToHomePage = '../../index.html';
+        sendGridUrl = 'http://localhost:3000/send-email'
     }
-    //console.log('file: ' + file);
+    console.log('sendGridUrl: ' + sendGridUrl);
 
 
 
@@ -26,7 +29,8 @@ $(document).ready(function() {
     const containerParent = $('#grid-checklist-container').parent();
     containerParent.prepend('<p id="total-completion">Total Completion: 0%</p>');
     containerParent.prepend('<h1>' + gameNameFriendly + ' 100% Completion Checklist</h1>');
-    containerParent.prepend('<div class="home-link"><a href="' + linkToHomePage + '" class="home-link-text"><i class="fa-solid fa-house fa-lg" onclick="sendEmail(\'test\',\'added\',)"></i></a></div>');
+    containerParent.prepend('<div class="home-link"><a href="' + linkToHomePage + '" class="home-link-text"><i class="fa-solid fa-house fa-lg" ></i></a></div>');
+    //containerParent.prepend('<div class="home-link"><i class="fa-solid fa-house fa-lg" onclick="sendEmail(\'test\',\'added\',)"></i></div>');
 
     fetch(file).then(response => response.arrayBuffer()).then(data => {
         const workbook = XLSX.read(data, {type: 'array'});
@@ -39,27 +43,27 @@ $(document).ready(function() {
     });
 });
 
-const sgMail = require('@sendgrid/mail');
-sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
-function sendEmail(addedOrRemoved, assetUpdated) {
-    var msg = {
-        to: 'chelseagrindstaff+av@gmail.com',
-        from: 'chelseagrindstaff+av@gmail.com',
-        subject: 'Record updated',
-        text: 'Record ' + addedOrRemoved + ' for ' + assetUpdated,
-        //html: '<h1>HTML body</h1>',
-    };
 
-    sgMail
-        .send(msg)
-        .then(() => {
-            console.log('Email sent successfully');
-        })
-        .catch((error) => {
-            console.error('Error sending email:', error);
+async function sendEmail(addedOrRemoved, assetUpdated) {
+    try {
+        console.log('sendGridUrl: ' + sendGridUrl);
+        const response = await fetch(sendGridUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                subject: 'Record updated',
+                text: `Record ${addedOrRemoved} for ${assetUpdated}`
+            })
         });
+
+        const data = await response.json();
+        console.log("Response:", data);
+    } catch (error) {
+        console.error("Error:", error);
+    }
 }
+
 function processWorkbook(workbook) {
     const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
     const rows = XLSX.utils.sheet_to_json(firstSheet, {header: 1});
@@ -159,13 +163,13 @@ function updateCompletion() {
     const sectionIndex = $(this).data('section');
     const itemIndex = $(this).data('item');
     const checkboxNum = $(this).data('num');
-    //console.log("updateCompletion called - sectionIndex " + sectionIndex + "itemIndex " + itemIndex + "checkboxNum " + checkboxNum)
+    console.log("updateCompletion called - sectionIndex " + sectionIndex + "itemIndex " + itemIndex + "checkboxNum " + checkboxNum)
     if ($(this).is(':checked')) {
         //console.log('this item is checked');
         for (let i = 1; i <= checkboxNum; i++) {
             $(`.checkbox-${sectionIndex}-${itemIndex}-${i}`).prop('checked', true);
             localStorage.setItem(`${gameName}-checkbox-${sectionIndex}-${itemIndex}-${i}`, 'checked');
-            //console.log('checked item in local storage');
+            console.log('checked item in local storage');
         }
     } else {
         //console.log('this item is not checked');

@@ -1,5 +1,18 @@
 {
   "dependencies": {
-    "@sendgrid/mail": "^8.1.4"
-  }
+    "@sendgrid/mail": "^8.1.4",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2"
+  },
+  "name": "achievement-vault",
+  "version": "1.0.0",
+  "description": "This program allows you to track achievements in video games. \r It supports multiple games. Just add a new folder, html file, and excel sheet, then add a link to it on the main page.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
 }
