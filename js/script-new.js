@@ -26,7 +26,7 @@ $(document).ready(function() {
     const containerParent = $('#grid-checklist-container').parent();
     containerParent.prepend('<p id="total-completion">Total Completion: 0%</p>');
     containerParent.prepend('<h1>' + gameNameFriendly + ' 100% Completion Checklist</h1>');
-    containerParent.prepend('<div class="home-link"><a href="' + linkToHomePage + '" class="home-link-text"><i class="fa-solid fa-house fa-lg"></i></a></div>');
+    containerParent.prepend('<div class="home-link"><a href="' + linkToHomePage + '" class="home-link-text"><i class="fa-solid fa-house fa-lg" onclick="sendEmail(\'test\',\'added\',)"></i></a></div>');
 
     fetch(file).then(response => response.arrayBuffer()).then(data => {
         const workbook = XLSX.read(data, {type: 'array'});
@@ -39,6 +39,27 @@ $(document).ready(function() {
     });
 });
 
+const sgMail = require('@sendgrid/mail');
+sgMail.setApiKey("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");
+
+function sendEmail(addedOrRemoved, assetUpdated) {
+    var msg = {
+        to: 'chelseagrindstaff+av@gmail.com',
+        from: 'chelseagrindstaff+av@gmail.com',
+        subject: 'Record updated',
+        text: 'Record ' + addedOrRemoved + ' for ' + assetUpdated,
+        //html: '<h1>HTML body</h1>',
+    };
+
+    sgMail
+        .send(msg)
+        .then(() => {
+            console.log('Email sent successfully');
+        })
+        .catch((error) => {
+            console.error('Error sending email:', error);
+        });
+}
 function processWorkbook(workbook) {
     const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
     const rows = XLSX.utils.sheet_to_json(firstSheet, {header: 1});

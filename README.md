@@ -43,3 +43,14 @@ If sass isn't installed, run
 ```npm install -g sass```
 
 Bug: Must set FileWatch Scope to "Current File". [Bug info](https://youtrack.jetbrains.com/issue/RIDER-55683/Unknown-scope-sign-for-Project-scope-in-SCSS-new-file-watcher)
+
+
+## More random notes
+
+digital ocean > Settings > Components > Commands > Build Command > npm install
+
+Digital Ocean needs an Output Directory. It atomatically scans for _static, dist, public, and build. Because there is no build process for this, we need to define it as "/". This is in the same place as the Command from above
+
+sendgrid api key 
+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
+
