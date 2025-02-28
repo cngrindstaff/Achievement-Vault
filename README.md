@@ -56,3 +56,59 @@ chelseagrindstaff+av@gmail.com
 
 
 
+
+
+I'm now getting a 404 when running locally. The main project folder is at Documents/Achievement-Vault. The server.js file lives at Documents/Achievement-Vault/js/server.js. The path defined for the POST inside that server.js file is "/send-email".  I used command prompt to go into the Achievement-Vault directory, and ran "node js/server.js", and it is now running on port 3000
+
+Given this info, what is the correct URL to the api that my frontend javascript needs to call?
+
+
+Since your Node.js server (server.js) is running on port 3000, and it defines the POST endpoint as "/send-email", your frontend should call:
+
+bash
+Copy
+Edit
+http://localhost:3000/send-email
+Why?
+Your backend is listening on port 3000 (app.listen(3000)).
+/send-email is a relative path, meaning it’s available under http://localhost:3000.
+Since you’re running server.js from Documents/Achievement-Vault, its location (js/server.js) does not affect the API's public URL.
+
+
+
+npm install @sendgrid/mail
+
+npm init -y
+
+
+to run the node server locally: 
+
+node js/server.js
+
+
+for node password, run 
+
+npm install express dotenv cors
+
+
+
+
+
+
+
+
+Start your Node.js server by running:
+
+sh
+Copy
+Edit
+node server.js
+or if you want automatic reloads whenever you make changes:
+
+sh
+Copy
+Edit
+npx nodemon server.js
+(Nodemon restarts the server when you modify files.)
+
+
