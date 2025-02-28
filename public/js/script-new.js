@@ -1,4 +1,4 @@
-var sendGridUrl = '/js/send-email';
+var sendGridUrl = '/send-email';
 
 $(document).ready(function() {
     //Paths are different when running locally. Check if it's local by whether or not it's loaded with a "file" path
