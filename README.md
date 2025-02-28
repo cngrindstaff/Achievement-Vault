@@ -112,3 +112,12 @@ npx nodemon server.js
 (Nodemon restarts the server when you modify files.)
 
 
+
+
+digitalocean domain servers
+ns1.digitalocean.com 
+ns2, ns3
+
+
+changed back to godaddy 
+

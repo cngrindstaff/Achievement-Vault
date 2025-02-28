@@ -191,7 +191,7 @@ function generateCheckboxes(sectionIndex, itemIndex, total, checked) {
 }
 
 function updateCompletion() {
-    console.log('updatecompletion - made it here');
+    //console.log('updatecompletion - made it here');
     const sectionIndex = $(this).data('section');
     const itemIndex = $(this).data('item');
     const checkboxNum = $(this).data('num');
@@ -201,11 +201,11 @@ function updateCompletion() {
 
     // 1️⃣ Get the text inside the parent "section-header-text" element
     const sectionHeaderText = $(`span.section-header-text[data-section="${sectionIndex}"]`).text().trim();
-    console.log("Section Header Text:", sectionHeaderText);
+    //console.log("Section Header Text:", sectionHeaderText);
 
     // 2️⃣ Get the text inside the sibling element's label
     const labelText = $(this).closest('.grid-item-2-row, .grid-item-1-row').find('.label').text().trim();
-    console.log("Label Text:", labelText);
+    //console.log("Label Text:", labelText);
     
     let action = ''; // Will be either "added" or "removed"
     
@@ -223,7 +223,7 @@ function updateCompletion() {
         for (let i = checkboxNum; i <= $(`input[data-section="${sectionIndex}"][data-item="${itemIndex}"]`).length; i++) {
             $(`.checkbox-${sectionIndex}-${itemIndex}-${i}`).prop('checked', false);
             localStorage.removeItem(`${gameName}-checkbox-${sectionIndex}-${itemIndex}-${i}`);
-            //console.log('removed item from local storage');
+            console.log('removed item from local storage');
         }
         action = 'removed';
     }
