@@ -4,7 +4,7 @@ This program allows you to track achievements in video games.
 It supports multiple games. Just add a new folder, html file, and excel sheet, then add a link to it on the main page.
 
 ## How it works
-You can have an excel file for each game. In it, list the achievements (and descriptions if you want). 
+Each game uses its own excel file. In it, list the achievements (and descriptions if you want). 
 Achievements/trackable items can be separated into sections. Each section will expand into a different area 
 on the page, for organization's sake. As items are checked off, they will be stored in local storage. To prevent loss 
 of data, the excel file is also set up to support having items already marked as checked. 
@@ -32,8 +32,15 @@ http-server --cors
 Access your files at `http://localhost:8080`
 
 
+## Node server
+This has been modified to include a node server for email and password 
 
+Run the server with:
+```node js/server.js```
 
+Alternatively, use the following to make the server automatically restart when files are modified: 
+```npm install -g nodemon```
+```nodemon js/server.js``` 
 
 ## Random notes
 ### Rider
@@ -47,77 +54,8 @@ Bug: Must set FileWatch Scope to "Current File". [Bug info](https://youtrack.jet
 
 ## More random notes
 
-digital ocean > Settings > Components > Commands > Build Command > npm install
-
-Digital Ocean needs an Output Directory. It atomatically scans for _static, dist, public, and build. Because there is no build process for this, we need to define it as "/". This is in the same place as the Command from above
-
-sender email
-chelseagrindstaff+av@gmail.com
 
 
 
 
-
-I'm now getting a 404 when running locally. The main project folder is at Documents/Achievement-Vault. The server.js file lives at Documents/Achievement-Vault/js/server.js. The path defined for the POST inside that server.js file is "/send-email".  I used command prompt to go into the Achievement-Vault directory, and ran "node js/server.js", and it is now running on port 3000
-
-Given this info, what is the correct URL to the api that my frontend javascript needs to call?
-
-
-Since your Node.js server (server.js) is running on port 3000, and it defines the POST endpoint as "/send-email", your frontend should call:
-
-bash
-Copy
-Edit
-http://localhost:3000/send-email
-Why?
-Your backend is listening on port 3000 (app.listen(3000)).
-/send-email is a relative path, meaning it’s available under http://localhost:3000.
-Since you’re running server.js from Documents/Achievement-Vault, its location (js/server.js) does not affect the API's public URL.
-
-
-
-npm install @sendgrid/mail
-
-npm init -y
-
-
-to run the node server locally: 
-
-node js/server.js
-
-
-for node password, run 
-
-npm install express dotenv cors
-
-
-
-
-
-
-
-
-Start your Node.js server by running:
-
-sh
-Copy
-Edit
-node server.js
-or if you want automatic reloads whenever you make changes:
-
-sh
-Copy
-Edit
-npx nodemon server.js
-(Nodemon restarts the server when you modify files.)
-
-
-
-
-digitalocean domain servers
-ns1.digitalocean.com 
-ns2, ns3
-
-
-changed back to godaddy 
 
