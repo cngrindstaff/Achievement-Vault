@@ -6,3 +6,4 @@ games/hades/~$hades_data.xlsx
 games/ale-and-tale-tavern/~$ingredient-list.xlsm
 /node_modules
 .env
+credentials.json
