@@ -1,9 +1,6 @@
 
 ~$data.xlsx
 .idea/*
-games/spiderman2/~$spiderman2_data.xlsx
-games/hades/~$hades_data.xlsx
-games/ale-and-tale-tavern/~$ingredient-list.xlsm
 /node_modules
 .env
 credentials.json
@@ -13,3 +10,4 @@ credentials_base64_new.txt
 decoded_powershell2.json
 decoded_powershell.json
 test_credentials.json
+
