@@ -1,5 +1,5 @@
 var sendGridUrl = '/send-email';
-var googleSheetsAppendUrl = '/google-sheets/append';
+var googleSheetsAppendUrl = '/google-sheets-append';
 
 
 $(document).ready(function() {

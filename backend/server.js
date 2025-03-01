@@ -47,9 +47,6 @@ app.use((req, res, next) => {
     next(); // Proceed to the next middleware (serve static files)
 });
 
-// Serve static files (your frontend)
-app.use(express.static(path.join(__dirname, "public"))); // Change 'public' to your folder name
-
 
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Google Sheets ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -57,15 +54,22 @@ app.use(express.static(path.join(__dirname, "public"))); // Change 'public' to y
 const googleCredentialsPath = path.join(__dirname, "credentials.json");
 
 // Step 1: Decode and write credentials.json
+
+console.log("Encoded credentials length:", process.env.AV_GOOGLE_SHEETS_CREDENTIALS?.length || "Not Set");
+
 if (!fs.existsSync(googleCredentialsPath)) {
     const encodedCreds = AV_GOOGLE_SHEETS_CREDENTIALS;
     if (!encodedCreds) {
         console.error("ERROR: AV_GOOGLE_SHEETS_CREDENTIALS environment variable not set!");
         process.exit(1);
     }
+    console.log("Encoded credentials length:", process.env.AV_GOOGLE_SHEETS_CREDENTIALS?.length || "Not Set");
 
     try {
         const decodedCreds = Buffer.from(encodedCreds, "base64").toString("utf-8");
+        // 🔍 Debug JSON content
+        console.log("Decoded credentials preview:", decodedCreds.substring(0, 100) + "...");
+
         fs.writeFileSync(googleCredentialsPath, decodedCreds, { mode: 0o600 }); // Secure the file
         console.log("Credentials file written successfully.");
     } catch (error) {
@@ -80,6 +84,19 @@ const auth = new google.auth.GoogleAuth({
     scopes: ["https://www.googleapis.com/auth/spreadsheets"],
 });
 
+
+// Debug: Check if auth works
+async function testAuth() {
+    try {
+        const client = await auth.getClient();
+        console.log("Google Auth successful!");
+    } catch (error) {
+        console.error("Google Auth failed:", error);
+    }
+}
+testAuth(); 
+
+
 // Step 3: Append Row Function
 async function appendRow(rowData) {
     const client = await auth.getClient();
@@ -87,7 +104,7 @@ async function appendRow(rowData) {
 
     const spreadsheetId = process.env.AV_GOOGLE_SHEETS_ID; 
     const range = "Sheet1!A1"; // Adjust based on your sheet
-
+ 
     const resource = { values: [rowData] };
     
     return await sheets.spreadsheets.values.append({
@@ -123,6 +140,7 @@ app.post("/google-sheets-append", async (req, res) => {
 // S
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
 
+console.log ('trying to start2');
 
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ SendGrid Email ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -152,3 +170,10 @@ app.post('/send-email', async (req, res) => {
 });
 
 
+console.log ('trying to start3');
+
+
+
+// Serve static files (your frontend)
+//app.use(express.static(path.join(__dirname, "public"))); 
+app.use(express.static(path.join(__dirname, "..", "public"))); // Go up one level
