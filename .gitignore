@@ -8,3 +8,8 @@ games/ale-and-tale-tavern/~$ingredient-list.xlsm
 .env
 credentials.json
 credentials_base64.txt
+credentials_base64-old.txt
+credentials_base64_new.txt
+decoded_powershell2.json
+decoded_powershell.json
+test_credentials.json

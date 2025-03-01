@@ -77,27 +77,11 @@ async function sendEmail(thisSubject, thisText) {
     }
 }
 
-/*async function sendEmail2(addedOrRemoved, thisSection, thisItem) {
-    try {
-        console.log('sendGridUrl: ' + sendGridUrl);
-        const response = await fetch(sendGridUrl, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                subject: 'Record updated',
-                text: `Record ${addedOrRemoved} for Game ${gameNameFriendly}, Section ${thisSection}, Item ${thisItem}`
-            })
-        });
 
-        const data = await response.json();
-        console.log("Response:", data);
-    } catch (error) {
-        console.error("Error:", error);
-    }
-}*/
-
-async function sendDataToSheets(gameName, sectionName, itemName) {
-    const data = [gameName, sectionName, itemName]; 
+async function sendDataToSheets(gameName, sectionName, itemName, action) {
+    var dateTimeNowUtc = new Date().toISOString()
+    console.log('dateTimeNowUtc: ' + dateTimeNowUtc);
+    const data = [dateTimeNowUtc, gameName, sectionName, itemName, action]; 
 
     const response = await fetch(googleSheetsAppendUrl, {
         method: "POST",
@@ -253,7 +237,7 @@ function updateCompletion() {
     // Call sendEmail function after updating localStorage
     if (action) {
         sendEmail(subject, emailText);
-        sendDataToSheets(gameNameFriendly, sectionHeaderText, labelText);
+        sendDataToSheets(gameNameFriendly, sectionHeaderText, labelText, action);
     }
 
     updateSectionCompletion(sectionIndex);

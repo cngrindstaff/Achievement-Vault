@@ -17,8 +17,15 @@ app.use(cors()); // Allow frontend to call this API
 const AV_USERNAME = process.env.AV_USERNAME;
 const AV_PASSWORD = process.env.AV_PASSWORD;
 const AV_GOOGLE_SHEETS_CREDENTIALS = process.env.AV_GOOGLE_SHEETS_CREDENTIALS;
+//console.log('AV_GOOGLE_SHEETS_CREDENTIALS: ' + AV_GOOGLE_SHEETS_CREDENTIALS);
 const AV_SENDGRID_API_KEY = process.env.AV_SENDGRID_API_KEY
 const AV_SENDGRID_SENDER_EMAIL = process.env.AV_SENDGRID_SENDER_EMAIL;
+const AV_GOOGLE_SHEETS_ID = process.env.AV_GOOGLE_SHEETS_ID;process.env.AV_GOOGLE_SHEETS_ID
+
+// Declare globally, bc we set it inside an if statement
+let googleAuth; 
+
+
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Middleware for Basic Authentication ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
 app.use((req, res, next) => {
@@ -55,54 +62,95 @@ const googleCredentialsPath = path.join(__dirname, "credentials.json");
 
 // Step 1: Decode and write credentials.json
 
-console.log("Encoded credentials length:", process.env.AV_GOOGLE_SHEETS_CREDENTIALS?.length || "Not Set");
+//console.log("1. Encoded credentials length:", AV_GOOGLE_SHEETS_CREDENTIALS?.length || "Not Set");
 
-if (!fs.existsSync(googleCredentialsPath)) {
+if (fs.existsSync(googleCredentialsPath)) {
+    //console.log("2. Credentials file already exists!");
+    initializeGoogleAuth();
+
+}
+
+else {
+    //console.log("2. Credentials file does not yet exist");
+
     const encodedCreds = AV_GOOGLE_SHEETS_CREDENTIALS;
-    if (!encodedCreds) {
+    if (!encodedCreds) { 
         console.error("ERROR: AV_GOOGLE_SHEETS_CREDENTIALS environment variable not set!");
         process.exit(1);
-    }
-    console.log("Encoded credentials length:", process.env.AV_GOOGLE_SHEETS_CREDENTIALS?.length || "Not Set");
+    } 
 
+    //const decodedCreds = Buffer.from(AV_GOOGLE_SHEETS_CREDENTIALS, "base64").toString("utf-8");
+    const decodedCreds = Buffer.from(AV_GOOGLE_SHEETS_CREDENTIALS, "base64").toString("binary");
+
+    //console.log("3. Decoded JSON length:", decodedCreds.length);
+    //console.log("4. Decoded credentials preview:", decodedCreds.substring(0, 300) + "...");
+    //console.log("5. ...");
+
+// Force synchronous writing to ensure the entire file is written
     try {
-        const decodedCreds = Buffer.from(encodedCreds, "base64").toString("utf-8");
-        // 🔍 Debug JSON content
-        console.log("Decoded credentials preview:", decodedCreds.substring(0, 100) + "...");
+        fs.writeFile(googleCredentialsPath, decodedCreds, { mode: 0o600 }, (err) => {
+            if (err) {
+                console.error("6. Error writing credentials file:", err);
+                process.exit(1);
+            }
 
-        fs.writeFileSync(googleCredentialsPath, decodedCreds, { mode: 0o600 }); // Secure the file
-        console.log("Credentials file written successfully.");
+            setTimeout(() => {
+                console.log("7. timeout Keeping process alive for debugging...");
+            }, 5000);
+            console.log("8. timeout finished...");
+            
+            //console.log("9. Credentials file written successfully!");
+
+            // 🔍 Verify file size after writing
+            //const stats = fs.statSync(googleCredentialsPath);
+            //console.log(`10. File size after write: ${stats.size} bytes`);
+
+            // 🟢 Only continue authentication once file is fully written
+            initializeGoogleAuth();
+            
+            if (stats.size !== decodedCreds.length) {
+                console.error("10b. File was not fully written! Expected:", decodedCreds.length, "but got:", stats.size);
+                process.exit(1);
+            }
+
+
+        });
     } catch (error) {
-        console.error("Error decoding credentials:", error);
-        process.exit(1);
+        console.error("11. Error writing credentials file:", error);
     }
+} 
+
+
+
+function initializeGoogleAuth() {
+    console.log("12. Initializing Google Auth...");
+    googleAuth = new google.auth.GoogleAuth({
+        keyFile: googleCredentialsPath,
+        scopes: ["https://www.googleapis.com/auth/spreadsheets"],
+    });
+
+    // Debug: Check if auth works
+    //testAuth(googleAuth);
 }
-
-// Step 2: Google Auth Setup
-const auth = new google.auth.GoogleAuth({
-    keyFile: googleCredentialsPath,
-    scopes: ["https://www.googleapis.com/auth/spreadsheets"],
-});
-
 
 // Debug: Check if auth works
-async function testAuth() {
+async function testAuth(authInstance) {
     try {
-        const client = await auth.getClient();
-        console.log("Google Auth successful!");
+        const client = await authInstance.getClient();
+        console.log("13. Google Auth successful!");
     } catch (error) {
-        console.error("Google Auth failed:", error);
+        console.error("13. Google Auth failed:", error);
     }
 }
-testAuth(); 
+//testAuth(); 
 
 
 // Step 3: Append Row Function
 async function appendRow(rowData) {
-    const client = await auth.getClient();
+    const client = await googleAuth.getClient();
     const sheets = google.sheets({ version: "v4", auth: client });
 
-    const spreadsheetId = process.env.AV_GOOGLE_SHEETS_ID; 
+    const spreadsheetId = AV_GOOGLE_SHEETS_ID; 
     const range = "Sheet1!A1"; // Adjust based on your sheet
  
     const resource = { values: [rowData] };
@@ -137,10 +185,7 @@ app.post("/google-sheets-append", async (req, res) => {
 
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Start the server ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-// S
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
-
-console.log ('trying to start2');
+app.listen(PORT, () => console.log(`14. Starting. Server running on port ${PORT}`));
 
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ SendGrid Email ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -168,9 +213,6 @@ app.post('/send-email', async (req, res) => {
         res.status(500).json({ error: 'Error sending email.' });
     }
 });
-
-
-console.log ('trying to start3');
 
 
 
