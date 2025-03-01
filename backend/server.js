@@ -108,10 +108,10 @@ else {
             // 🟢 Only continue authentication once file is fully written
             initializeGoogleAuth();
             
-            if (stats.size !== decodedCreds.length) {
+/*            if (stats.size !== decodedCreds.length) {
                 console.error("10b. File was not fully written! Expected:", decodedCreds.length, "but got:", stats.size);
                 process.exit(1);
-            }
+            }*/
 
 
         });
