@@ -50,3 +50,7 @@ If sass isn't installed, run
 ```npm install -g sass```
 
 Bug: Must set FileWatch Scope to "Current File". [Bug info](https://youtrack.jetbrains.com/issue/RIDER-55683/Unknown-scope-sign-for-Project-scope-in-SCSS-new-file-watcher)
+
+
+### Local
+Run the site locally by going to http://localhost:3000/

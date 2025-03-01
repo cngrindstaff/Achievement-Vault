@@ -1,5 +1,7 @@
 ﻿require("dotenv").config();
 
+console.log ('trying to start');
+
 const express = require('express');
 const sgMail = require('@sendgrid/mail');
 const cors = require('cors');
@@ -15,13 +17,14 @@ app.use(cors()); // Allow frontend to call this API
 const AV_USERNAME = process.env.AV_USERNAME;
 const AV_PASSWORD = process.env.AV_PASSWORD;
 const AV_GOOGLE_SHEETS_CREDENTIALS = process.env.AV_GOOGLE_SHEETS_CREDENTIALS;
-
+const AV_SENDGRID_API_KEY = process.env.AV_SENDGRID_API_KEY
+const AV_SENDGRID_SENDER_EMAIL = process.env.AV_SENDGRID_SENDER_EMAIL;
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Middleware for Basic Authentication ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
 app.use((req, res, next) => {
     const authHeader = req.headers.authorization;
 
-    if (!authHeader) {
+    if (!authHeader || !authHeader.startsWith("Basic ")) {
         res.setHeader("WWW-Authenticate", 'Basic realm="Protected Area"');
         return res.status(401).send("Unauthorized: No credentials provided");
     }
@@ -123,15 +126,18 @@ app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
 
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ SendGrid Email ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-sgMail.setApiKey(process.env.AV_SENDGRID_API_KEY);
+sgMail.setApiKey(AV_SENDGRID_API_KEY);
 
 // Endpoint to send emails
 app.post('/send-email', async (req, res) => {
     const { subject, text } = req.body;
 
+    if (!subject || !text) {
+        return res.status(400).json({ error: "Subject and text are required." });
+    }
     const msg = {
-        to: process.env.AV_SENDGRID_SENDER_EMAIL,
-        from: process.env.AV_SENDGRID_SENDER_EMAIL,
+        to: AV_SENDGRID_SENDER_EMAIL,
+        from: AV_SENDGRID_SENDER_EMAIL,
         subject,
         text
     };
