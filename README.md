@@ -36,11 +36,11 @@ Access your files at `http://localhost:8080`
 This has been modified to include a node server for email and password 
 
 Run the server with:
-```node js/server.js```
+```node backend/server.js```
 
 Alternatively, use the following to make the server automatically restart when files are modified: 
 ```npm install -g nodemon```
-```nodemon js/server.js``` 
+```nodemon backend/server.js``` 
 
 ## Random notes
 ### Rider
@@ -50,3 +50,7 @@ If sass isn't installed, run
 ```npm install -g sass```
 
 Bug: Must set FileWatch Scope to "Current File". [Bug info](https://youtrack.jetbrains.com/issue/RIDER-55683/Unknown-scope-sign-for-Project-scope-in-SCSS-new-file-watcher)
+
+
+### Local
+Run the site locally by going to http://localhost:3000/

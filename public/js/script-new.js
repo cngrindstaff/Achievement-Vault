@@ -1,4 +1,6 @@
 var sendGridUrl = '/send-email';
+var googleSheetsAppendUrl = '/google-sheets-append';
+
 
 $(document).ready(function() {
     //Paths are different when running locally. Check if it's local by whether or not it's loaded with a "file" path
@@ -19,8 +21,10 @@ $(document).ready(function() {
         file = 'http://localhost:8080/games/' + gameName + '/' + gameName + '_data.xlsx';
         linkToHomePage = '../../index.html';
         sendGridUrl = 'http://localhost:3000/send-email'
+        googleSheetsAppendUrl = 'http://localhost:3000/google-sheets-append'
     }
     console.log('sendGridUrl: ' + sendGridUrl);
+    console.log('googleSheetsAppendUrl: ' + googleSheetsAppendUrl);
 
 
 
@@ -73,24 +77,23 @@ async function sendEmail(thisSubject, thisText) {
     }
 }
 
-/*async function sendEmail2(addedOrRemoved, thisSection, thisItem) {
-    try {
-        console.log('sendGridUrl: ' + sendGridUrl);
-        const response = await fetch(sendGridUrl, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                subject: 'Record updated',
-                text: `Record ${addedOrRemoved} for Game ${gameNameFriendly}, Section ${thisSection}, Item ${thisItem}`
-            })
-        });
 
-        const data = await response.json();
-        console.log("Response:", data);
-    } catch (error) {
-        console.error("Error:", error);
-    }
-}*/
+async function sendDataToSheets(gameName, sectionName, itemName, action) {
+    var dateTimeNowUtc = new Date().toISOString()
+    console.log('dateTimeNowUtc: ' + dateTimeNowUtc);
+    const data = [dateTimeNowUtc, gameName, sectionName, itemName, action]; 
+
+    const response = await fetch(googleSheetsAppendUrl, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ rowData: data }),
+    });
+
+    const result = await response.json();
+    console.log(result);
+}
 
 function processWorkbook(workbook) {
     const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
@@ -234,6 +237,7 @@ function updateCompletion() {
     // Call sendEmail function after updating localStorage
     if (action) {
         sendEmail(subject, emailText);
+        sendDataToSheets(gameNameFriendly, sectionHeaderText, labelText, action);
     }
 
     updateSectionCompletion(sectionIndex);
