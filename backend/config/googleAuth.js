@@ -3,7 +3,7 @@ const path = require("path");
 const { google } = require("googleapis");
 
 const AV_GOOGLE_SHEETS_CREDENTIALS = process.env.AV_GOOGLE_SHEETS_CREDENTIALS;
-console.log('AV_SENDGRID_SENDER_EMAIL' + process.env.AV_SENDGRID_SENDER_EMAIL) 
+
 const googleCredentialsPath = path.join(__dirname, "../credentials.json");
 let googleAuth = null;
 
@@ -19,7 +19,8 @@ function initializeGoogleAuth() {
 if (fs.existsSync(googleCredentialsPath)) {
     initializeGoogleAuth();
 } else {
-    if (!AV_GOOGLE_SHEETS_CREDENTIALS) {
+    const encodedCreds = AV_GOOGLE_SHEETS_CREDENTIALS;
+    if (!encodedCreds) {
         console.error("ERROR: AV_GOOGLE_SHEETS_CREDENTIALS environment variable not set!");
         process.exit(1);
     }
