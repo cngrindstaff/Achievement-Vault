@@ -1,32 +1,13 @@
-var sendGridUrl = '/send-email';
-var googleSheetsAppendUrl = '/google-sheets-append';
-
+var sendGridUrl = '/api/send-email';
+var googleSheetsAppendUrl = '/api/google-sheets-append';
+var dataFile = '/games/' + gameName + '/' + gameName + '_data.xlsx';
+var linkToHomePage = '../../';
 
 $(document).ready(function() {
-    //Paths are different when running locally. Check if it's local by whether or not it's loaded with a "file" path
-    var isRunningLocally = false;
-    if(location.href.startsWith('file:')){
-        //alert("It's a local server!");
-        isRunningLocally = true;
-    }
-
     //set the title field that's in the head, from the game's HTML
     const titleElement = document.querySelector('title');
     titleElement.textContent = gameNameFriendly + ' 100% Completion Checklist';
     
-    var file = '/games/' + gameName + '/' + gameName + '_data.xlsx';
-    var linkToHomePage = '../../';
-    if(isRunningLocally) 
-    {
-        file = 'http://localhost:8080/games/' + gameName + '/' + gameName + '_data.xlsx';
-        linkToHomePage = '../../index.html';
-        sendGridUrl = 'http://localhost:3000/send-email'
-        googleSheetsAppendUrl = 'http://localhost:3000/google-sheets-append'
-    }
-    console.log('sendGridUrl: ' + sendGridUrl);
-    console.log('googleSheetsAppendUrl: ' + googleSheetsAppendUrl);
-
-
 
     
     // Add sibling elements before grid-checklist-container
@@ -36,7 +17,7 @@ $(document).ready(function() {
     containerParent.prepend('<div class="home-link"><a href="' + linkToHomePage + '" class="home-link-text"><i class="fa-solid fa-house fa-lg" ></i></a></div>');
     //containerParent.prepend('<div class="home-link"><i class="fa-solid fa-house fa-lg" onclick="sendEmail(\'test\',\'added\',)"></i></div>');
 
-    fetch(file).then(response => response.arrayBuffer()).then(data => {
+    fetch(dataFile).then(response => response.arrayBuffer()).then(data => {
         const workbook = XLSX.read(data, {type: 'array'});
         processWorkbook(workbook);
         initializeCheckboxes(); // Initialize checkboxes after processing workbook
@@ -60,7 +41,7 @@ $(document).ready(function() {
 
 async function sendEmail(thisSubject, thisText) {
     try {
-        console.log('sendGridUrl: ' + sendGridUrl);
+        //onsole.log('sendGridUrl: ' + sendGridUrl);
         const response = await fetch(sendGridUrl, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -71,7 +52,7 @@ async function sendEmail(thisSubject, thisText) {
         });
 
         const data = await response.json();
-        console.log("Response:", data);
+        //console.log("Response:", data);
     } catch (error) {
         console.error("Error:", error);
     }
@@ -92,7 +73,7 @@ async function sendDataToSheets(gameName, sectionName, itemName, action) {
     });
 
     const result = await response.json();
-    console.log(result);
+    //console.log(result);
 }
 
 function processWorkbook(workbook) {
@@ -145,7 +126,6 @@ function generateChecklist(rows) {
                     </div>
                 </div>
             `;
-            //console.log('made it here - after calling generateCheckboxes');
             sectionContent.append(itemTemplate);
             
             //THIS IS THE OLD METHOD! See the comment regarding Event Delegation in the document.ready for more information.    
@@ -194,13 +174,12 @@ function generateCheckboxes(sectionIndex, itemIndex, total, checked) {
 }
 
 function updateCompletion() {
-    //console.log('updatecompletion - made it here');
+    //console.log('updateCompletion - made it here');
     const sectionIndex = $(this).data('section');
     const itemIndex = $(this).data('item');
     const checkboxNum = $(this).data('num');
     
-    
-    console.log("updateCompletion called - sectionIndex " + sectionIndex + "itemIndex " + itemIndex + "checkboxNum " + checkboxNum)
+    //console.log("updateCompletion called - sectionIndex " + sectionIndex + "itemIndex " + itemIndex + "checkboxNum " + checkboxNum)
 
     // 1️⃣ Get the text inside the parent "section-header-text" element
     const sectionHeaderText = $(`span.section-header-text[data-section="${sectionIndex}"]`).text().trim();
@@ -258,25 +237,22 @@ function removeTrailingSpace (str){
     return str;
 }
 function updateSectionCompletion(sectionIndex) {
-    const sectionHeaderTextDiv = $(`span.section-header-text[data-section="${sectionIndex}"]`);
+    var sectionHeaderTextDiv = $(`span.section-header-text[data-section="${sectionIndex}"]`);
     const checkboxes = $(`input[data-section="${sectionIndex}"]`);
     const checkedCheckboxes = checkboxes.filter(':checked').length;
     const totalCheckboxes = checkboxes.length;
     const sectionCompletion = checkedCheckboxes + '/' + totalCheckboxes;
     const sectionCompletionPercent = ((checkedCheckboxes / totalCheckboxes) * 100).toFixed(2);
     var sectionHeaderText = sectionHeaderTextDiv.text();
-    sectionTitle = trimBeforeParenthesis(sectionHeaderText);
+    var sectionTitle = trimBeforeParenthesis(sectionHeaderText);
     sectionTitle = removeTrailingSpace(sectionTitle);
     
-    //var lastIndex = sectionHeaderText.lastIndexOf(' ');
-    //const sectionTitle = sectionHeaderText.substr(0, lastIndex);
     sectionHeaderTextDiv.text(`${sectionTitle} (${sectionCompletion}) (${sectionCompletionPercent}%)`);
     
     //get the header, add the # of checkboxes for that section
     const sectionHeaderDiv = $(`div.section-header[data-section="${sectionIndex}"]`);
     sectionHeaderDiv.attr("checked-checkboxes",checkedCheckboxes);
     sectionHeaderDiv.attr("total-checkboxes",totalCheckboxes);
-
 }
 
 function updateTotalCompletion() {
@@ -291,10 +267,7 @@ function updateTotalCompletion() {
         var totalCheckedCheckboxes = 0;
         var totalCheckboxes = 0;
         sections.each(function() {
-            //const sectionCompletion = parseFloat($(this).text().match(/\(([^)]+)%\)/)[1]); //this gets the percentage from the header, ex: 58.47%
             var thisSectionTitle = $(this).text();
-            //logAllAttributes($(this));
-            //console.log('updateTotalCompletion sectiontitle ' + thisSectionTitle);
             var sectionCheckedCheckboxesInt = parseInt($(this).attr('checked-checkboxes'));
             var sectionTotalCheckboxesInt = parseInt($(this).attr('total-checkboxes'));
             //console.log('sectionCheckedCheckboxesInt ' + sectionCheckedCheckboxesInt);
