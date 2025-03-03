@@ -17,8 +17,15 @@ function initializeGoogleAuth() {
 if (fs.existsSync(googleCredentialsPath)) {
     initializeGoogleAuth();
 } else {
-    console.error("❌ Google credentials file is missing!");
-    process.exit(1);
+    const encodedCreds = AV_GOOGLE_SHEETS_CREDENTIALS;
+    if (!encodedCreds) {
+        console.error("ERROR: AV_GOOGLE_SHEETS_CREDENTIALS environment variable not set!");
+        process.exit(1);
+    }
+    const decodedCreds = Buffer.from(AV_GOOGLE_SHEETS_CREDENTIALS, "base64").toString("utf-8");
+    fs.writeFileSync(googleCredentialsPath, decodedCreds, { mode: 0o600 }); // Secure the file
+    initializeGoogleAuth();
+
 }
 
 module.exports = { googleAuth, initializeGoogleAuth };
