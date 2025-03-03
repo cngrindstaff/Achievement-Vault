@@ -2,6 +2,8 @@
 const path = require("path");
 const { google } = require("googleapis");
 
+const AV_GOOGLE_SHEETS_CREDENTIALS = process.env.AV_GOOGLE_SHEETS_CREDENTIALS;
+
 const googleCredentialsPath = path.join(__dirname, "../credentials.json");
 let googleAuth = null;
 
