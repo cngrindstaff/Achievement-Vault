@@ -29,7 +29,7 @@ body {
 }
 
 .container {
-  max-width: 600px;
+  max-width: 700px;
   width: 100%;
 }
 
@@ -40,8 +40,10 @@ h1 {
 }
 
 .section-header, .game-list-item {
-  background-color: #6AD6DC;
-  color: #104042;
+  /*	background-color: $teal_bck_color-2;
+  	color: $teal_font_dark;*/
+  color: #CEF2F3;
+  background-color: #1F7F84;
   padding: 15px;
   border: none;
   border-radius: 5px;
@@ -66,10 +68,12 @@ h1 {
   flex-grow: 1;
 }
 
-.section {
+.section, .section-table {
+  /*	color: $teal_font_light;
+  	background-color: $teal_bck_color-5;*/
+  background-color: #6AD6DC;
+  color: #104042;
   padding: 10px;
-  color: #CEF2F3;
-  background-color: #1F7F84;
   border: 1px solid #104042;
   border-radius: 5px;
   margin-bottom: 10px;
@@ -102,7 +106,7 @@ input[type=checkbox] {
 
 .label {
   font-size: 16px;
-  color: #CEF2F3;
+  color: #104042;
 }
 
 #checklist-container {
@@ -214,6 +218,37 @@ a {
 
 .fa-house {
   color: #6AD6DC;
+}
+
+/*************************************** TABLES *******************************/
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+}
+
+th, td {
+  border: 1px solid #104042;
+  padding: 8px;
+  text-align: left;
+}
+
+th {
+  cursor: pointer;
+}
+
+.section-table {
+  background-color: #2FBFC6;
+}
+
+/* even rows */
+tr:nth-child(even) {
+  background-color: #9CE4E8;
+}
+
+/* odd rows */
+tr:nth-child(odd) {
+  background-color: #6AD6DC;
 }
 
 /*# sourceMappingURL=styles.css.map */

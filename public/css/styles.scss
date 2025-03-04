@@ -64,7 +64,7 @@ body {
 	padding: 20px;
 }
 .container {
-	max-width: 600px;
+	max-width: 700px;
 	width: 100%;
 }
 h1 {
@@ -74,8 +74,10 @@ h1 {
 }
 .section-header, .game-list-item
  {
-	background-color: $teal_bck_color-2;
-	color: $teal_font_dark;
+/*	background-color: $teal_bck_color-2;
+	color: $teal_font_dark;*/
+	color: $teal_font_light;
+	background-color: $teal_bck_color-5;
 	padding: 15px;
 	border: none;
 	border-radius: 5px; 
@@ -84,7 +86,7 @@ h1 {
 	font-size: 15px;
 	cursor: pointer;
 	/*width: 100%;*/ /*I don't know why, but if this is set to 100%, then the dropdown icon on the section headers ends up going past the 100% width area*/
-	margin-bottom: 5px;
+	margin-bottom: 5px; 
 }
 .section-header {
 	justify-content: space-between;
@@ -95,11 +97,13 @@ h1 {
 }
 .section-header-text {
 	flex-grow: 1;
-}
+} 
 .section {
+/*	color: $teal_font_light;
+	background-color: $teal_bck_color-5;*/
+	background-color: $teal_bck_color-2;
+	color: $teal_font_dark;
 	padding: 10px;
-	color: $teal_font_light;
-	background-color: $teal_bck_color-5;
 	border: 1px solid $teal_font_dark; 
 	border-radius: 5px;
 	margin-bottom: 10px;
@@ -129,7 +133,8 @@ input[type="checkbox"] {
 }
 .label {
 	font-size: 16px;
-	color: $teal_font_light;
+	//color: $teal_font_light;
+	color: $teal_font_dark;
 }
 #checklist-container {
 	display: flex;
@@ -235,4 +240,36 @@ a {
 
 .fa-house {
 	color: $teal_bck_color_2;
+}
+
+/*************************************** TABLES *******************************/
+
+table {
+	width: 100%;
+	border-collapse: collapse;
+	margin-top: 10px;
+} 
+th, td {
+	border: 1px solid $teal_font_dark;
+	padding: 8px;
+	text-align: left;
+}
+th {
+	cursor: pointer;
+}
+
+.section-table {
+	@extend .section;
+	background-color: $teal_bck_color-3;
+}
+
+/* even rows */
+tr:nth-child(even) {
+	background-color: $teal_bck_color-1; 
+}
+
+/* odd rows */
+tr:nth-child(odd) {
+	background-color: $teal_bck_color-2; 
+	//color: $teal_font_light;
 }
