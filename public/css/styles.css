@@ -147,6 +147,12 @@ input[type=checkbox] {
   background-color: #2FBFC6;
 }
 
+.link-container {
+  display: flex;
+  gap: 10px; /* Space between icons */
+  align-items: center; /* Align vertically */
+}
+
 a {
   color: #104042;
   text-decoration: none;
@@ -216,7 +222,7 @@ a {
   display: inline-block;
 }
 
-.fa-house {
+.fa {
   color: #6AD6DC;
 }
 

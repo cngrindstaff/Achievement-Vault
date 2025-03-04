@@ -2,19 +2,26 @@ var sendGridUrl = '/api/send-email';
 var googleSheetsAppendUrl = '/api/google-sheets-append';
 var excelFilePath = '/games/' + gameName + '/' + gameName + '_data.xlsx';
 var linkToHomePage = '../../';
+var linkToGamePage = '/games/' + gameName + '/' + gameName + '.html';
 
 $(document).ready(function() {
     //set the title field that's in the head, from the game's HTML
     const titleElement = document.querySelector('title');
     titleElement.textContent = gameNameFriendly + ' 100% Completion Checklist';
-    
 
+    //.append() puts data inside an element at last index and .prepend() puts the prepending elem at first index.
+    const mainContainer = $('#container');
     
-    // Add sibling elements before grid-checklist-container
-    const containerParent = $('#grid-checklist-container').parent();
-    containerParent.prepend('<p id="total-completion">Total Completion: 0%</p>');
-    containerParent.prepend('<h1>' + gameNameFriendly + ' 100% Completion Checklist</h1>');
-    containerParent.prepend('<div class="home-link"><a href="' + linkToHomePage + '" class="home-link-text"><i class="fa-solid fa-house fa-lg" ></i></a></div>');
+    mainContainer.prepend('<p id="total-completion">Total Completion: 0%</p>');
+    mainContainer.prepend('<h1>' + gameNameFriendly + ' 100% Completion Checklist</h1>');
+
+    mainContainer.prepend(`<div class="link-container"> </div>`);
+    const linkContainerDiv = $('.link-container');
+    if(hasTablePage){
+        linkContainerDiv.prepend('<div class="link-icon"><a href="' + linkToGamePage + '" class="link-icon-text" title="Return to Game Page"><i class="fa fa-arrow-left fa-lg" ></i></a></div>');
+    }
+    linkContainerDiv.prepend('<div class="link-icon"><a href="' + linkToHomePage + '" class="link-icon-text"><i class="fa fa-solid fa-house fa-lg" ></i></a></div>');
+
 
     fetch(excelFilePath).then(response => response.arrayBuffer()).then(data => {
         const workbook = XLSX.read(data, {type: 'array'});
@@ -82,8 +89,8 @@ function processWorkbook(workbook) {
 }
 
 function generateChecklist(rows) {
-    const container = $('#grid-checklist-container');
-    container.empty();
+    const gridContainer = $('#grid-checklist-container');
+    gridContainer.empty();
     let sectionCount = 0;
 
     // Determine total sections
@@ -107,9 +114,9 @@ function generateChecklist(rows) {
             </div>
             <div class="section" data-section="${sectionIndex}" style="display: none;"></div>
         `;
-        container.append(sectionTemplate);
+        gridContainer.append(sectionTemplate);
 
-        const sectionContent = container.find(`.section[data-section="${sectionIndex}"]`);
+        const sectionContent = gridContainer.find(`.section[data-section="${sectionIndex}"]`);
         const items = extractItems(rows, sectionIndex);
 
         // Add items to section
