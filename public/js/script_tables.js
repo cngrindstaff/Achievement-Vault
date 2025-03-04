@@ -1,17 +1,22 @@
 var excelFilePath = '/games/' + gameName + '/' + gameName + '_data_2.xlsx';
 var linkToHomePage = '../../';
+var linkToGamePage = '/games/' + gameName + '/' + gameName + '.html';
 
 $(document).ready(function() {
     //set the title field that's in the head, from the game's HTML
     const titleElement = document.querySelector('title');
     titleElement.textContent = gameNameFriendly + ' Other Tables';
     
-
-    
     // Add sibling elements before grid-checklist-container
-    const containerParent = $('#grid-tables-container').parent();
-    containerParent.prepend('<h1>' + gameNameFriendly + ': Other Tables</h1>');
-    containerParent.prepend('<div class="home-link"><a href="' + linkToHomePage + '" class="home-link-text"><i class="fa-solid fa-house fa-lg" ></i></a></div>');
+    //.append() puts data inside an element at last index and .prepend() puts the prepending elem at first index.
+    const mainContainer = $('#container');
+
+    mainContainer.prepend('<h1>' + gameNameFriendly + ': Other Tables</h1>');
+    mainContainer.prepend(`<div class="link-container"> </div>`);
+
+    const linkContainerDiv = $('.link-container');
+    linkContainerDiv.prepend('<div class="link-icon"><a href="' + linkToGamePage + '" class="link-icon-text" title="Return to Game Page"><i class="fa fa-arrow-left fa-lg" ></i></a></div>');
+    linkContainerDiv.prepend('<div class="link-icon"><a href="' + linkToHomePage + '" class="link-icon-text"><i class="fa fa-solid fa-house fa-lg" ></i></a></div>');
 
 
     // Fetch and process the Excel file
@@ -25,8 +30,8 @@ $(document).ready(function() {
         .then(data => {
             const workbook = XLSX.read(data, { type: 'array' });
 
-            const container = document.getElementById('grid-tables-container');
-            container.innerHTML = ''; // Clear previous data
+            const gridContainer = document.getElementById('grid-tables-container');
+            gridContainer.innerHTML = ''; // Clear previous data
 
             if (workbook.SheetNames.length === 0) {
                 showNoTablesMessage();
@@ -43,7 +48,7 @@ $(document).ready(function() {
             });
 
             // If no valid tables were created, show the "No tables available" message
-            if (container.innerHTML.trim() === '') {
+            if (gridContainer.innerHTML.trim() === '') {
                 showNoTablesMessage();
             }
         })
@@ -60,7 +65,7 @@ function showNoTablesMessage() {
 }
 
     function createSection(sectionTitle, sectionIndex, data) {
-        const container = document.getElementById('grid-tables-container');
+        const gridContainer = document.getElementById('grid-tables-container');
 
         // Create section header
         const sectionHeader = document.createElement('div');
@@ -82,8 +87,8 @@ function showNoTablesMessage() {
         displayTable(section, data);
 
         // Append elements to container
-        container.appendChild(sectionHeader);
-        container.appendChild(section);
+        gridContainer.appendChild(sectionHeader);
+        gridContainer.appendChild(section);
 
         // Toggle section visibility on header click
         sectionHeader.addEventListener('click', () => {
@@ -94,7 +99,7 @@ function showNoTablesMessage() {
         });
     }
 
-    function displayTable(container, data) {
+    function displayTable(gridTablesContainer, data) {
         const table = document.createElement('table');
         const thead = document.createElement('thead');
         const tbody = document.createElement('tbody');
@@ -124,7 +129,7 @@ function showNoTablesMessage() {
 
         table.appendChild(thead);
         table.appendChild(tbody);
-        container.appendChild(table);
+        gridTablesContainer.appendChild(table);
     }
 
     function sortTable(table, colIndex) {

@@ -171,6 +171,13 @@ input[type="checkbox"] {
 .home-link:hover {
 	background-color: $teal_bck_color-3;
 }
+
+.link-container {
+	display: flex;
+	gap: 10px; /* Space between icons */
+	align-items: center; /* Align vertically */
+}
+
 a {
 	color: $teal_font_dark;
 	text-decoration: none;
@@ -238,7 +245,7 @@ a {
 	display: inline-block; 
 }
 
-.fa-house {
+.fa {
 	color: $teal_bck_color_2;
 }
 

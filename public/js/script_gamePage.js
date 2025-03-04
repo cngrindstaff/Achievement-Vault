@@ -1,4 +1,3 @@
-var linkToHomePage = '../../';
 var linkToChecklistPage = '/games/' + gameName + '/' + gameName + '_checklist.html';
 var linkToTablesPage = '/games/' + gameName + '/' + gameName + '_tables.html';
 
