@@ -1,6 +1,6 @@
 var sendGridUrl = '/api/send-email';
 var googleSheetsAppendUrl = '/api/google-sheets-append';
-var dataFile = '/games/' + gameName + '/' + gameName + '_data.xlsx';
+var excelFilePath = '/games/' + gameName + '/' + gameName + '_data.xlsx';
 var linkToHomePage = '../../';
 
 $(document).ready(function() {
@@ -16,7 +16,7 @@ $(document).ready(function() {
     containerParent.prepend('<h1>' + gameNameFriendly + ' 100% Completion Checklist</h1>');
     containerParent.prepend('<div class="home-link"><a href="' + linkToHomePage + '" class="home-link-text"><i class="fa-solid fa-house fa-lg" ></i></a></div>');
 
-    fetch(dataFile).then(response => response.arrayBuffer()).then(data => {
+    fetch(excelFilePath).then(response => response.arrayBuffer()).then(data => {
         const workbook = XLSX.read(data, {type: 'array'});
         processWorkbook(workbook);
         initializeCheckboxes(); // Initialize checkboxes after processing workbook
