@@ -243,10 +243,24 @@ a {
 .section-header-icon { 
 	font-size: 14px;
 	display: inline-block; 
-}
-
+} 
+ 
 .fa {
 	color: $teal_bck_color_2;
+}
+
+.fa-border {
+	border-color: $teal_bck_color_2 !important;
+	border-radius: 5px  !important; /* Optional: Rounds the edges */
+	border-width: 2px !important;/* Optional: thickness of the lines */
+	
+	/* Adjust padding for size */
+	padding-left: 7px !important;
+	padding-right: 7px !important;
+	padding-top: 14px !important;
+	padding-bottom: 14px !important;
+
+
 }
 
 /*************************************** TABLES *******************************/

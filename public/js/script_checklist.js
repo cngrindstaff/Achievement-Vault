@@ -18,9 +18,9 @@ $(document).ready(function() {
     mainContainer.prepend(`<div class="link-container"> </div>`);
     const linkContainerDiv = $('.link-container');
     if(hasTablePage){
-        linkContainerDiv.prepend('<div class="link-icon"><a href="' + linkToGamePage + '" class="link-icon-text" title="Return to Game Page"><i class="fa fa-arrow-left fa-lg" ></i></a></div>');
+        linkContainerDiv.prepend('<div class="link-icon"><a href="' + linkToGamePage + '" class="link-icon-text" title="Return to Game Page"><i class="fa fa-arrow-left fa-lg fa-border" ></i></a></div>');
     }
-    linkContainerDiv.prepend('<div class="link-icon"><a href="' + linkToHomePage + '" class="link-icon-text"><i class="fa fa-solid fa-house fa-lg" ></i></a></div>');
+    linkContainerDiv.prepend('<div class="link-icon"><a href="' + linkToHomePage + '" class="link-icon-text"><i class="fa fa-solid fa-house fa-lg fa-border" ></i></a></div>');
 
 
     fetch(excelFilePath).then(response => response.arrayBuffer()).then(data => {
