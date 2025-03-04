@@ -226,6 +226,17 @@ a {
   color: #6AD6DC;
 }
 
+.fa-border {
+  border-color: #6AD6DC !important;
+  border-radius: 5px !important; /* Optional: Rounds the edges */
+  border-width: 2px !important; /* Optional: thickness of the lines */
+  /* Adjust padding for size */
+  padding-left: 7px !important;
+  padding-right: 7px !important;
+  padding-top: 14px !important;
+  padding-bottom: 14px !important;
+}
+
 /*************************************** TABLES *******************************/
 table {
   width: 100%;
