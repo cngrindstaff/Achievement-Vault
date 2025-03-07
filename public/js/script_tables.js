@@ -58,9 +58,9 @@ $(document).ready(function() {
         });    });
 
 function showNoTablesMessage() {
-    console.log('made it here');
-    document.getElementById('grid-tables-container').innerHTML = `
-                <div class="no-tables">No tables available</div>
+    document.getElementById('grid-tables-container').innerHTML = 
+            `
+            <div class="no-tables">No tables available</div>
             `;
 }
 
