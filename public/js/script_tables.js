@@ -1,4 +1,4 @@
-var excelFilePath = '/games/' + gameName + '/' + gameName + '_data_2.xlsx';
+var excelFilePath = '/games/' + gameName + '/' + gameName + '_tables.xlsx';
 var linkToHomePage = '../../';
 var linkToGamePage = '/games/' + gameName + '/' + gameName + '.html';
 
