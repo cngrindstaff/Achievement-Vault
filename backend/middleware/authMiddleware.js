@@ -1,7 +1,7 @@
 ﻿const AV_USERNAME = process.env.AV_USERNAME;
 const AV_PASSWORD = process.env.AV_PASSWORD;
 
-function basicAuthMiddleware(req, res, next) {
+export default function basicAuthMiddleware(req, res, next) {
     const authHeader = req.headers.authorization;
 
     if (!authHeader || !authHeader.startsWith("Basic ")) {
@@ -24,4 +24,3 @@ function basicAuthMiddleware(req, res, next) {
     next(); // Continue to next middleware
 }
 
-module.exports = basicAuthMiddleware;

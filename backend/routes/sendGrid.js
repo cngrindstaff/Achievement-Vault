@@ -1,5 +1,5 @@
-﻿const express = require("express");
-const sgMail = require("@sendgrid/mail");
+﻿import express from "express";
+import sgMail from "@sendgrid/mail";
 
 const router = express.Router();
 sgMail.setApiKey(process.env.AV_SENDGRID_API_KEY);
@@ -27,4 +27,5 @@ router.post("/send-email", async (req, res) => {
     }
 });
 
-module.exports = router;
+// Export the router for use in server.js
+export default router;

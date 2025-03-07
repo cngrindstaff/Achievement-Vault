@@ -1,10 +1,9 @@
-﻿const express = require("express");
-const { google } = require("googleapis");
-const { googleAuth } = require("../config/googleAuth");
+﻿import express from "express";
+import { googleAuth, google } from "../config/googleAuth.js";
 
 const router = express.Router();
 
-async function appendRow(rowData) {
+export async function appendRow(rowData) {
     if (!googleAuth) {
         console.error("❌ Google Auth is not initialized!");
         return;
@@ -42,4 +41,6 @@ router.post("/google-sheets-append", async (req, res) => {
     }
 });
 
-module.exports = router;
+// Export the router for use in server.js
+// A file can have ONE default export, but as many named exports as you want (export function, export const)
+export default router;

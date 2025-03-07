@@ -1,3 +1,5 @@
+import { createSlug } from './script_utilities.js';
+
 const sendGridUrl = '/api/send-email';
 const googleSheetsAppendUrl = '/api/google-sheets-append';
 const excelFilePath = '/games/' + gameName + '/' + gameName + '_data.xlsx';
@@ -102,11 +104,12 @@ function generateChecklist(rows) {
     for (let sectionIndex = 0; sectionIndex < sectionCount; sectionIndex++) {
         const sectionTitle = rows[0][sectionIndex * 4];
         if (!sectionTitle) break;
+        var sectionTitleClean = createSlug(sectionTitle);
 
         // Create section template with the section header and the section body
         const sectionTemplate = `
             <div class="section-header" data-section="${sectionIndex}">
-                <span class="section-header-text" data-section="${sectionIndex}" data-section-title="${sectionTitle}">
+                <span class="section-header-text" data-section="${sectionIndex}" data-section-title="${sectionTitle}" data-section-title-clean="${sectionTitleClean}"">
                     ${sectionTitle} (0%)
                 </span>
                 <span class="section-header-icon">
@@ -122,6 +125,7 @@ function generateChecklist(rows) {
 
         // Add items to section
         items.forEach((item, index) => {
+            var itemNameClean = createSlug(item.name);
             const itemTemplate = `
                 <div class="grid-item-${item.description ? '2' : '1'}-row">
                     <div class="column1">
@@ -129,7 +133,7 @@ function generateChecklist(rows) {
                         ${item.description ? `<div class="description">${item.description}</div>` : ''}
                     </div>
                     <div class="column2">
-                        ${generateCheckboxes(sectionIndex, index, item.numOfCheckboxes, item.numAlreadyChecked)}
+                        ${generateCheckboxes(sectionIndex, index, item.numOfCheckboxes, item.numAlreadyChecked, itemNameClean)}
                     </div>
                 </div>
             `;
@@ -160,7 +164,7 @@ function extractItems(rows, sectionIndex) {
 }
 
 // Helper function to generate checkboxes, using the Excel info for if the item has been checked or not
-function generateCheckboxes(sectionIndex, itemIndex, total, checked) {
+function generateCheckboxes(sectionIndex, itemIndex, total, checked, sectionTitleClean, itemNameClean) {
     const checkboxes = [];
     for (let i = 1; i <= total; i++) {
         const isChecked = i <= checked ? 'checked' : '';
@@ -171,6 +175,8 @@ function generateCheckboxes(sectionIndex, itemIndex, total, checked) {
                 data-item="${itemIndex}" 
                 data-num-checkbox-clicked="${i}" 
                 data-num-total-checkboxes="${total}" 
+                data-section-title-clean="${sectionTitleClean}" 
+                data-item-name-clean="${itemNameClean}" 
                 ${isChecked}>
         `);
     }
