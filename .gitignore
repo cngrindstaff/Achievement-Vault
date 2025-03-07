@@ -1,15 +1,7 @@
 
-~$data.xlsx
 .idea/*
 /node_modules
 .env
 credentials.json
-credentials_base64.txt
-credentials_base64-old.txt
-credentials_base64_new.txt
-decoded_powershell2.json
-decoded_powershell.json
-test_credentials.json
+**/~$*.xlsx
 
-public/games/hello-kitty-island-adventure/~$hello-kitty-island-adventure_data.xlsx
-public/games/hello-kitty-island-adventure/~$hello-kitty-island-adventure_data_2.xlsx
