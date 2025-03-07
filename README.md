@@ -1,7 +1,6 @@
 
 # Achievement Vault
 This program allows you to track achievements in video games. 
-It supports multiple games. Just add a new folder, html file, and excel sheet, then add a link to it on the main page.
 
 ## How it works
 Each game uses its own excel file. In it, list the achievements (and descriptions if you want). 
@@ -11,36 +10,25 @@ of data, the excel file is also set up to support having items already marked as
 For trackable items that have degrees, more than one checkbox can be added per item. For example, the Keepsakes items in 
 Hades increase in level up to 3 times, so for each of these, there are 3 checkboxes next to each item. 
 
-
-
-
-## Accessing the excel files locally
-When running this locally, by default there will be a CORS error when the JS tries to access the excel file. The file needs to be hosted on a local web server.
-
-Install node.js
-
-Install http-server (use command line/bash):
-```
-npm install -g http-server
-```
-Navigate to your project directory and run:
-```
-http-server --cors
-```
-*By default, `http-server` doesn’t enable CORS headers. You need to explicitly allow them by running the server with the `--cors` flag*
-
-Access your files at `http://localhost:8080`
-
-
 ## Node server
-This has been modified to include a node server for email and password 
+This has been modified to include a node server for 3 new features:
+1. Email and password log-in
+2. Sending an email when an item is checked/unchecked
+3. Making a record in Google sheets when an item is checked/unchecked
 
-Run the server with:
-```node backend/server.js```
+## Running Locally
+1. Run the server with: ```node backend/server.js```
 
-Alternatively, use the following to make the server automatically restart when files are modified: 
-```npm install -g nodemon```
-```nodemon backend/server.js``` 
+2. Alternatively, use these commands to make the server automatically restart when files are modified: 
+   * Install nodemon: ```npm install -g nodemon```
+   * Use nodemon to start the server: ```nodemon backend/server.js``` 
+3. Load http://localhost:3000/
+
+Alternatively, create a CMD file with the following content and put it in the project's root directory:
+```
+start chrome http://localhost:3000/
+nodemon backend/server.js
+```
 
 ## Random notes
 ### Rider
@@ -51,6 +39,3 @@ If sass isn't installed, run
 
 Bug: Must set FileWatch Scope to "Current File". [Bug info](https://youtrack.jetbrains.com/issue/RIDER-55683/Unknown-scope-sign-for-Project-scope-in-SCSS-new-file-watcher)
 
-
-### Local
-Run the site locally by going to http://localhost:3000/
