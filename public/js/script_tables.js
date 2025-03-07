@@ -1,6 +1,8 @@
-var excelFilePath = '/games/' + gameName + '/' + gameName + '_tables.xlsx';
-var linkToHomePage = '../../';
-var linkToGamePage = '/games/' + gameName + '/' + gameName + '.html';
+import { createSlug } from "./script_utilities.js";
+
+const excelFilePath = '/games/' + gameName + '/' + gameName + '_tables.xlsx';
+const linkToHomePage = '../../';
+const linkToGamePage = '/games/' + gameName + '/' + gameName + '.html';
 
 $(document).ready(function() {
     //set the title field that's in the head, from the game's HTML
@@ -67,12 +69,14 @@ function showNoTablesMessage() {
     function createSection(sectionTitle, sectionIndex, data) {
         const gridContainer = document.getElementById('grid-tables-container');
 
+        var sectionTitleClean = createSlug(sectionTitle);
         // Create section header
         const sectionHeader = document.createElement('div');
         sectionHeader.classList.add('section-header');
         sectionHeader.dataset.section = sectionIndex;
         sectionHeader.innerHTML = `
-                <span class="section-header-text" data-section="${sectionIndex}" data-section-title="${sectionTitle}">${sectionTitle}</span>
+                <span class="section-header-text" data-section="${sectionIndex}" data-section-title="${sectionTitle}" 
+                    data-section-title-clean="${sectionTitleClean}">${sectionTitle}</span>
                 <span class="section-header-icon">
                     <i class="fas fa-chevron-down"></i>
                 </span>

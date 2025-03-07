@@ -1,12 +1,17 @@
-﻿require("dotenv").config();
-const express = require("express");
-const cors = require("cors");
-const path = require("path");
+﻿import "dotenv/config";
+import express from "express";
+import cors from "cors";
+import path from "path";
+import { fileURLToPath } from "url";  // Needed for __dirname in ES6
 
 // Import middleware & routes
-const basicAuthMiddleware = require("./middleware/authMiddleware");
-const googleSheetsRoutes = require("./routes/googleSheets");
-const sendGridRoutes = require("./routes/sendGrid");
+import basicAuthMiddleware from "./middleware/authMiddleware.js";
+import googleSheetsRouter from "./routes/googleSheets.js";
+import sendGridRouter from "./routes/sendGrid.js";
+
+// Define __dirname manually in ES6 modules
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -16,8 +21,8 @@ app.use(cors());
 app.use(basicAuthMiddleware); // Apply authentication globally
 
 // API Routes
-app.use("/api", googleSheetsRoutes);
-app.use("/api", sendGridRoutes);
+app.use("/api", googleSheetsRouter);
+app.use("/api", sendGridRouter);
 
 // Serve static files
 app.use(express.static(path.join(__dirname, "..", "public")));
