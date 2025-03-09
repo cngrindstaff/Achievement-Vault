@@ -1,6 +1,8 @@
 ﻿import express from "express";
 import sgMail from "@sendgrid/mail";
 
+var SEND_EMAIL = process.env.SEND_EMAIL;
+console.log('SEND_EMAIL: ' + SEND_EMAIL);
 const router = express.Router();
 sgMail.setApiKey(process.env.AV_SENDGRID_API_KEY);
 
@@ -18,13 +20,17 @@ router.post("/send-email", async (req, res) => {
         text,
     };
 
-    try {
-        await sgMail.send(msg);
-        res.status(200).json({ message: "✅ Email sent successfully!" });
-    } catch (error) {
-        console.error("❌ SendGrid Error:", error);
-        res.status(500).json({ error: "Error sending email." });
+    if(SEND_EMAIL === true)
+    {
+        try {
+            await sgMail.send(msg);
+            res.status(200).json({ message: "✅ Email sent successfully!" });
+        } catch (error) {
+            console.error("❌ SendGrid Error:", error);
+            res.status(500).json({ error: "Error sending email." });
+        }
     }
+
 });
 
 // Export the router for use in server.js
