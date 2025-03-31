@@ -84,6 +84,11 @@ async function sendDataToSheets(gameName, sectionName, itemName, action, checkbo
     if (debugLogging) console.log(sheetsResponse);
 }
 
+function createStorageItemName(gameName, sectionNameClean, itemNameClean, i) {
+    var storageItemName = `${gameName}--checkbox--${sectionNameClean}--${itemNameClean}--${i}`;
+    return storageItemName;
+}
+
 function processWorkbook(workbook) {
     const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
     const rows = XLSX.utils.sheet_to_json(firstSheet, {header: 1});
@@ -133,7 +138,7 @@ function generateChecklist(rows) {
                         ${item.description ? `<div class="description">${item.description}</div>` : ''}
                     </div>
                     <div class="column2">
-                        ${generateCheckboxes(sectionIndex, index, item.numOfCheckboxes, item.numAlreadyChecked, itemNameClean)}
+                        ${generateCheckboxes(sectionIndex, index, item.numOfCheckboxes, item.numAlreadyChecked, sectionTitleClean, itemNameClean)}
                     </div>
                 </div>
             `;
@@ -164,17 +169,18 @@ function extractItems(rows, sectionIndex) {
 }
 
 // Helper function to generate checkboxes, using the Excel info for if the item has been checked or not
-function generateCheckboxes(sectionIndex, itemIndex, total, checked, sectionTitleClean, itemNameClean) {
+function generateCheckboxes(sectionIndex, itemIndex, item_checkboxes_total, item_checkboxes_checked, sectionTitleClean, itemNameClean) {
     const checkboxes = [];
-    for (let i = 1; i <= total; i++) {
-        const isChecked = i <= checked ? 'checked' : '';
+    for (let i = 1; i <= item_checkboxes_total; i++) {
+        const isChecked = i <= item_checkboxes_checked ? 'checked' : '';
+        var checkboxName = createStorageItemName(gameName, sectionTitleClean, itemNameClean, i);
         checkboxes.push(`
             <input type="checkbox" 
-                class="checkbox-${sectionIndex}-${itemIndex}-${i}" 
+                class="checkbox-${checkboxName}" 
                 data-section="${sectionIndex}" 
                 data-item="${itemIndex}" 
                 data-num-checkbox-clicked="${i}" 
-                data-num-total-checkboxes="${total}" 
+                data-num-total-checkboxes="${item_checkboxes_total}" 
                 data-section-title-clean="${sectionTitleClean}" 
                 data-item-name-clean="${itemNameClean}" 
                 ${isChecked}>
@@ -187,21 +193,29 @@ function updateCompletion() {
     const sectionIndex = $(this).data('section');
     const itemIndex = $(this).data('item');
     const checkboxNum = $(this).data('num-checkbox-clicked');
+    const sectionTitleClean = $(this).data('section-title-clean');
+    const itemNameClean = $(this).data('item-name-clean');
     
-    if (debugLogging) console.log("updateCompletion called - sectionIndex " + sectionIndex + "itemIndex " + itemIndex + "checkboxNum " + checkboxNum)
+    //if (debugLogging) 
+    console.log("updateCompletion called - sectionIndex " + sectionIndex + ". itemIndex " + itemIndex + ". checkboxNum " + checkboxNum +
+        ". sectionTitleClean " + sectionTitleClean + ". itemNameClean " + itemNameClean)
 
     //get the section-header-text div
     var sectionHeaderTextDiv = $(`span.section-header-text[data-section="${sectionIndex}"]`);
     
-    // 1️⃣ Get the text inside the "section-header-text" element
+    // Get the text inside the "section-header-text" element
     const sectionHeaderText = sectionHeaderTextDiv.text().trim();
     if (debugLogging) console.log("Section Header Text:", sectionHeaderText);
 
-    // 1️⃣ Get the sectionTitle data attribute value from "section-header-text" element
+    // Get the sectionTitle data attribute value from "section-header-text" element
     const sectionTitle = sectionHeaderTextDiv.attr('data-section-title');
     if (debugLogging) console.log('sectionTitle: ' + sectionTitle);
-    
-    // 2️⃣ Get the text inside the sibling element's label
+
+    // Get the sectionTitleClean data attribute value from "section-header-text" element
+/*    const sectionTitleClean = sectionHeaderTextDiv.attr('data-section-title-clean');
+    if (debugLogging) console.log('sectionTitleClean: ' + sectionTitleClean);*/
+
+    // Get the text inside the sibling element's label
     const checkboxItemName = $(this).closest('.grid-item-2-row, .grid-item-1-row').find('.label').text().trim();
     if (debugLogging) console.log("checkboxItemName:", checkboxItemName);
     
@@ -220,7 +234,9 @@ function updateCompletion() {
         if (debugLogging) console.log('this item is checked. CheckboxNum: ' + checkboxNum);
         for (let i = 1; i <= checkboxNum; i++) {
             $(`.checkbox-${sectionIndex}-${itemIndex}-${i}`).prop('checked', true);
-            var storageItemName = `${gameName}-checkbox-${sectionIndex}-${itemIndex}-${i}`;
+            //var storageItemName = `${gameName}-checkbox-${sectionIndex}-${itemIndex}-${i}`;
+            //var storageItemName = createStorageItemName(gameName, sectionIndex, itemIndex, i);
+            var storageItemName = createStorageItemName(gameName, sectionTitleClean, itemNameClean, checkboxNum);
             localStorage.setItem(storageItemName, 'checked');
             if (debugLogging) console.log('checked item in local storage. storageItemName: ' + storageItemName);
         }
@@ -229,7 +245,9 @@ function updateCompletion() {
         if (debugLogging) console.log('this item is not checked. CheckboxNum: ' + checkboxNum);
         for (let i = checkboxNum; i <= $(`input[data-section="${sectionIndex}"][data-item="${itemIndex}"]`).length; i++) {
             $(`.checkbox-${sectionIndex}-${itemIndex}-${i}`).prop('checked', false);
-            var storageItemName = `${gameName}-checkbox-${sectionIndex}-${itemIndex}-${i}`;
+            //var storageItemName = `${gameName}-checkbox-${sectionIndex}-${itemIndex}-${i}`;
+            //var storageItemName = createStorageItemName(gameName, sectionIndex, itemIndex, i);
+            var storageItemName = createStorageItemName(gameName, sectionTitleClean, itemNameClean, checkboxNum);
             localStorage.removeItem(storageItemName);
             if (debugLogging) console.log('removed item from local storage. storageItemName: ' + storageItemName);
         }
@@ -310,11 +328,16 @@ function updateTotalCompletion() {
 //Local Storage might have updated checkboxes. Initialize them on top of what was in Excel.
 function initializeCheckboxesFromLocalStorage() {
     $('input[type="checkbox"]').each(function() {
-        const sectionIndex = $(this).data('section');
-        const itemIndex = $(this).data('item');
+        //const sectionIndex = $(this).data('section');
+        //const itemIndex = $(this).data('item');
         const checkboxNum = $(this).data('num-checkbox-clicked');
-        const storageItemName = `${gameName}-checkbox-${sectionIndex}-${itemIndex}-${checkboxNum}`;
-        
+        const sectionTitleClean = $(this).data('section-title-clean');
+        const itemNameClean = $(this).data('item-name-clean');
+
+        //const storageItemName = `${gameName}-checkbox-${sectionIndex}-${itemIndex}-${checkboxNum}`;
+        //var storageItemName = createStorageItemName(gameName, sectionIndex, itemIndex, checkboxNum);
+        var storageItemName = createStorageItemName(gameName, sectionTitleClean, itemNameClean, checkboxNum);
+
         if (localStorage.getItem(storageItemName) === 'checked') {
             $(this).prop('checked', true);
         }
