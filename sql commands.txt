@@ -39,3 +39,73 @@ ADD ListOrder INT NOT NULL DEFAULT 0;
 
 ALTER TABLE Records
 ADD LongDescription VARCHAR(1000);
+
+***********
+
+
+DELIMITER $$
+
+CREATE PROCEDURE GetAllGames()
+BEGIN
+    SELECT * FROM `achievement-vault`.Games;
+END $$
+
+DELIMITER ;
+
+
+***********
+
+DELIMITER $$
+
+CREATE PROCEDURE GetAllSectionsByGameID(IN inputGameID INT)
+BEGIN
+    SELECT * FROM Sections
+    WHERE GameID = inputGameID;
+END $$
+
+DELIMITER ;
+
+***********
+
+DELIMITER $$
+
+CREATE PROCEDURE GetAllGameDataByGameID(IN inputGameID INT)
+BEGIN
+    SELECT 
+        g.ID AS GameID,
+        g.Name AS GameName,
+        g.FriendlyName,
+        
+        s.Name AS SectionName,
+        s.ListOrder AS SectionListOrder,
+        
+        r.ID AS RecordID,
+        r.Name AS RecordName,
+        r.Description AS RecordDescription,
+        r.NumberOfCheckboxes,
+        r.NumberAlreadyCompleted,
+        r.ListOrder AS RecordListOrder,
+        r.LongDescription AS RecordLongDescription
+
+    FROM Games g
+    LEFT JOIN Sections s ON g.ID = s.GameID
+    LEFT JOIN Records r ON s.ID = r.SectionID
+    WHERE g.ID = inputGameID;
+END $$
+
+DELIMITER ;
+
+*****
+
+DELIMITER $$
+
+CREATE PROCEDURE GetAllRecordsBySectionID(IN inputSectionID INT)
+BEGIN
+    SELECT * FROM Records
+    WHERE SectionID = inputSectionID;
+END $$
+
+DELIMITER ;
+
+
+*****
