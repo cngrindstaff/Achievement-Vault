@@ -109,3 +109,36 @@ DELIMITER ;
 
 
 *****
+
+DELIMITER $$
+
+CREATE PROCEDURE UpdateRecord(
+    IN inputRecordID INT,
+    IN inputNumberAlreadyCompleted INT
+)
+BEGIN
+    -- Check if the record exists
+    IF NOT EXISTS (
+        SELECT 1 FROM Records WHERE ID = inputRecordID
+    ) THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Error: Record not found.';
+    ELSE
+        -- Try to update the record
+        UPDATE Records
+        SET NumberAlreadyCompleted = inputNumberAlreadyCompleted
+        WHERE ID = inputRecordID;
+
+        -- Check if any row was actually updated
+        IF ROW_COUNT() = 0 THEN
+            SIGNAL SQLSTATE '45000'
+            SET MESSAGE_TEXT = 'Error: Record exists but no update was performed.';
+        END IF;
+    END IF;
+END $$
+
+DELIMITER ;
+
+*****
+
+
