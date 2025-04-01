@@ -28,7 +28,7 @@ body {
   padding: 20px;
 }
 
-.container {
+.container , .game-list-container{
   max-width: 700px;
   width: 100%;
 }

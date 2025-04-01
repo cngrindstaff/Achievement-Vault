@@ -31,6 +31,7 @@ nodemon backend/server.js
 ```
 
 ## Random notes
+This uses ES Modules instead of CommonJS
 ### Rider
 Auto-compile SASS to CSS using a [FileWatch in Jetbrains]( https://www.jetbrains.com/help/rider/Transpiling_SASS_LESS_and_SCSS_to_CSS.html#less_sass_scss_compiling_to_css)
 

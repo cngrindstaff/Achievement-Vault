@@ -9,6 +9,5 @@ $(document).ready(function() {
 
     $(".section-header.link-checklist").attr("href", linkToChecklistPage);
     $(".section-header.link-tables").attr("href", linkToTablesPage);
-
- 
 });
+

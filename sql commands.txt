@@ -142,3 +142,16 @@ DELIMITER ;
 *****
 
 
+https://www.digitalocean.com/community/tutorials/how-to-create-a-new-user-and-grant-permissions-in-mysql
+
+
+CREATE USER 'achievement_vault_user'@'%' IDENTIFIED BY 'H4Pffb*E^8TDo$N@';
+GRANT EXECUTE ON PROCEDURE achievement_vault.* TO 'achievement_vault_user'@'%';
+FLUSH PRIVILEGES;
+
+
+***
+npm install mysql2
+
+***
+
