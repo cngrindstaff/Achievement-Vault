@@ -36,4 +36,87 @@ router.get('/db/games/:gameId', async (req, res) => {
     }
 });
 
+// Route 3: Get all data for a game by ID
+router.get('/db/games/full/:gameId', async (req, res) => {
+    //console.log('made it here2');
+    const gameId = req.params.gameId;
+    //console.log('gameId: ' + gameId);
+    try {
+        const [rows] = await db.query('CALL GetAllGameDataByGameID(?)', [gameId]);
+        const result = rows[0];
+
+        if (result.length === 0) {
+            return res.status(404).json({ error: 'Game not found' });
+        }
+
+        res.json(result);
+    } catch (err) {
+        console.error(`Error fetching full gamedata  with ID ${gameId}:`, err);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
+// Route 4: Get all sections for a game by ID
+router.get('/db/sections/:gameId', async (req, res) => {
+    console.log('made it here sections/gameid');
+    const gameId = req.params.gameId;
+    //console.log('gameId: ' + gameId);
+    try {
+        const [rows] = await db.query('CALL GetAllSectionsByGameID(?)', [gameId]);
+        const result = rows[0];
+
+        if (result.length === 0) {
+            return res.status(404).json({ error: 'Game not found' });
+        }
+
+        res.json(result);
+    } catch (err) {
+        console.error(`Error fetching sections  with game ID ${gameId}:`, err);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
+// Route 5: Get all records for a game section by section Id
+router.get('/db/records/:sectionId', async (req, res) => {
+    console.log('made it records/sectionId');
+    const sectionId = req.params.sectionId;
+    console.log('sectionId: ' + sectionId);
+    try {
+        const [rows] = await db.query('CALL GetAllRecordsBySectionID(?)', [sectionId]);
+        const result = rows[0];
+
+        if (result.length === 0) {
+            return res.status(404).json({ error: 'Game or section not found' });
+        }
+
+        res.json(result);
+    } catch (err) {
+        console.error(`Error fetching section data with section ID ${sectionId}:`, err);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
+// Route 6: Update Record
+router.put('/db/record/updateCompletion/:recordId', async (req, res) => {
+    const recordId = req.params.recordId;
+    const { numberAlreadyCompleted } = req.body;
+
+    console.log('recordId: ' + recordId + ". numberAlreadyCompleted: " + numberAlreadyCompleted);
+
+    if (numberAlreadyCompleted === undefined) {
+        return res.status(400).json({ error: 'Missing required field: numberAlreadyCompleted' });
+    }
+
+    console.log('made it here2 - recordId ' + recordId + ' numberAlreadyCompleted ' + numberAlreadyCompleted);
+
+    
+    try {
+        await db.query('CALL UpdateRecord(?, ?)', [recordId, numberAlreadyCompleted]);
+        res.json({ message: 'Progress updated successfully' });
+    } catch (err) {
+        console.error('Error updating progress:', err);
+        res.status(500).json({ error: 'Database error' });
+    }
+});
+
 export default router;

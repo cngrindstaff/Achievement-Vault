@@ -7,7 +7,7 @@
         games.forEach(game => {
             const p = document.createElement('p');
             p.className = 'game-list-item';
-            p.onclick = () => window.location.href = `game.html?id=${game.ID}&name=${game.Name}`;
+            p.onclick = () => window.location.href = `game?id=${game.ID}&name=${game.Name}`;
             p.textContent = game.FriendlyName;
             container.appendChild(p);
         });

@@ -146,7 +146,7 @@ https://www.digitalocean.com/community/tutorials/how-to-create-a-new-user-and-gr
 
 
 CREATE USER 'achievement_vault_user'@'%' IDENTIFIED BY 'password';
-GRANT EXECUTE ON PROCEDURE achievement_vault.GetGameById TO 'achievement_vault_user'@'%';
+GRANT EXECUTE ON PROCEDURE achievement_vault.GetAllSectionsByGameID TO 'achievement_vault_user'@'%';
 FLUSH PRIVILEGES;
 
 
