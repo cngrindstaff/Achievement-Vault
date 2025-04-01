@@ -8,6 +8,7 @@ import { fileURLToPath } from "url";  // Needed for __dirname in ES6
 import basicAuthMiddleware from "./middleware/authMiddleware.js";
 import googleSheetsRouter from "./routes/googleSheets.js";
 import sendGridRouter from "./routes/sendGrid.js";
+import dbRouter from "./routes/db.js";
 
 // Define __dirname manually in ES6 modules
 const __filename = fileURLToPath(import.meta.url);
@@ -23,6 +24,7 @@ app.use(basicAuthMiddleware); // Apply authentication globally
 // API Routes
 app.use("/api", googleSheetsRouter);
 app.use("/api", sendGridRouter);
+app.use("/api", dbRouter);
 
 // Serve static files
 app.use(express.static(path.join(__dirname, "..", "public")));

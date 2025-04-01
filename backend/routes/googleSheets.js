@@ -5,7 +5,7 @@ const router = express.Router();
 
 export async function appendRow(rowData) {
     if (!googleAuth) {
-        console.error("❌ Google Auth is not initialized!");
+        console.error("Google Auth is not initialized!");
         return;
     }
 
