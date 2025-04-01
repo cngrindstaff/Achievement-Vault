@@ -5,7 +5,7 @@ import db from '../config/mysqlConnector.js';
 
 // Route 1: Get all games
 router.get('/db/games/all', async (req, res) => {
-    console.log('made it here');
+    //console.log('made it here');
     try {
         const [rows] = await db.query('CALL GetAllGames()');
         const games = rows[0]; // CALL returns an array of result sets
@@ -18,7 +18,9 @@ router.get('/db/games/all', async (req, res) => {
 
 // Route 2: Get a single game by ID
 router.get('/db/games/:gameId', async (req, res) => {
+    //console.log('made it here2');
     const gameId = req.params.gameId;
+    //console.log('gameId: ' + gameId);
     try {
         const [rows] = await db.query('CALL GetGameById(?)', [gameId]);
         const result = rows[0];

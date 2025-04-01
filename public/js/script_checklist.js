@@ -2,22 +2,22 @@ import { createSlug } from './script_utilities.js';
 
 const sendGridUrl = '/api/send-email';
 const googleSheetsAppendUrl = '/api/google-sheets-append';
-const excelFilePath = '/games/' + gameName + '/' + gameName + '_data.xlsx';
+const excelFilePath = '/games/' + gameId + '/' + gameId + '_data.xlsx';
 const linkToHomePage = '../../';
-const linkToGamePage = '/games/' + gameName + '/' + gameName + '.html';
+const linkToGamePage = '/games/' + gameId + '/' + gameId + '.html';
 
 var debugLogging = false;
 
 $(document).ready(function() {
     //set the title field that's in the head using the variable from the game's HTML
     const titleElement = document.querySelector('title');
-    titleElement.textContent = gameNameFriendly + ' 100% Completion Checklist';
+    titleElement.textContent = passed_gameNameFriendly + ' 100% Completion Checklist';
 
     //.append() puts data inside an element at last index and .prepend() puts the prepending elem at first index.
     const mainContainer = $('#container');
     
     mainContainer.prepend('<p id="total-completion">Total Completion: 0%</p>');
-    mainContainer.prepend('<h1>' + gameNameFriendly + ' 100% Completion Checklist</h1>');
+    mainContainer.prepend('<h1>' + passed_gameNameFriendly + ' 100% Completion Checklist</h1>');
 
     mainContainer.prepend(`<div class="link-container"> </div>`);
     const linkContainerDiv = $('.link-container');
@@ -173,7 +173,7 @@ function generateCheckboxes(sectionIndex, itemIndex, item_checkboxes_total, item
     const checkboxes = [];
     for (let i = 1; i <= item_checkboxes_total; i++) {
         const isChecked = i <= item_checkboxes_checked ? 'checked' : '';
-        var checkboxName = createStorageItemName(gameName, sectionTitleClean, itemNameClean, i);
+        var checkboxName = createStorageItemName(gameId, sectionTitleClean, itemNameClean, i);
         checkboxes.push(`
             <input type="checkbox" 
                 class="checkbox-${checkboxName}" 
@@ -236,7 +236,7 @@ function updateCompletion() {
             $(`.checkbox-${sectionIndex}-${itemIndex}-${i}`).prop('checked', true);
             //var storageItemName = `${gameName}-checkbox-${sectionIndex}-${itemIndex}-${i}`;
             //var storageItemName = createStorageItemName(gameName, sectionIndex, itemIndex, i);
-            var storageItemName = createStorageItemName(gameName, sectionTitleClean, itemNameClean, checkboxNum);
+            var storageItemName = createStorageItemName(gameId, sectionTitleClean, itemNameClean, checkboxNum);
             localStorage.setItem(storageItemName, 'checked');
             if (debugLogging) console.log('checked item in local storage. storageItemName: ' + storageItemName);
         }
@@ -247,15 +247,15 @@ function updateCompletion() {
             $(`.checkbox-${sectionIndex}-${itemIndex}-${i}`).prop('checked', false);
             //var storageItemName = `${gameName}-checkbox-${sectionIndex}-${itemIndex}-${i}`;
             //var storageItemName = createStorageItemName(gameName, sectionIndex, itemIndex, i);
-            var storageItemName = createStorageItemName(gameName, sectionTitleClean, itemNameClean, checkboxNum);
+            var storageItemName = createStorageItemName(gameId, sectionTitleClean, itemNameClean, checkboxNum);
             localStorage.removeItem(storageItemName);
             if (debugLogging) console.log('removed item from local storage. storageItemName: ' + storageItemName);
         }
         action = 'removed';
     }
 
-    var subject = `Record updated for ${gameNameFriendly}`
-    var emailText = `A record was ${action} for ${gameNameFriendly}.\nSection: ${sectionTitle}\nItem: ${checkboxItemName}`
+    var subject = `Record updated for ${passed_gameNameFriendly}`
+    var emailText = `A record was ${action} for ${passed_gameNameFriendly}.\nSection: ${sectionTitle}\nItem: ${checkboxItemName}`
     if(numberOfCheckboxes > 1){
         emailText += `\nCheckbox Number Clicked: ${checkboxNumberClicked}`
     }
@@ -263,10 +263,10 @@ function updateCompletion() {
     if (action) {
         sendEmail(subject, emailText);
         if(numberOfCheckboxes > 1) {
-            sendDataToSheets(gameNameFriendly, sectionTitle, checkboxItemName, action, checkboxNumberClicked);
+            sendDataToSheets(passed_gameNameFriendly, sectionTitle, checkboxItemName, action, checkboxNumberClicked);
         }
         else {
-            sendDataToSheets(gameNameFriendly, sectionTitle, checkboxItemName, action, null);
+            sendDataToSheets(passed_gameNameFriendly, sectionTitle, checkboxItemName, action, null);
         }
     }
 
@@ -336,7 +336,7 @@ function initializeCheckboxesFromLocalStorage() {
 
         //const storageItemName = `${gameName}-checkbox-${sectionIndex}-${itemIndex}-${checkboxNum}`;
         //var storageItemName = createStorageItemName(gameName, sectionIndex, itemIndex, checkboxNum);
-        var storageItemName = createStorageItemName(gameName, sectionTitleClean, itemNameClean, checkboxNum);
+        var storageItemName = createStorageItemName(gameId, sectionTitleClean, itemNameClean, checkboxNum);
 
         if (localStorage.getItem(storageItemName) === 'checked') {
             $(this).prop('checked', true);
