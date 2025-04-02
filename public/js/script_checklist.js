@@ -271,10 +271,10 @@ function updateCompletion() {
         }
         dbUtils.updateRecordInDatabase(recordId, numberAlreadyCompleted);
         if(numberOfCheckboxes > 1) {
-            //sendDataToSheets(gameNameFriendly, sectionTitle, checkboxItemName, action, checkboxNumberClicked);
+            sendDataToSheets(gameNameFriendly, sectionTitle, checkboxItemName, action, checkboxNumberClicked);
         }
         else {
-            //sendDataToSheets(gameNameFriendly, sectionTitle, checkboxItemName, action, null);
+            sendDataToSheets(gameNameFriendly, sectionTitle, checkboxItemName, action, null);
         }
     }
 
