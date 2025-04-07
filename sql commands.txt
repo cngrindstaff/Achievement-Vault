@@ -17,7 +17,7 @@ CREATE TABLE Sections (
 CREATE TABLE Records (
     ID INT AUTO_INCREMENT PRIMARY KEY,
     Name VARCHAR(100) NOT NULL,
-    Description VARCHAR(250),
+    Description VARCHAR(1000),
     SectionID INT NOT NULL,
     GameID INT NOT NULL,
     NumberOfCheckboxes INT NOT NULL DEFAULT 0,
@@ -47,7 +47,8 @@ DELIMITER $$
 
 CREATE PROCEDURE GetAllGames()
 BEGIN
-    SELECT * FROM `achievement-vault`.Games;
+    SELECT * FROM `achievement-vault`.Games
+	ORDER BY Name ASC;
 END $$
 
 DELIMITER ;
@@ -161,6 +162,20 @@ CREATE PROCEDURE GetGameById(IN gameID INT)
 BEGIN
     SELECT * FROM Games
     WHERE ID = gameID;
+    
+END $$
+
+DELIMITER ;
+
+***
+
+DELIMITER $$
+
+CREATE DEFINER="doadmin"@"%" PROCEDURE "GetAllRecordsByGameID" (IN inputGameID INT)
+BEGIN
+    SELECT * FROM Records
+    WHERE GameID = inputGameID
+    ORDER BY ListOrder ASC;
 END $$
 
 DELIMITER ;
