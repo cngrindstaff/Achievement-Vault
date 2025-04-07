@@ -1,5 +1,5 @@
 import { loadGameData } from "./script_db_helper.js";
-import {getQueryParam} from "./script_utilities.js";
+import { getQueryParam } from "./script_utilities.js";
 
 // Define these at the top level so they can be reused
 let gameId = null;
@@ -18,15 +18,16 @@ $(document).ready(async function () {
     gameName = result.Name;
     gameNameFriendly = result.FriendlyName;
     hasDataTables = result.HasDataTables;
-    console.log('gameId:' + gameId + ', gameName:' + gameName + ', gameNameFriendly:' + gameNameFriendly);
+    //console.log('gameId:' + gameId + ', gameName:' + gameName + ', gameNameFriendly:' + gameNameFriendly);
 
     // Now safely use the values
-    var linkToChecklistPage = `/checklist?id=${gameId}&name=${gameName}`;
-    var linkToTablesPage = `/tables?id=${gameId}&name=${gameName}`;
-
+    //Set the HTML title
     $("title").text(gameNameFriendly);
+    //Set the .game-name element
     document.querySelector('.game-name').textContent = gameNameFriendly;
-
+    //Generate the URLs
+    var linkToChecklistPage = `/checklist?id=${gameId}&name=${gameName}`;
+    var linkToTablesPage = `/table?id=${gameId}&name=${gameName}`;
 
     $('#grid-link-container').append(`<a class="section-header link-checklist" href="${linkToChecklistPage}">100% Checklist</a>`);
     

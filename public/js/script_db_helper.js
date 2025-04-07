@@ -106,5 +106,35 @@ export async function updateRecordInDatabase(recordId, numberAlreadyCompleted){
     }
 }
 
+export async function loadGameTablesByGameId(gameId) {
+    if (!gameId) {
+        alert("Missing game ID in URL.");
+        return;
+    }
 
+    try {
+        const res = await fetch(`/api/db/gameTables/${gameId}`);
+        const data = await res.json();
+        return data;
+    } catch (err) {
+        console.error("Error fetching game data:", err);
+    }
+}
+export async function loadTableRecordsByTableId(tableId) {
+    if (!tableId) {
+        alert("Missing table ID in URL.");
+        return;
+    }
 
+    try {
+        const res = await fetch(`/api/db/tableRecords/${tableId}`);
+        if(res === null){
+            console.error("Error fetching table data. Returned null");
+            return null;
+        }
+        const data = await res.json();
+        return data;
+    } catch (err) {
+        console.error("Error fetching table data:", err);
+    }
+}

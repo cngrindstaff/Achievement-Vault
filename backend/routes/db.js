@@ -119,4 +119,49 @@ router.put('/db/record/updateCompletion/:recordId', async (req, res) => {
     }
 });
 
+
+//get all game Tables by gameId
+router.get('/db/gameTables/:gameId', async (req, res) => {
+    //console.log('made it here sections/gameid');
+    const gameId = req.params.gameId;
+    //console.log('gameId: ' + gameId);
+    try {
+        const [rows] = await db.query('CALL GetAllGameTablesByGameID(?)', [gameId]);
+        const result = rows[0];
+
+        if (result.length === 0) {
+            return res.status(404).json({ error: 'Game not found' });
+        }
+
+        res.json(result);
+    } catch (err) {
+        console.error(`Error fetching game tables with game ID ${gameId}:`, err);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
+
+router.get('/db/tableRecords/:tableId', async (req, res) => {
+    const gameId = req.params.tableId;
+    try {
+        const [rows] = await db.query('CALL GetAllTableRecordsByTableID(?)', [gameId]);
+        //console.log('rows:', rows);
+        if (!rows || rows.length === 0 || (Array.isArray(rows[0]) && rows[0].length === 0)) {
+            console.log("No records returned.");
+            return null;
+        }
+        
+        const result = rows[0];
+
+        if (result.length === 0) {
+            return res.status(404).json({ error: 'Game not found' });
+        }
+
+        res.json(result);
+    } catch (err) {
+        console.error(`Error fetching game tables with game ID ${gameId}:`, err);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
 export default router;
