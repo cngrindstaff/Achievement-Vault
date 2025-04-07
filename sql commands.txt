@@ -91,7 +91,8 @@ BEGIN
     FROM Games g
     LEFT JOIN Sections s ON g.ID = s.GameID
     LEFT JOIN Records r ON s.ID = r.SectionID
-    WHERE g.ID = inputGameID;
+    WHERE g.ID = inputGameID
+	ORDER BY SectionListOrder ASC, RecordListOrder ASC, RecordName ASC;
 END $$
 
 DELIMITER ;
@@ -194,5 +195,69 @@ END
 
 ***************
 ALTER TABLE Games RENAME COLUMN HasDataTable TO HasDataTables;
+
+***************
+CREATE TABLE GameTables (
+    ID INT AUTO_INCREMENT PRIMARY KEY,
+    Name VARCHAR(100) NOT NULL,
+    GameID INT NOT NULL,
+	ListOrder INT NOT NULL DEFAULT 1,
+    FOREIGN KEY (GameID) REFERENCES Games(ID)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE
+);
+***************
+
+DELIMITER $$
+
+CREATE DEFINER="doadmin"@"%" PROCEDURE "GetAllGameTablesByGameID" (IN inputGameID INT)
+BEGIN
+    SELECT * FROM GameTables
+    WHERE GameID = inputGameID
+    ORDER BY ListOrder ASC, Name ASC;
+END $$
+
+DELIMITER ;
+
+
+***************
+
+ALTER TABLE GameTables
+ADD FieldName_01 VARCHAR(100),
+ADD FieldName_02 VARCHAR(100),
+ADD FieldName_03 VARCHAR(100),
+ADD FieldName_04 VARCHAR(100),
+ADD FieldName_05 VARCHAR(100),
+ADD FieldName_06 VARCHAR(100);
+
+***************
+CREATE TABLE GameTableRecords (
+    ID INT AUTO_INCREMENT PRIMARY KEY,
+    TableID INT NOT NULL,
+	ListOrder INT NOT NULL DEFAULT 1,
+	Field_01 VARCHAR(500) NOT NULL,
+	Field_02 VARCHAR(500),
+	Field_03 VARCHAR(500),
+	Field_04 VARCHAR(500),
+	Field_05 VARCHAR(500),
+	Field_06 VARCHAR(500),
+    FOREIGN KEY (TableID) REFERENCES GameTables(ID)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE
+);
+
+***************
+DELIMITER $$
+
+CREATE DEFINER="doadmin"@"%" PROCEDURE "GetAllTableRecordsByTableID" (IN inputTableID INT)
+BEGIN
+    SELECT * FROM GameTableRecords
+    WHERE TableID = inputTableID
+    ORDER BY ListOrder ASC, Field_01 ASC;
+END $$
+
+DELIMITER ;
+***************
+GRANT EXECUTE ON PROCEDURE achievement_vault.GetAllTableRecordsByTableID TO 'achievement_vault_user'@'%';
 
 ***************

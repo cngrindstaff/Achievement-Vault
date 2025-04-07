@@ -39,6 +39,9 @@ app.get('/index', (req, res) => {
 app.get('/checklist', (req, res) => {
     res.sendFile(path.join(__dirname, '../public/checklist.html'));
 });
+app.get('/table', (req, res) => {
+    res.sendFile(path.join(__dirname, '../public/table.html'));
+});
 
 // Run the server on port
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));

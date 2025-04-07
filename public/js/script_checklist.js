@@ -1,6 +1,5 @@
 import * as utils from './script_utilities.js';
 import * as dbUtils from './script_db_helper.js';
-import {loadGameData} from "./script_db_helper.js";
 
 const sendGridUrl = '/api/send-email';
 const googleSheetsAppendUrl = '/api/google-sheets-append';
@@ -12,7 +11,7 @@ var debugLogging = false;
 let gameId = null;
 let gameNameFriendly = null;
 let gameName = null;
-let hasTablePage = false;
+let hasDataTables = false;
 let linkToGamePage = null;
 
 $(document).ready(async function () {
@@ -20,12 +19,12 @@ $(document).ready(async function () {
     var passed_gameName = utils.getQueryParam('name');
 
     // Fetch game data first
-    const gameData = await loadGameData(passed_gameId);
+    const gameData = await dbUtils.loadGameData(passed_gameId);
     //console.log('gameData:', gameData);
     gameId = gameData.ID;
     gameName = gameData.Name;
     gameNameFriendly = gameData.FriendlyName;
-    hasTablePage = gameData.HasTablePage;
+    hasDataTables = gameData.HasDataTables;
     linkToGamePage = '/game?id=' + gameId + '&name=' + gameName;
 
     //set the title field that's in the head using the variable from the game's HTML
@@ -40,7 +39,7 @@ $(document).ready(async function () {
 
     mainContainer.prepend(`<div class="link-container"> </div>`);
     const linkContainerDiv = $('.link-container');
-    if(hasTablePage){
+    if(hasDataTables){
         linkContainerDiv.prepend('<div class="link-icon"><a href="' + linkToGamePage + '" class="link-icon-text" title="Return to Game Page"><i class="fa fa-arrow-left fa-lg fa-border" ></i></a></div>');
     }
     linkContainerDiv.prepend('<div class="link-icon"><a href="' + linkToHomePage + '" class="link-icon-text"><i class="fa fa-solid fa-house fa-lg fa-border" ></i></a></div>');
