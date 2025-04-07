@@ -2,7 +2,7 @@ CREATE TABLE Games (
     ID INT AUTO_INCREMENT PRIMARY KEY,
     Name VARCHAR(100) NOT NULL,
     FriendlyName VARCHAR(100) NOT NULL,
-    HasDataTable BOOLEAN NOT NULL DEFAULT FALSE
+    HasDataTables BOOLEAN NOT NULL DEFAULT FALSE
 );
 
 CREATE TABLE Sections (
@@ -17,7 +17,7 @@ CREATE TABLE Sections (
 CREATE TABLE Records (
     ID INT AUTO_INCREMENT PRIMARY KEY,
     Name VARCHAR(100) NOT NULL,
-    Description VARCHAR(250),
+    Description VARCHAR(1000),
     SectionID INT NOT NULL,
     GameID INT NOT NULL,
     NumberOfCheckboxes INT NOT NULL DEFAULT 0,
@@ -47,7 +47,8 @@ DELIMITER $$
 
 CREATE PROCEDURE GetAllGames()
 BEGIN
-    SELECT * FROM `achievement-vault`.Games;
+    SELECT * FROM `achievement-vault`.Games
+	ORDER BY Name ASC;
 END $$
 
 DELIMITER ;
@@ -145,8 +146,8 @@ DELIMITER ;
 https://www.digitalocean.com/community/tutorials/how-to-create-a-new-user-and-grant-permissions-in-mysql
 
 
-CREATE USER 'achievement_vault_user'@'%' IDENTIFIED BY 'H4Pffb*E^8TDo$N@';
-GRANT EXECUTE ON PROCEDURE achievement_vault.* TO 'achievement_vault_user'@'%';
+CREATE USER 'achievement_vault_user'@'%' IDENTIFIED BY 'password';
+GRANT EXECUTE ON PROCEDURE achievement_vault.GetAllSectionsByGameID TO 'achievement_vault_user'@'%';
 FLUSH PRIVILEGES;
 
 
@@ -155,3 +156,43 @@ npm install mysql2
 
 ***
 
+DELIMITER $$
+
+CREATE PROCEDURE GetGameById(IN gameID INT)
+BEGIN
+    SELECT * FROM Games
+    WHERE ID = gameID;
+    
+END $$
+
+DELIMITER ;
+
+***
+
+DELIMITER $$
+
+CREATE DEFINER="doadmin"@"%" PROCEDURE "GetAllRecordsByGameID" (IN inputGameID INT)
+BEGIN
+    SELECT * FROM Records
+    WHERE GameID = inputGameID
+    ORDER BY ListOrder ASC;
+END $$
+
+DELIMITER ;
+
+***************
+
+CREATE DEFINER="doadmin"@"%" PROCEDURE "admin_get_stored_procedure_access_for_users"()
+BEGIN
+	SELECT Routine_type, Routine_name, User, Host
+	FROM mysql.procs_priv
+	WHERE Db = DATABASE()
+	AND Proc_priv = 'Execute'
+	Order by Routine_name;
+END
+
+
+***************
+ALTER TABLE Games RENAME COLUMN HasDataTable TO HasDataTables;
+
+***************

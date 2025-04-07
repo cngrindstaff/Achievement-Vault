@@ -40,3 +40,12 @@ If sass isn't installed, run
 
 Bug: Must set FileWatch Scope to "Current File". [Bug info](https://youtrack.jetbrains.com/issue/RIDER-55683/Unknown-scope-sign-for-Project-scope-in-SCSS-new-file-watcher)
 
+## V3
+This now uses a My SQL Database
+
+Main page is `index.html`. It loads `script_home.js`. The script calls an endpoint in db.js, which calls the GetAllGames stored procedure. It then creates a list of the games and generates links to them. 
+
+Each item listed will link to the game page - `game?id=${game.ID}&name=${game.Name}`. The second query param is unnecessary, but can be helpful to have in the URL bar.
+
+The `game.html` file creates a landing page for the game. It then calls `script_gamePage.js`, which creates links to the main checklist - `checklist?id=${gameId}&name=${gameName}` - and the page with additional tables - `tables?id=${gameId}&name=${gameName}`.
+

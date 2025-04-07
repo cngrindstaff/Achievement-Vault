@@ -1,19 +1,19 @@
 import { createSlug } from "./script_utilities.js";
 
-const excelFilePath = '/games/' + gameName + '/' + gameName + '_tables.xlsx';
+const excelFilePath = '/games/' + gameId + '/' + gameId + '_tables.xlsx';
 const linkToHomePage = '../../';
-const linkToGamePage = '/games/' + gameName + '/' + gameName + '.html';
+const linkToGamePage = '/games/' + gameId + '/' + gameId + '.html';
 
 $(document).ready(function() {
     //set the title field that's in the head, from the game's HTML
     const titleElement = document.querySelector('title');
-    titleElement.textContent = gameNameFriendly + ' Other Tables';
+    titleElement.textContent = passed_gameNameFriendly + ' Other Tables';
     
     // Add sibling elements before grid-checklist-container
     //.append() puts data inside an element at last index and .prepend() puts the prepending elem at first index.
     const mainContainer = $('#container');
 
-    mainContainer.prepend('<h1>' + gameNameFriendly + ': Other Tables</h1>');
+    mainContainer.prepend('<h1>' + passed_gameNameFriendly + ': Other Tables</h1>');
     mainContainer.prepend(`<div class="link-container"> </div>`);
 
     const linkContainerDiv = $('.link-container');

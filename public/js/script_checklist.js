@@ -1,14 +1,33 @@
-import { createSlug } from './script_utilities.js';
+import * as utils from './script_utilities.js';
+import * as dbUtils from './script_db_helper.js';
+import {loadGameData} from "./script_db_helper.js";
 
 const sendGridUrl = '/api/send-email';
 const googleSheetsAppendUrl = '/api/google-sheets-append';
-const excelFilePath = '/games/' + gameName + '/' + gameName + '_data.xlsx';
-const linkToHomePage = '../../';
-const linkToGamePage = '/games/' + gameName + '/' + gameName + '.html';
+const linkToHomePage = './';
 
 var debugLogging = false;
 
-$(document).ready(function() {
+// Define these at the top level so they can be reused
+let gameId = null;
+let gameNameFriendly = null;
+let gameName = null;
+let hasTablePage = false;
+let linkToGamePage = null;
+
+$(document).ready(async function () {
+    var passed_gameId = utils.getQueryParam('id');
+    var passed_gameName = utils.getQueryParam('name');
+
+    // Fetch game data first
+    const gameData = await loadGameData(passed_gameId);
+    //console.log('gameData:', gameData);
+    gameId = gameData.ID;
+    gameName = gameData.Name;
+    gameNameFriendly = gameData.FriendlyName;
+    hasTablePage = gameData.HasTablePage;
+    linkToGamePage = '/game?id=' + gameId + '&name=' + gameName;
+
     //set the title field that's in the head using the variable from the game's HTML
     const titleElement = document.querySelector('title');
     titleElement.textContent = gameNameFriendly + ' 100% Completion Checklist';
@@ -27,16 +46,14 @@ $(document).ready(function() {
     linkContainerDiv.prepend('<div class="link-icon"><a href="' + linkToHomePage + '" class="link-icon-text"><i class="fa fa-solid fa-house fa-lg fa-border" ></i></a></div>');
 
 
-    fetch(excelFilePath).then(response => response.arrayBuffer()).then(data => {
-        const workbook = XLSX.read(data, {type: 'array'});
-        processWorkbook(workbook);
-        initializeCheckboxesFromLocalStorage(); // Initialize checkboxes after processing workbook
-        updateAllSectionsCompletion(); // Update section percentages
-        updateTotalCompletion(); // Calculate initial total completion percentage
-    }).catch(error => {
-        console.error('Error fetching the Excel file:', error);
-    });
+    // Fetch sections for that game
+    const sections = await dbUtils.loadSectionsByGameId(passed_gameId);
     
+    await processData(sections);
+    updateAllSectionsCompletion(); // Update section percentages
+    updateTotalCompletion(); // Calculate initial total completion percentage    
+
+   
     //https://chatgpt.com/share/67c0f24e-db90-8004-be01-0dec495fc388
     // 🔥 This line prevents multiple event bindings by using event delegation
     //Previously, I was using Direct Binding, and every time new elements were added dynamically (i.e., checkboxes were added inside generateChecklist), the listener got 
@@ -48,6 +65,63 @@ $(document).ready(function() {
     $('#grid-checklist-container').on('change', 'input[type="checkbox"]', updateCompletion);
 
 });
+
+async function processData(sections) {
+    const gridContainer = $('#grid-checklist-container');
+    gridContainer.empty();
+    let sectionCount = sections.length;
+    for (const section of sections) {
+        const sectionIndex = sections.indexOf(section);
+        var sectionId = section.ID;
+        var sectionTitle = section.Name;
+        var sectionTitleClean = utils.createSlug(sectionTitle);
+
+        // Create section template with the section header and the section body
+        const sectionTemplate = `
+            <div class="section-header" data-section="${sectionIndex}">
+                <span class="section-header-text" data-section="${sectionIndex}" data-section-title="${sectionTitle}" data-section-title-clean="${sectionTitleClean}"">
+                    ${sectionTitle} (0%)
+                </span>
+                <span class="section-header-icon">
+                    <i class="fas fa-chevron-down"></i>
+                </span>
+            </div>
+            <div class="section" data-section="${sectionIndex}" style="display: none;"></div>
+        `;
+        gridContainer.append(sectionTemplate);
+
+        const sectionContent = gridContainer.find(`.section[data-section="${sectionIndex}"]`);
+        const records = await dbUtils.loadRecordsBySectionId(sectionId);
+        records.forEach((record, recordIndex) => {
+            var recordName = record.Name;
+            var recordId = record.ID;
+            var recordDescription = record.Description;
+            var recordCheckboxesTotal = record.NumberOfCheckboxes;
+            var recordCheckboxesAlreadyCompleted = record.NumberAlreadyCompleted;
+            //console.log('recordName:' , recordName);
+            var recordNameClean = utils.createSlug(recordName);
+            
+            const itemTemplate = `
+                <div class="grid-item-${recordDescription ? '2' : '1'}-row">
+                    <div class="column1">
+                        <div class="label">${recordName}</div>
+                        ${recordDescription ? `<div class="description">${recordDescription}</div>` : ''}
+                    </div>
+                    <div class="column2">
+                        ${generateCheckboxes(sectionIndex, recordIndex, recordCheckboxesTotal, recordCheckboxesAlreadyCompleted, 
+                            sectionTitleClean, recordNameClean, recordId)}
+                    </div>
+                </div>
+            `;
+            sectionContent.append(itemTemplate);
+        });
+        
+        // Add toggle functionality to section header
+        $(`.section-header[data-section="${sectionIndex}"]`).on('click', function () {
+            $(this).next('.section').toggle();
+        });
+    }
+}
 
 async function sendEmail(thisSubject, thisText) {
     try {
@@ -89,91 +163,14 @@ function createStorageItemName(gameName, sectionNameClean, itemNameClean, i) {
     return storageItemName;
 }
 
-function processWorkbook(workbook) {
-    const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
-    const rows = XLSX.utils.sheet_to_json(firstSheet, {header: 1});
-    generateChecklist(rows);
-}
 
-//Generate the checklist using the Excel data
-function generateChecklist(rows) {
-    const gridContainer = $('#grid-checklist-container');
-    gridContainer.empty();
-    let sectionCount = 0;
-
-    // Determine total sections
-    while (rows[0][sectionCount * 4] !== undefined) {
-        sectionCount++;
-    }
-
-    for (let sectionIndex = 0; sectionIndex < sectionCount; sectionIndex++) {
-        const sectionTitle = rows[0][sectionIndex * 4];
-        if (!sectionTitle) break;
-        var sectionTitleClean = createSlug(sectionTitle);
-
-        // Create section template with the section header and the section body
-        const sectionTemplate = `
-            <div class="section-header" data-section="${sectionIndex}">
-                <span class="section-header-text" data-section="${sectionIndex}" data-section-title="${sectionTitle}" data-section-title-clean="${sectionTitleClean}"">
-                    ${sectionTitle} (0%)
-                </span>
-                <span class="section-header-icon">
-                    <i class="fas fa-chevron-down"></i>
-                </span>
-            </div>
-            <div class="section" data-section="${sectionIndex}" style="display: none;"></div>
-        `;
-        gridContainer.append(sectionTemplate);
-
-        const sectionContent = gridContainer.find(`.section[data-section="${sectionIndex}"]`);
-        const items = extractItems(rows, sectionIndex);
-
-        // Add items to section
-        items.forEach((item, index) => {
-            var itemNameClean = createSlug(item.name);
-            const itemTemplate = `
-                <div class="grid-item-${item.description ? '2' : '1'}-row">
-                    <div class="column1">
-                        <div class="label">${item.name}</div>
-                        ${item.description ? `<div class="description">${item.description}</div>` : ''}
-                    </div>
-                    <div class="column2">
-                        ${generateCheckboxes(sectionIndex, index, item.numOfCheckboxes, item.numAlreadyChecked, sectionTitleClean, itemNameClean)}
-                    </div>
-                </div>
-            `;
-            sectionContent.append(itemTemplate);
-        });
-
-        // Add toggle functionality to section header
-        $(`.section-header[data-section="${sectionIndex}"]`).on('click', function () {
-            $(this).next('.section').toggle();
-        });
-        
-        
-    }
-}
-
-// Helper function to extract items from rows from Excel data
-function extractItems(rows, sectionIndex) {
-    const items = [];
-    for (let i = 1; i < rows.length; i++) {
-        const name = rows[i][sectionIndex * 4];
-        const description = rows[i][sectionIndex * 4 + 1] || '';
-        const numOfCheckboxes = rows[i][sectionIndex * 4 + 2] || 0;
-        const numAlreadyChecked = rows[i][sectionIndex * 4 + 3] || 0;
-        if (!name) break;
-        items.push({ name, description, numOfCheckboxes, numAlreadyChecked });
-    }
-    return items;
-}
-
-// Helper function to generate checkboxes, using the Excel info for if the item has been checked or not
-function generateCheckboxes(sectionIndex, itemIndex, item_checkboxes_total, item_checkboxes_checked, sectionTitleClean, itemNameClean) {
+// Helper function to generate checkboxes, using the DB info for if the item has been checked or not
+function generateCheckboxes(sectionIndex, itemIndex, item_checkboxes_total, item_checkboxes_checked, sectionTitleClean, 
+                            itemNameClean, recordId) {
     const checkboxes = [];
     for (let i = 1; i <= item_checkboxes_total; i++) {
         const isChecked = i <= item_checkboxes_checked ? 'checked' : '';
-        var checkboxName = createStorageItemName(gameName, sectionTitleClean, itemNameClean, i);
+        var checkboxName = createStorageItemName(gameId, sectionTitleClean, itemNameClean, i);
         checkboxes.push(`
             <input type="checkbox" 
                 class="checkbox-${checkboxName}" 
@@ -183,11 +180,13 @@ function generateCheckboxes(sectionIndex, itemIndex, item_checkboxes_total, item
                 data-num-total-checkboxes="${item_checkboxes_total}" 
                 data-section-title-clean="${sectionTitleClean}" 
                 data-item-name-clean="${itemNameClean}" 
+                data-record-id="${recordId}" 
                 ${isChecked}>
         `);
     }
     return checkboxes.join('');
 }
+
 
 function updateCompletion() {
     const sectionIndex = $(this).data('section');
@@ -195,10 +194,11 @@ function updateCompletion() {
     const checkboxNum = $(this).data('num-checkbox-clicked');
     const sectionTitleClean = $(this).data('section-title-clean');
     const itemNameClean = $(this).data('item-name-clean');
+    const recordId = $(this).data('record-id');
     
     //if (debugLogging) 
     console.log("updateCompletion called - sectionIndex " + sectionIndex + ". itemIndex " + itemIndex + ". checkboxNum " + checkboxNum +
-        ". sectionTitleClean " + sectionTitleClean + ". itemNameClean " + itemNameClean)
+        ". sectionTitleClean " + sectionTitleClean + ". itemNameClean " + itemNameClean + ". recordId " + recordId);
 
     //get the section-header-text div
     var sectionHeaderTextDiv = $(`span.section-header-text[data-section="${sectionIndex}"]`);
@@ -234,22 +234,18 @@ function updateCompletion() {
         if (debugLogging) console.log('this item is checked. CheckboxNum: ' + checkboxNum);
         for (let i = 1; i <= checkboxNum; i++) {
             $(`.checkbox-${sectionIndex}-${itemIndex}-${i}`).prop('checked', true);
-            //var storageItemName = `${gameName}-checkbox-${sectionIndex}-${itemIndex}-${i}`;
-            //var storageItemName = createStorageItemName(gameName, sectionIndex, itemIndex, i);
-            var storageItemName = createStorageItemName(gameName, sectionTitleClean, itemNameClean, checkboxNum);
-            localStorage.setItem(storageItemName, 'checked');
-            if (debugLogging) console.log('checked item in local storage. storageItemName: ' + storageItemName);
+            //var storageItemName = createStorageItemName(gameId, sectionTitleClean, itemNameClean, checkboxNum);
+            //localStorage.setItem(storageItemName, 'checked');
+            //if (debugLogging) console.log('checked item in local storage. storageItemName: ' + storageItemName);
         }
         action = 'added';
     } else {
         if (debugLogging) console.log('this item is not checked. CheckboxNum: ' + checkboxNum);
         for (let i = checkboxNum; i <= $(`input[data-section="${sectionIndex}"][data-item="${itemIndex}"]`).length; i++) {
             $(`.checkbox-${sectionIndex}-${itemIndex}-${i}`).prop('checked', false);
-            //var storageItemName = `${gameName}-checkbox-${sectionIndex}-${itemIndex}-${i}`;
-            //var storageItemName = createStorageItemName(gameName, sectionIndex, itemIndex, i);
-            var storageItemName = createStorageItemName(gameName, sectionTitleClean, itemNameClean, checkboxNum);
-            localStorage.removeItem(storageItemName);
-            if (debugLogging) console.log('removed item from local storage. storageItemName: ' + storageItemName);
+            //var storageItemName = createStorageItemName(gameId, sectionTitleClean, itemNameClean, checkboxNum);
+            //localStorage.removeItem(storageItemName);
+            //if (debugLogging) console.log('removed item from local storage. storageItemName: ' + storageItemName);
         }
         action = 'removed';
     }
@@ -259,9 +255,21 @@ function updateCompletion() {
     if(numberOfCheckboxes > 1){
         emailText += `\nCheckbox Number Clicked: ${checkboxNumberClicked}`
     }
-    // Call sendEmail function after updating localStorage
+
+    var numberAlreadyCompleted = "";
+    
     if (action) {
         sendEmail(subject, emailText);
+
+        if(action === "added"){
+            numberAlreadyCompleted = checkboxNumberClicked;
+        }
+        else {//action === "removed"
+            if(checkboxNumberClicked === 1) numberAlreadyCompleted = 0;
+            else numberAlreadyCompleted = checkboxNumberClicked - 1;
+            
+        }
+        dbUtils.updateRecordInDatabase(recordId, numberAlreadyCompleted);
         if(numberOfCheckboxes > 1) {
             sendDataToSheets(gameNameFriendly, sectionTitle, checkboxItemName, action, checkboxNumberClicked);
         }
@@ -336,7 +344,7 @@ function initializeCheckboxesFromLocalStorage() {
 
         //const storageItemName = `${gameName}-checkbox-${sectionIndex}-${itemIndex}-${checkboxNum}`;
         //var storageItemName = createStorageItemName(gameName, sectionIndex, itemIndex, checkboxNum);
-        var storageItemName = createStorageItemName(gameName, sectionTitleClean, itemNameClean, checkboxNum);
+        var storageItemName = createStorageItemName(gameId, sectionTitleClean, itemNameClean, checkboxNum);
 
         if (localStorage.getItem(storageItemName) === 'checked') {
             $(this).prop('checked', true);

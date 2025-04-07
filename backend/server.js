@@ -29,4 +29,16 @@ app.use("/api", dbRouter);
 // Serve static files
 app.use(express.static(path.join(__dirname, "..", "public")));
 
-app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
+// Custom routes to make the ".html" optional
+app.get('/game', (req, res) => {
+    res.sendFile(path.join(__dirname, '../public/game.html'));
+});
+app.get('/index', (req, res) => {
+    res.sendFile(path.join(__dirname, '../public/index.html'));
+});
+app.get('/checklist', (req, res) => {
+    res.sendFile(path.join(__dirname, '../public/checklist.html'));
+});
+
+// Run the server on port
+app.listen(PORT, () => console.log(`Server running on port ${PORT}`));

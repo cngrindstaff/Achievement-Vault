@@ -1,4 +1,10 @@
-﻿function trimBeforeParenthesis(str) {
+﻿export function getQueryParam(param) {
+    const urlParams = new URLSearchParams(window.location.search);
+    //console.log('urlParams: ' + urlParams);
+    return urlParams.get(param);
+}
+
+function trimBeforeParenthesis(str) {
     const index = str.indexOf('('); // Find the first index of '('
     if (index === -1) {
         return str; // Return the original string if '(' is not found
@@ -24,19 +30,25 @@ function logAllAttributes(thisElement){
 }
 
 
-export function createSlug(value) {
+export function createSlug(str) {
+    //console.log('str:', str);
+
+    if (!str || typeof str !== 'string') {
+        console.warn('Bad input to createSlug:', str);
+    }
+    
     // Convert to lower case
-    value = value.toLowerCase();
+    str = str.toLowerCase();
     // Remove diacritics (accents)
-    value = removeDiacritics(value);
+    str = removeDiacritics(str);
     // Ensure all word delimiters are hyphens
-    value = value.replace(/[\s—–_]/g, "-");
+    str = str.replace(/[\s—–_]/g, "-");
     // Strip out invalid characters
-    value = value.replace(/[^a-z0-9\-]/g, "");
+    str = str.replace(/[^a-z0-9\-]/g, "");
     // Replace multiple hyphens (-) with a single hyphen
-    value = value.replace(/-{2,}/g, "-");
+    str = str.replace(/-{2,}/g, "-");
     // Trim hyphens (-) from ends
-    return value.replace(/^-+|-+$/g, "");
+    return str.replace(/^-+|-+$/g, "");
 }
 
 function removeDiacritics(str) {
