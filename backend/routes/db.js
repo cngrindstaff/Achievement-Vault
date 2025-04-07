@@ -58,7 +58,7 @@ router.get('/db/games/full/:gameId', async (req, res) => {
 
 // Route 4: Get all sections for a game by ID
 router.get('/db/sections/:gameId', async (req, res) => {
-    console.log('made it here sections/gameid');
+    //console.log('made it here sections/gameid');
     const gameId = req.params.gameId;
     //console.log('gameId: ' + gameId);
     try {
@@ -78,9 +78,9 @@ router.get('/db/sections/:gameId', async (req, res) => {
 
 // Route 5: Get all records for a game section by section Id
 router.get('/db/records/:sectionId', async (req, res) => {
-    console.log('made it records/sectionId');
+    //console.log('made it records/sectionId');
     const sectionId = req.params.sectionId;
-    console.log('sectionId: ' + sectionId);
+    //console.log('sectionId: ' + sectionId);
     try {
         const [rows] = await db.query('CALL GetAllRecordsBySectionID(?)', [sectionId]);
         const result = rows[0];
@@ -101,13 +101,13 @@ router.put('/db/record/updateCompletion/:recordId', async (req, res) => {
     const recordId = req.params.recordId;
     const { numberAlreadyCompleted } = req.body;
 
-    console.log('recordId: ' + recordId + ". numberAlreadyCompleted: " + numberAlreadyCompleted);
+    //console.log('recordId: ' + recordId + ". numberAlreadyCompleted: " + numberAlreadyCompleted);
 
     if (numberAlreadyCompleted === undefined) {
         return res.status(400).json({ error: 'Missing required field: numberAlreadyCompleted' });
     }
 
-    console.log('made it here2 - recordId ' + recordId + ' numberAlreadyCompleted ' + numberAlreadyCompleted);
+    //console.log('made it here2 - recordId ' + recordId + ' numberAlreadyCompleted ' + numberAlreadyCompleted);
 
     
     try {

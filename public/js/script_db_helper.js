@@ -49,10 +49,10 @@ export async function loadSectionsByGameId(gameId) {
     }
 
     try {
-        console.log('made it here loadSectionsByGameId');
+        //console.log('made it here loadSectionsByGameId');
         const res = await fetch(`/api/db/sections/${gameId}`);
         const data = await res.json();
-        console.log('Section data:', data);
+        //console.log('Section data:', data);
         /*        return {
                     gameId: data.ID,
                     gameNameFriendly: data.FriendlyName || passed_gameName || passed_gameId,
