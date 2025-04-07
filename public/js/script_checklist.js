@@ -122,7 +122,7 @@ async function processData(sections) {
     }
 }
 
-async function sendEmail(thisSubject, thisText) {
+/*async function sendEmail(thisSubject, thisText) {
     try {
         const response = await fetch(sendGridUrl, {
             method: 'POST',
@@ -138,7 +138,7 @@ async function sendEmail(thisSubject, thisText) {
     } catch (error) {
         console.error("Error:", error);
     }
-}
+}*/
 
 
 async function sendDataToSheets(gameName, sectionName, itemName, action, checkboxNumberClicked) {
@@ -195,10 +195,11 @@ function updateCompletion() {
     const itemNameClean = $(this).data('item-name-clean');
     const recordId = $(this).data('record-id');
     
-    //if (debugLogging) 
-    console.log("updateCompletion called - sectionIndex " + sectionIndex + ". itemIndex " + itemIndex + ". checkboxNum " + checkboxNum +
-        ". sectionTitleClean " + sectionTitleClean + ". itemNameClean " + itemNameClean + ". recordId " + recordId);
-
+    if (debugLogging) {
+        console.log("updateCompletion called - sectionIndex " + sectionIndex + ". itemIndex " + itemIndex + ". checkboxNum " + checkboxNum +
+            ". sectionTitleClean " + sectionTitleClean + ". itemNameClean " + itemNameClean + ". recordId " + recordId);
+    }
+    
     //get the section-header-text div
     var sectionHeaderTextDiv = $(`span.section-header-text[data-section="${sectionIndex}"]`);
     
@@ -258,7 +259,7 @@ function updateCompletion() {
     var numberAlreadyCompleted = "";
     
     if (action) {
-        sendEmail(subject, emailText);
+        //sendEmail(subject, emailText);
 
         if(action === "added"){
             numberAlreadyCompleted = checkboxNumberClicked;
