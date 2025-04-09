@@ -67,14 +67,15 @@ export async function loadSectionsByGameId(gameId) {
     }
 }
 
-export async function loadRecordsBySectionId(sectionId) {
+export async function loadRecordsBySectionId(sectionId, recordOrderPreference) {
     if (!sectionId) {
         alert("Missing sectionId in URL.");
         return;
     }
+    //console.log('sectionId: ' + sectionId + ' recordOrderPreference: ' + recordOrderPreference);
 
     try {
-        const res = await fetch(`/api/db/records/${sectionId}`);
+        const res = await fetch(`/api/db/records/${sectionId}/order/${recordOrderPreference}`);
         const data = await res.json();
         //console.log('Records data:', data);
         /*        return {

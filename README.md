@@ -49,3 +49,9 @@ Each item listed will link to the game page - `game?id=${game.ID}&name=${game.Na
 
 The `game.html` file creates a landing page for the game. It then calls `script_gamePage.js`, which creates links to the main checklist - `checklist?id=${gameId}&name=${gameName}` - and the page with additional tables - `tables?id=${gameId}&name=${gameName}`.
 
+Sorting options:
+* order-name  = ListOrder ASC, Name ASC
+* name = Name ASC
+* completed-order-name = NumberAlreadyCompleted ASC, ListOrderASC, Name ASC
+* null = same as order-name
+

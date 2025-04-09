@@ -74,7 +74,9 @@ async function processData(sections) {
         var sectionId = section.ID;
         var sectionTitle = section.Name;
         var sectionTitleClean = utils.createSlug(sectionTitle);
-
+        var sectionRecordOrderPreference = section.RecordOrderPreference;
+        if(sectionRecordOrderPreference === '') sectionRecordOrderPreference = null;
+        
         // Create section template with the section header and the section body
         const sectionTemplate = `
             <div class="section-header" data-section="${sectionIndex}">
@@ -90,7 +92,7 @@ async function processData(sections) {
         gridContainer.append(sectionTemplate);
 
         const sectionContent = gridContainer.find(`.section[data-section="${sectionIndex}"]`);
-        const records = await dbUtils.loadRecordsBySectionId(sectionId);
+        const records = await dbUtils.loadRecordsBySectionId(sectionId, sectionRecordOrderPreference);
         records.forEach((record, recordIndex) => {
             var recordName = record.Name;
             var recordId = record.ID;

@@ -1,263 +1,36 @@
-CREATE TABLE Games (
-    ID INT AUTO_INCREMENT PRIMARY KEY,
-    Name VARCHAR(100) NOT NULL,
-    FriendlyName VARCHAR(100) NOT NULL,
-    HasDataTables BOOLEAN NOT NULL DEFAULT FALSE
-);
-
-CREATE TABLE GameSections (
-    ID INT AUTO_INCREMENT PRIMARY KEY,
-    Name VARCHAR(100) NOT NULL,
-    GameID INT NOT NULL,
-    FOREIGN KEY (GameID) REFERENCES Games(ID)
-        ON DELETE CASCADE
-        ON UPDATE CASCADE
-);
-
-CREATE TABLE GameRecords (
-    ID INT AUTO_INCREMENT PRIMARY KEY,
-    Name VARCHAR(100) NOT NULL,
-    Description VARCHAR(1000),
-    SectionID INT NOT NULL,
-    GameID INT NOT NULL,
-    NumberOfCheckboxes INT NOT NULL DEFAULT 0,
-    NumberAlreadyCompleted INT NOT NULL DEFAULT 0,
-    FOREIGN KEY (SectionID) REFERENCES Sections(ID)
-        ON DELETE CASCADE
-        ON UPDATE CASCADE,
-    FOREIGN KEY (GameID) REFERENCES Games(ID)
-        ON DELETE CASCADE
-        ON UPDATE CASCADE
-);
-
-
-ALTER TABLE GameSections
-ADD ListOrder INT NOT NULL DEFAULT 0;
-
-ALTER TABLE GameRecords
-ADD ListOrder INT NOT NULL DEFAULT 0;
-
-ALTER TABLE GameRecords
-ADD LongDescription VARCHAR(1000);
-
-***********
-
-
-DELIMITER $$
-
-CREATE PROCEDURE GetAllGames()
-BEGIN
-    SELECT * FROM `achievement-vault`.Games
-	ORDER BY Name ASC;
-END $$
-
-DELIMITER ;
-
-
-***********
-
-DELIMITER $$
-
-CREATE PROCEDURE GetAllGameSectionsByGameID(IN inputGameID INT)
-BEGIN
-    SELECT * FROM GameSections
-    WHERE GameID = inputGameID;
-END $$
-
-DELIMITER ;
-
-***********
-
-DELIMITER $$
-
-CREATE PROCEDURE GetAllGameDataByGameID(IN inputGameID INT)
-BEGIN
-    SELECT 
-        g.ID AS GameID,
-        g.Name AS GameName,
-        g.FriendlyName,
-        
-        s.Name AS SectionName,
-        s.ListOrder AS SectionListOrder,
-        
-        r.ID AS RecordID,
-        r.Name AS RecordName,
-        r.Description AS RecordDescription,
-        r.NumberOfCheckboxes,
-        r.NumberAlreadyCompleted,
-        r.ListOrder AS RecordListOrder,
-        r.LongDescription AS RecordLongDescription
-
-    FROM Games g
-    LEFT JOIN GameSections s ON g.ID = s.GameID
-    LEFT JOIN GameRecords r ON s.ID = r.SectionID
-    WHERE g.ID = inputGameID
-	ORDER BY SectionListOrder ASC, RecordListOrder ASC, RecordName ASC;
-END $$
-
-DELIMITER ;
-
-*****
-
-DELIMITER $$
-
-CREATE PROCEDURE GetAllGameRecordsBySectionID(IN inputSectionID INT)
-BEGIN
-    SELECT * FROM GameRecords
-    WHERE SectionID = inputSectionID;
-END $$
-
-DELIMITER ;
-
-
-*****
-
-DELIMITER $$
-
-CREATE PROCEDURE UpdateGameRecord(
-    IN inputRecordID INT,
-    IN inputNumberAlreadyCompleted INT
-)
-BEGIN
-    -- Check if the record exists
-    IF NOT EXISTS (
-        SELECT 1 FROM GameRecords WHERE ID = inputRecordID
-    ) THEN
-        SIGNAL SQLSTATE '45000'
-        SET MESSAGE_TEXT = 'Error: Record not found.';
-    ELSE
-        -- Try to update the record
-        UPDATE GameRecords
-        SET NumberAlreadyCompleted = inputNumberAlreadyCompleted
-        WHERE ID = inputRecordID;
-
-        -- Check if any row was actually updated
-        IF ROW_COUNT() = 0 THEN
-            SIGNAL SQLSTATE '45000'
-            SET MESSAGE_TEXT = 'Error: Record exists but no update was performed.';
-        END IF;
-    END IF;
-END $$
-
-DELIMITER ;
-
-*****
-
+CREATE USER
 
 https://www.digitalocean.com/community/tutorials/how-to-create-a-new-user-and-grant-permissions-in-mysql
 
 
-CREATE USER 'achievement_vault_user'@'%' IDENTIFIED BY 'password';
-GRANT EXECUTE ON PROCEDURE achievement_vault.GetAllSectionsByGameID TO 'achievement_vault_user'@'%';
+CREATE USER 'username'@'%' IDENTIFIED BY 'password';
 FLUSH PRIVILEGES;
 
-
-***
-npm install mysql2
-
-***
-
-DELIMITER $$
-
-CREATE PROCEDURE GetGameById(IN gameID INT)
-BEGIN
-    SELECT * FROM Games
-    WHERE ID = gameID;
-    
-END $$
-
-DELIMITER ;
-
-***
-
-DELIMITER $$
-
-CREATE DEFINER="doadmin"@"%" PROCEDURE "GetAllGameRecordsByGameID" (IN inputGameID INT)
-BEGIN
-    SELECT * FROM GameRecords
-    WHERE GameID = inputGameID
-    ORDER BY ListOrder ASC;
-END $$
-
-DELIMITER ;
-
-***************
-
-CREATE DEFINER="doadmin"@"%" PROCEDURE "admin_get_stored_procedure_access_for_users"()
-BEGIN
-	SELECT Routine_type, Routine_name, User, Host
-	FROM mysql.procs_priv
-	WHERE Db = DATABASE()
-	AND Proc_priv = 'Execute'
-	Order by Routine_name;
-END
+************************************************
 
 
-***************
-ALTER TABLE Games RENAME COLUMN HasDataTable TO HasDataTables;
+Give user permission to stored procedures
 
-***************
-CREATE TABLE GameTables (
-    ID INT AUTO_INCREMENT PRIMARY KEY,
-    Name VARCHAR(100) NOT NULL,
-    GameID INT NOT NULL,
-	ListOrder INT NOT NULL DEFAULT 1,
-    FOREIGN KEY (GameID) REFERENCES Games(ID)
-        ON DELETE CASCADE
-        ON UPDATE CASCADE
-);
-***************
-
-DELIMITER $$
-
-CREATE DEFINER="doadmin"@"%" PROCEDURE "GetAllGameTablesByGameID" (IN inputGameID INT)
-BEGIN
-    SELECT * FROM GameTables
-    WHERE GameID = inputGameID
-    ORDER BY ListOrder ASC, Name ASC;
-END $$
-
-DELIMITER ;
-
-
-***************
-
-ALTER TABLE GameTables
-ADD FieldName_01 VARCHAR(100),
-ADD FieldName_02 VARCHAR(100),
-ADD FieldName_03 VARCHAR(100),
-ADD FieldName_04 VARCHAR(100),
-ADD FieldName_05 VARCHAR(100),
-ADD FieldName_06 VARCHAR(100);
-
-***************
-CREATE TABLE GameTableRecords (
-    ID INT AUTO_INCREMENT PRIMARY KEY,
-    TableID INT NOT NULL,
-	ListOrder INT NOT NULL DEFAULT 1,
-	Field_01 VARCHAR(500) NOT NULL,
-	Field_02 VARCHAR(500),
-	Field_03 VARCHAR(500),
-	Field_04 VARCHAR(500),
-	Field_05 VARCHAR(500),
-	Field_06 VARCHAR(500),
-    FOREIGN KEY (TableID) REFERENCES GameTables(ID)
-        ON DELETE CASCADE
-        ON UPDATE CASCADE
-);
-
-***************
-DELIMITER $$
-
-CREATE DEFINER="doadmin"@"%" PROCEDURE "GetAllTableRecordsByTableID" (IN inputTableID INT)
-BEGIN
-    SELECT * FROM GameTableRecords
-    WHERE TableID = inputTableID
-    ORDER BY ListOrder ASC, Field_01 ASC;
-END $$
-
-DELIMITER ;
-***************
+GRANT EXECUTE ON PROCEDURE achievement_vault.GetGameById TO 'achievement_vault_user'@'%';
+GRANT EXECUTE ON PROCEDURE achievement_vault.GetAllGames TO 'achievement_vault_user'@'%';
+GRANT EXECUTE ON PROCEDURE achievement_vault.GetAllGameSectionsByGameID TO 'achievement_vault_user'@'%';
+GRANT EXECUTE ON PROCEDURE achievement_vault.GetAllGameRecordsByGameID TO 'achievement_vault_user'@'%';
+GRANT EXECUTE ON PROCEDURE achievement_vault.GetAllGameDataByGameID TO 'achievement_vault_user'@'%';
+GRANT EXECUTE ON PROCEDURE achievement_vault.GetAllGameRecordsByGameSectionID TO 'achievement_vault_user'@'%';
+GRANT EXECUTE ON PROCEDURE achievement_vault.GetAllGameTablesByGameID TO 'achievement_vault_user'@'%';
 GRANT EXECUTE ON PROCEDURE achievement_vault.GetAllTableRecordsByTableID TO 'achievement_vault_user'@'%';
+GRANT EXECUTE ON PROCEDURE achievement_vault.UpdateGameRecord TO 'achievement_vault_user'@'%';
+GRANT EXECUTE ON PROCEDURE achievement_vault.GetAllGameRecordsByGameSectionIDWithOrdering TO 'achievement_vault_user'@'%';
 
-***************
+************************************************
+
+update achievement_vault.GameSections 
+set RecordOrderPreference = 'completed asc'
+where GameID = 4 and RecordOrderPreference is null
+;
+
+
+update achievement_vault.GameSections 
+set RecordOrderPreference = 'completed-order-name'
+where GameID = 4 and RecordOrderPreference = 'completed asc'
+;
