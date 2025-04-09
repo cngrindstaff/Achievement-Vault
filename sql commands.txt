@@ -5,7 +5,7 @@ CREATE TABLE Games (
     HasDataTables BOOLEAN NOT NULL DEFAULT FALSE
 );
 
-CREATE TABLE Sections (
+CREATE TABLE GameSections (
     ID INT AUTO_INCREMENT PRIMARY KEY,
     Name VARCHAR(100) NOT NULL,
     GameID INT NOT NULL,
@@ -14,7 +14,7 @@ CREATE TABLE Sections (
         ON UPDATE CASCADE
 );
 
-CREATE TABLE Records (
+CREATE TABLE GameRecords (
     ID INT AUTO_INCREMENT PRIMARY KEY,
     Name VARCHAR(100) NOT NULL,
     Description VARCHAR(1000),
@@ -31,13 +31,13 @@ CREATE TABLE Records (
 );
 
 
-ALTER TABLE Sections
+ALTER TABLE GameSections
 ADD ListOrder INT NOT NULL DEFAULT 0;
 
-ALTER TABLE Records
+ALTER TABLE GameRecords
 ADD ListOrder INT NOT NULL DEFAULT 0;
 
-ALTER TABLE Records
+ALTER TABLE GameRecords
 ADD LongDescription VARCHAR(1000);
 
 ***********
@@ -58,9 +58,9 @@ DELIMITER ;
 
 DELIMITER $$
 
-CREATE PROCEDURE GetAllSectionsByGameID(IN inputGameID INT)
+CREATE PROCEDURE GetAllGameSectionsByGameID(IN inputGameID INT)
 BEGIN
-    SELECT * FROM Sections
+    SELECT * FROM GameSections
     WHERE GameID = inputGameID;
 END $$
 
@@ -89,8 +89,8 @@ BEGIN
         r.LongDescription AS RecordLongDescription
 
     FROM Games g
-    LEFT JOIN Sections s ON g.ID = s.GameID
-    LEFT JOIN Records r ON s.ID = r.SectionID
+    LEFT JOIN GameSections s ON g.ID = s.GameID
+    LEFT JOIN GameRecords r ON s.ID = r.SectionID
     WHERE g.ID = inputGameID
 	ORDER BY SectionListOrder ASC, RecordListOrder ASC, RecordName ASC;
 END $$
@@ -101,9 +101,9 @@ DELIMITER ;
 
 DELIMITER $$
 
-CREATE PROCEDURE GetAllRecordsBySectionID(IN inputSectionID INT)
+CREATE PROCEDURE GetAllGameRecordsBySectionID(IN inputSectionID INT)
 BEGIN
-    SELECT * FROM Records
+    SELECT * FROM GameRecords
     WHERE SectionID = inputSectionID;
 END $$
 
@@ -114,20 +114,20 @@ DELIMITER ;
 
 DELIMITER $$
 
-CREATE PROCEDURE UpdateRecord(
+CREATE PROCEDURE UpdateGameRecord(
     IN inputRecordID INT,
     IN inputNumberAlreadyCompleted INT
 )
 BEGIN
     -- Check if the record exists
     IF NOT EXISTS (
-        SELECT 1 FROM Records WHERE ID = inputRecordID
+        SELECT 1 FROM GameRecords WHERE ID = inputRecordID
     ) THEN
         SIGNAL SQLSTATE '45000'
         SET MESSAGE_TEXT = 'Error: Record not found.';
     ELSE
         -- Try to update the record
-        UPDATE Records
+        UPDATE GameRecords
         SET NumberAlreadyCompleted = inputNumberAlreadyCompleted
         WHERE ID = inputRecordID;
 
@@ -172,9 +172,9 @@ DELIMITER ;
 
 DELIMITER $$
 
-CREATE DEFINER="doadmin"@"%" PROCEDURE "GetAllRecordsByGameID" (IN inputGameID INT)
+CREATE DEFINER="doadmin"@"%" PROCEDURE "GetAllGameRecordsByGameID" (IN inputGameID INT)
 BEGIN
-    SELECT * FROM Records
+    SELECT * FROM GameRecords
     WHERE GameID = inputGameID
     ORDER BY ListOrder ASC;
 END $$
