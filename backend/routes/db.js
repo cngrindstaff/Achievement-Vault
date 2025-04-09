@@ -62,7 +62,7 @@ router.get('/db/sections/:gameId', async (req, res) => {
     const gameId = req.params.gameId;
     //console.log('gameId: ' + gameId);
     try {
-        const [rows] = await db.query('CALL GetAllSectionsByGameID(?)', [gameId]);
+        const [rows] = await db.query('CALL GetAllGameSectionsByGameID(?)', [gameId]);
         const result = rows[0];
 
         if (result.length === 0) {
@@ -82,7 +82,7 @@ router.get('/db/records/:sectionId', async (req, res) => {
     const sectionId = req.params.sectionId;
     //console.log('sectionId: ' + sectionId);
     try {
-        const [rows] = await db.query('CALL GetAllRecordsBySectionID(?)', [sectionId]);
+        const [rows] = await db.query('CALL GetAllGameRecordsByGameSectionID(?)', [sectionId]);
         const result = rows[0];
 
         if (result.length === 0) {
@@ -111,7 +111,7 @@ router.put('/db/record/updateCompletion/:recordId', async (req, res) => {
 
     
     try {
-        await db.query('CALL UpdateRecord(?, ?)', [recordId, numberAlreadyCompleted]);
+        await db.query('CALL UpdateGameRecord(?, ?)', [recordId, numberAlreadyCompleted]);
         res.json({ message: 'Progress updated successfully' });
     } catch (err) {
         console.error('Error updating progress:', err);
