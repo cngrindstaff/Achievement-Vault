@@ -1,0 +1,84 @@
+SQL Tables
+
+CREATE TABLE Games (
+    ID INT AUTO_INCREMENT PRIMARY KEY,
+    Name VARCHAR(100) NOT NULL,
+    FriendlyName VARCHAR(100) NOT NULL,
+    HasDataTables BOOLEAN NOT NULL DEFAULT FALSE
+);
+
+************************************************
+
+
+CREATE TABLE GameSections (
+    ID INT AUTO_INCREMENT PRIMARY KEY,
+    Name VARCHAR(100) NOT NULL,
+    GameID INT NOT NULL,
+	ListOrder INT NOT NULL DEFAULT 0,
+    FOREIGN KEY (GameID) REFERENCES Games(ID)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE
+);
+
+ALTER TABLE GameSections
+ADD RecordOrderPreference VARCHAR(100);
+
+************************************************
+
+CREATE TABLE GameRecords (
+    ID INT AUTO_INCREMENT PRIMARY KEY,
+    Name VARCHAR(100) NOT NULL,
+    Description VARCHAR(1000),
+    SectionID INT NOT NULL,
+    GameID INT NOT NULL,
+    NumberOfCheckboxes INT NOT NULL DEFAULT 0,
+    NumberAlreadyCompleted INT NOT NULL DEFAULT 0,
+	ListOrder INT NOT NULL DEFAULT 100,
+	LongDescription VARCHAR(1000) DEFAULT NULL,
+    FOREIGN KEY (SectionID) REFERENCES Sections(ID)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE,
+    FOREIGN KEY (GameID) REFERENCES Games(ID)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE
+);
+
+
+************************************************
+
+CREATE TABLE GameTables (
+    ID INT AUTO_INCREMENT PRIMARY KEY,
+    Name VARCHAR(100) NOT NULL,
+    GameID INT NOT NULL,
+	ListOrder INT NOT NULL DEFAULT 1,
+    FieldName_01 VARCHAR(100),
+    FieldName_02 VARCHAR(100),
+    FieldName_03 VARCHAR(100),
+    FieldName_04 VARCHAR(100),
+    FieldName_05 VARCHAR(100),
+    FieldName_06 VARCHAR(100),
+    FOREIGN KEY (GameID) REFERENCES Games(ID)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE
+);
+
+************************************************
+
+
+CREATE TABLE GameTableRecords (
+    ID INT AUTO_INCREMENT PRIMARY KEY,
+    TableID INT NOT NULL,
+	ListOrder INT NOT NULL DEFAULT 1,
+	Field_01 VARCHAR(500) NOT NULL,
+	Field_02 VARCHAR(500),
+	Field_03 VARCHAR(500),
+	Field_04 VARCHAR(500),
+	Field_05 VARCHAR(500),
+	Field_06 VARCHAR(500),
+    FOREIGN KEY (TableID) REFERENCES GameTables(ID)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE
+);
+
+************************************************
+

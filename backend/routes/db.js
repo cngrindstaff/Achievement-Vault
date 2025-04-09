@@ -77,12 +77,13 @@ router.get('/db/sections/:gameId', async (req, res) => {
 });
 
 // Route 5: Get all records for a game section by section Id
-router.get('/db/records/:sectionId', async (req, res) => {
+router.get('/db/records/:sectionId/order/:recordOrderPreference', async (req, res) => {
     //console.log('made it records/sectionId');
     const sectionId = req.params.sectionId;
-    //console.log('sectionId: ' + sectionId);
+    const recordOrderPreference = req.params.recordOrderPreference
+    //console.log('sectionId: ' + sectionId + ' recordOrderPreference: ' + recordOrderPreference);
     try {
-        const [rows] = await db.query('CALL GetAllGameRecordsByGameSectionID(?)', [sectionId]);
+        const [rows] = await db.query('CALL GetAllGameRecordsByGameSectionIDWithOrdering(?, ?)', [sectionId, recordOrderPreference]);
         const result = rows[0];
 
         if (result.length === 0) {

@@ -1,0 +1,216 @@
+sql_stored_procedures
+
+************************************************
+
+DELIMITER $$
+
+CREATE PROCEDURE GetGameById(IN gameID INT)
+BEGIN
+    SELECT * FROM Games
+    WHERE ID = gameID;
+    
+END $$
+
+DELIMITER ;
+
+************************************************
+
+DELIMITER $$
+
+CREATE PROCEDURE GetAllGames()
+BEGIN
+    SELECT * FROM `achievement-vault`.Games
+	ORDER BY Name ASC;
+END $$
+
+DELIMITER ;
+
+************************************************
+(previously GetAllSectionsByGameID)
+DELIMITER $$
+
+CREATE PROCEDURE GetAllGameSectionsByGameID(IN inputGameID INT)
+BEGIN
+    SELECT * FROM GameSections
+    WHERE GameID = inputGameID;
+	ORDER BY ListOrder ASC, ID ASC;
+END $$
+
+DELIMITER ;
+
+************************************************
+
+(previously GetAllRecordsByGameID)
+DELIMITER $$
+
+CREATE PROCEDURE GetAllGameRecordsByGameID (IN inputGameID INT)
+BEGIN
+    SELECT * FROM GameRecords
+    WHERE GameID = inputGameID
+    ORDER BY ListOrder ASC;
+END $$
+
+DELIMITER ;
+
+************************************************
+
+DELIMITER $$
+
+CREATE PROCEDURE GetAllGameDataByGameID(IN inputGameID INT)
+BEGIN
+    SELECT 
+        g.ID AS GameID,
+        g.Name AS GameName,
+        g.FriendlyName,
+        
+        s.Name AS SectionName,
+        s.ListOrder AS SectionListOrder,
+        
+        r.ID AS RecordID,
+        r.Name AS RecordName,
+        r.Description AS RecordDescription,
+        r.NumberOfCheckboxes,
+        r.NumberAlreadyCompleted,
+        r.ListOrder AS RecordListOrder,
+        r.LongDescription AS RecordLongDescription
+
+    FROM Games g
+    LEFT JOIN GameSections s ON g.ID = s.GameID
+    LEFT JOIN GameRecords r ON s.ID = r.SectionID
+    WHERE g.ID = inputGameID
+	ORDER BY SectionListOrder ASC, RecordListOrder ASC, RecordName ASC;
+END $$
+
+DELIMITER ;
+
+************************************************
+
+(previously GetAllRecordsBySectionID)
+DELIMITER $$
+
+CREATE PROCEDURE GetAllGameRecordsByGameSectionID(IN inputSectionID INT)
+BEGIN
+    SELECT * FROM GameRecords
+    WHERE SectionID = inputSectionID;
+	ORDER BY ListOrder ASC, ID ASC;
+END $$
+
+DELIMITER ;
+
+************************************************
+
+DELIMITER $$
+
+CREATE PROCEDURE GetAllGameTablesByGameID (IN inputGameID INT)
+BEGIN
+    SELECT * FROM GameTables
+    WHERE GameID = inputGameID
+    ORDER BY ListOrder ASC, Name ASC;
+END $$
+
+DELIMITER ;
+
+************************************************
+
+DELIMITER $$
+
+CREATE PROCEDURE GetAllTableRecordsByTableID (IN inputTableID INT)
+BEGIN
+    SELECT * FROM GameTableRecords
+    WHERE TableID = inputTableID
+    ORDER BY ListOrder ASC, Field_01 ASC;
+END $$
+
+DELIMITER ;
+
+************************************************
+
+(previously UpdateRecord)
+
+DELIMITER $$
+
+CREATE PROCEDURE UpdateGameRecord(
+    IN inputRecordID INT,
+    IN inputNumberAlreadyCompleted INT
+)
+BEGIN
+    -- Check if the record exists
+    IF NOT EXISTS (
+        SELECT 1 FROM GameRecords WHERE ID = inputRecordID
+    ) THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Error: Record not found.';
+    ELSE
+        -- Try to update the record
+        UPDATE GameRecords
+        SET NumberAlreadyCompleted = inputNumberAlreadyCompleted
+        WHERE ID = inputRecordID;
+
+        -- Check if any row was actually updated
+        IF ROW_COUNT() = 0 THEN
+            SIGNAL SQLSTATE '45000'
+            SET MESSAGE_TEXT = 'Error: Record exists but no update was performed.';
+        END IF;
+    END IF;
+END $$
+
+DELIMITER ;
+
+************************************************
+
+DELIMITER $$
+
+CREATE PROCEDURE admin_GetUserPermissionsForStoredProcedures ()
+BEGIN
+	SELECT Routine_type, Routine_name, User, Host
+	FROM mysql.procs_priv
+	WHERE Db = DATABASE()
+	AND Proc_priv = 'Execute'
+	Order by Routine_name;
+END $$
+
+DELIMITER ;
+
+
+************************************************
+
+DELIMITER $$
+CREATE PROCEDURE GetAllGameRecordsByGameSectionIDWithOrdering(
+    IN inputSectionID INT,
+    IN inputOrderPreference VARCHAR(50)
+)
+BEGIN
+	## PREPARE is how MySQL creates a prepared statement — that is, a SQL query stored as a template in memory, which you can then fill in with real values and run.
+	## EXECUTE executes
+	## This substitutes ? placeholders in your query with actual values.
+	## You must use USING if your query has placeholders like ?.
+	## After you're done with a prepared statement, you deallocate it — like cleaning up temporary memory
+
+	-- Copy inputSectionID into a user-defined variable
+    SET @sectionID = inputSectionID;
+    
+    -- Build dynamic SQL string
+    SET @queryText = CONCAT(
+        'SELECT * FROM GameRecords WHERE SectionID = ? ORDER BY ',
+        CASE
+            WHEN inputOrderPreference = 'order-name' THEN 'ListOrder ASC, Name ASC'
+            WHEN inputOrderPreference = 'name' THEN 'Name ASC'
+            WHEN inputOrderPreference = 'completed-order-name' THEN 'NumberAlreadyCompleted ASC, ListOrder ASC, Name ASC'
+            ELSE 'ListOrder ASC, Name ASC' -- fallback to default
+        END
+    );
+
+	-- Prepare, execute, and clean up
+    PREPARE stmt FROM @queryText;
+    EXECUTE stmt USING @sectionID;
+    DEALLOCATE PREPARE stmt;
+END$$
+DELIMITER ;
+
+
+************************************************
+
+
+************************************************
+
+
