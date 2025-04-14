@@ -68,61 +68,85 @@ $(document).ready(async function () {
 async function processData(sections) {
     const gridContainer = $('#grid-checklist-container');
     gridContainer.empty();
-    let sectionCount = sections.length;
-    for (const section of sections) {
-        const sectionIndex = sections.indexOf(section);
-        var sectionId = section.ID;
-        var sectionTitle = section.Name;
-        var sectionTitleClean = utils.createSlug(sectionTitle);
-        var sectionRecordOrderPreference = section.RecordOrderPreference;
-        if(sectionRecordOrderPreference === '') sectionRecordOrderPreference = null;
-        
-        // Create section template with the section header and the section body
-        const sectionTemplate = `
+
+    // Pre-fetch all records in parallel
+    const recordsPromises = sections.map(section =>
+        dbUtils.loadRecordsBySectionId(section.ID, section.RecordOrderPreference || null)
+            .catch(err => {
+                console.error(`Failed to load records for section ${section.Name} (ID: ${section.ID})`, err);
+                return []; // Fallback to empty array on error
+            })
+    );
+    const allRecordsBySection = await Promise.all(recordsPromises);
+
+    const sectionFragments = [];
+
+    sections.forEach((section, sectionIndex) => {
+        const sectionId = section.ID;
+        const sectionTitle = section.Name;
+        const sectionTitleClean = utils.createSlug(sectionTitle);
+
+        const sectionHeader = $(`
             <div class="section-header" data-section="${sectionIndex}">
-                <span class="section-header-text" data-section="${sectionIndex}" data-section-title="${sectionTitle}" data-section-title-clean="${sectionTitleClean}"">
+                <span class="section-header-text" data-section="${sectionIndex}" data-section-title="${sectionTitle}" data-section-title-clean="${sectionTitleClean}">
                     ${sectionTitle} (0%)
                 </span>
                 <span class="section-header-icon">
                     <i class="fas fa-chevron-down"></i>
                 </span>
             </div>
-            <div class="section" data-section="${sectionIndex}" style="display: none;"></div>
-        `;
-        gridContainer.append(sectionTemplate);
+        `);
 
-        const sectionContent = gridContainer.find(`.section[data-section="${sectionIndex}"]`);
-        const records = await dbUtils.loadRecordsBySectionId(sectionId, sectionRecordOrderPreference);
-        records.forEach((record, recordIndex) => {
-            var recordName = record.Name;
-            var recordId = record.ID;
-            var recordDescription = record.Description;
-            var recordCheckboxesTotal = record.NumberOfCheckboxes;
-            var recordCheckboxesAlreadyCompleted = record.NumberAlreadyCompleted;
-            //console.log('recordName:' , recordName);
-            var recordNameClean = utils.createSlug(recordName);
-            
-            const itemTemplate = `
-                <div class="grid-item-${recordDescription ? '2' : '1'}-row">
-                    <div class="column1">
-                        <div class="label">${recordName}</div>
-                        ${recordDescription ? `<div class="description">${recordDescription}</div>` : ''}
+        const sectionBody = $(`<div class="section" data-section="${sectionIndex}" style="display: none;"></div>`);
+
+        const records = allRecordsBySection[sectionIndex] || [];
+        if (records.length === 0) {
+            sectionBody.append(`<div class="no-records">No checklist items found for this section.</div>`);
+        } else {
+            records.forEach((record, recordIndex) => {
+                const recordName = record.Name;
+                const recordId = record.ID;
+                const recordDescription = record.Description;
+                const totalCheckboxes = record.NumberOfCheckboxes || 0;
+                const completedCheckboxes = record.NumberAlreadyCompleted || 0;
+                const recordNameClean = utils.createSlug(recordName);
+
+                const checkboxesHTML = generateCheckboxes(
+                    sectionIndex,
+                    recordIndex,
+                    totalCheckboxes,
+                    completedCheckboxes,
+                    sectionTitleClean,
+                    recordNameClean,
+                    recordId
+                );
+
+                const recordHTML = `
+                    <div class="grid-item-${recordDescription ? '2' : '1'}-row">
+                        <div class="column1">
+                            <div class="label">${recordName}</div>
+                            ${recordDescription ? `<div class="description">${recordDescription}</div>` : ''}
+                        </div>
+                        <div class="column2">
+                            ${checkboxesHTML}
+                        </div>
                     </div>
-                    <div class="column2">
-                        ${generateCheckboxes(sectionIndex, recordIndex, recordCheckboxesTotal, recordCheckboxesAlreadyCompleted, 
-                            sectionTitleClean, recordNameClean, recordId)}
-                    </div>
-                </div>
-            `;
-            sectionContent.append(itemTemplate);
-        });
-        
-        // Add toggle functionality to section header
-        $(`.section-header[data-section="${sectionIndex}"]`).on('click', function () {
+                `;
+
+                sectionBody.append(recordHTML);
+            });
+        }
+
+        sectionHeader.on('click', function () {
             $(this).next('.section').toggle();
         });
-    }
+
+        sectionFragments.push(sectionHeader, sectionBody);
+    });
+
+    gridContainer.append(sectionFragments);
 }
+
 
 /*async function sendEmail(thisSubject, thisText) {
     try {
@@ -285,23 +309,28 @@ function updateCompletion() {
 }
 
 function updateSectionCompletion(sectionIndex) {
-    var sectionHeaderTextDiv = $(`span.section-header-text[data-section="${sectionIndex}"]`);
+    const sectionHeaderTextDiv = $(`span.section-header-text[data-section="${sectionIndex}"]`);
     const checkboxes = $(`input[data-section="${sectionIndex}"]`);
     const checkedCheckboxes = checkboxes.filter(':checked').length;
     const totalCheckboxes = checkboxes.length;
-    const sectionCompletion = checkedCheckboxes + '/' + totalCheckboxes;
-    const sectionCompletionPercent = ((checkedCheckboxes / totalCheckboxes) * 100).toFixed(2);
+    const sectionCompletion = `${checkedCheckboxes}/${totalCheckboxes}`;
 
     const sectionTitle = sectionHeaderTextDiv.attr('data-section-title');
-    if (debugLogging) console.log('sectionTitle' + sectionTitle);
-    
-    sectionHeaderTextDiv.text(`${sectionTitle} (${sectionCompletion}) (${sectionCompletionPercent}%)`);
-    
-    //get the header, add the # of checkboxes for that section
+
+    let displayText = `${sectionTitle} (${sectionCompletion})`;
+    if (totalCheckboxes > 0) {
+        const sectionCompletionPercent = ((checkedCheckboxes / totalCheckboxes) * 100).toFixed(2);
+        displayText += ` (${sectionCompletionPercent}%)`;
+    }
+
+    sectionHeaderTextDiv.text(displayText);
+
+    // Update data attributes used in total completion
     const sectionHeaderDiv = $(`div.section-header[data-section="${sectionIndex}"]`);
-    sectionHeaderDiv.attr("checked-checkboxes",checkedCheckboxes);
-    sectionHeaderDiv.attr("total-checkboxes",totalCheckboxes);
+    sectionHeaderDiv.attr("checked-checkboxes", checkedCheckboxes);
+    sectionHeaderDiv.attr("total-checkboxes", totalCheckboxes);
 }
+
 
 function updateTotalCompletion() {
     try {

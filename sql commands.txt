@@ -34,3 +34,19 @@ update achievement_vault.GameSections
 set RecordOrderPreference = 'completed-order-name'
 where GameID = 4 and RecordOrderPreference = 'completed asc'
 ;
+
+update GameRecords
+Set ListOrder = 100
+where GameID = 4 and ListOrder = 1 and (SectionID = 81 or SectionID = 82)
+
+
+-- This will show what the replace command will return
+SELECT REPLACE(Name, '#2', '#02')
+FROM achievement_vault.GameRecords 
+WHERE sectionID=103 and name like '%#2%' 
+
+-- Replace Command
+update achievement_vault.GameRecords
+set Name = Replace(Name, 'Big Challenge\'s Furniture - Big Challenges ', 'Big Challenge - ')
+where GameID = 4 and SectionID = 105
+
