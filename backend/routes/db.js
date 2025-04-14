@@ -81,17 +81,20 @@ router.get('/db/records/:sectionId/order/:recordOrderPreference', async (req, re
     //console.log('made it records/sectionId');
     const sectionId = req.params.sectionId;
     const recordOrderPreference = req.params.recordOrderPreference
-    //console.log('sectionId: ' + sectionId + ' recordOrderPreference: ' + recordOrderPreference);
+    console.log('sectionId: ' + sectionId + ' recordOrderPreference: ' + recordOrderPreference);
     try {
         const [rows] = await db.query('CALL GetAllGameRecordsByGameSectionIDWithOrdering(?, ?)', [sectionId, recordOrderPreference]);
         const result = rows[0];
 
-        if (result.length === 0) {
-            return res.status(404).json({ error: 'Game or section not found' });
+        if (result.length === 0) { 
+            console.error(`Section or records not found ${sectionId}`);
+            res.json();
+        }
+        else {
+            res.json(result);
         }
 
-        res.json(result);
-    } catch (err) {
+    } catch (err) { 
         console.error(`Error fetching section data with section ID ${sectionId}:`, err);
         res.status(500).json({ error: 'Internal server error' });
     }
