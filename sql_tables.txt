@@ -23,6 +23,9 @@ CREATE TABLE GameSections (
 ALTER TABLE GameSections
 ADD RecordOrderPreference VARCHAR(100);
 
+ALTER TABLE GameSections
+ADD Hidden BOOLEAN NOT NULL DEFAULT FALSE;
+
 ************************************************
 
 CREATE TABLE GameRecords (
@@ -42,6 +45,9 @@ CREATE TABLE GameRecords (
         ON DELETE CASCADE
         ON UPDATE CASCADE
 );
+
+ALTER TABLE GameRecords
+ADD Hidden BOOLEAN NOT NULL DEFAULT FALSE;
 
 
 ************************************************
