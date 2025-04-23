@@ -50,3 +50,6 @@ update achievement_vault.GameRecords
 set Name = Replace(Name, 'Big Challenge\'s Furniture - Big Challenges ', 'Big Challenge - ')
 where GameID = 4 and SectionID = 105
 
+
+
+updated GetAllSectionsByGameID, GetAllGameSectionsByGameID, `GetAllGameRecordsByGameSectionIDWithOrdering`  to include "WHERE Hidden = false"
