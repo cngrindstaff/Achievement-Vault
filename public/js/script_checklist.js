@@ -46,7 +46,7 @@ $(document).ready(async function () {
 
 
     // Fetch sections for that game
-    const sections = await dbUtils.loadSectionsByGameId(passed_gameId);
+    const sections = await dbUtils.loadSectionsByGameId(passed_gameId, false);
     
     await processData(sections);
     updateAllSectionsCompletion(); // Update section percentages
@@ -71,7 +71,7 @@ async function processData(sections) {
 
     // Pre-fetch all records in parallel
     const recordsPromises = sections.map(section =>
-        dbUtils.loadRecordsBySectionId(section.ID, section.RecordOrderPreference || null)
+        dbUtils.loadRecordsBySectionId(section.ID, section.RecordOrderPreference || null, false)
             .catch(err => {
                 console.error(`Failed to load records for section ${section.Name} (ID: ${section.ID})`, err);
                 return []; // Fallback to empty array on error

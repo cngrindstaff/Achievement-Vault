@@ -26,14 +26,20 @@ END $$
 DELIMITER ;
 
 ************************************************
-(previously GetAllSectionsByGameID)
+(previously GetAllSectionsByGameID, GetAllGameSectionsByGameID)
 DELIMITER $$
 
-CREATE PROCEDURE GetAllGameSectionsByGameID(IN inputGameID INT)
+CREATE PROCEDURE "GetGameSectionsByGameID"(IN inputGameID INT, IN includeHiddenSections bool)
 BEGIN
+    -- Default to TRUE if NULL is passed
+    IF includeHiddenSections IS NULL THEN
+        SET includeHiddenSections = TRUE;
+    END IF;
+    
     SELECT * FROM GameSections
-    WHERE GameID = inputGameID;
-	ORDER BY ListOrder ASC, ID ASC;
+    WHERE GameID = inputGameID
+    AND Hidden = includeHiddenSections
+    ORDER BY ListOrder ASC, ID ASC;
 END $$
 
 DELIMITER ;
@@ -43,11 +49,15 @@ DELIMITER ;
 (previously GetAllRecordsByGameID)
 DELIMITER $$
 
-CREATE PROCEDURE GetAllGameRecordsByGameID (IN inputGameID INT)
+CREATE DEFINER="doadmin"@"%" PROCEDURE "GetGameRecordsByGameSectionID"(
+	IN inputSectionID INT,
+    IN includeHiddenSections BOOL
+)
 BEGIN
     SELECT * FROM GameRecords
-    WHERE GameID = inputGameID
-    ORDER BY ListOrder ASC;
+    WHERE SectionID = inputSectionID
+    AND Hidden = includeHiddenSections
+    ORDER BY ListOrder ASC, ID ASC;
 END $$
 
 DELIMITER ;
@@ -174,37 +184,42 @@ DELIMITER ;
 
 ************************************************
 
+
 DELIMITER $$
-CREATE PROCEDURE GetAllGameRecordsByGameSectionIDWithOrdering(
+CREATE PROCEDURE "GetGameRecordsByGameSectionIDWithOrdering"(
     IN inputSectionID INT,
-    IN inputOrderPreference VARCHAR(50)
+    IN inputOrderPreference VARCHAR(50),
+    IN includeHiddenSections BOOL
 )
 BEGIN
-	## PREPARE is how MySQL creates a prepared statement — that is, a SQL query stored as a template in memory, which you can then fill in with real values and run.
-	## EXECUTE executes
-	## This substitutes ? placeholders in your query with actual values.
-	## You must use USING if your query has placeholders like ?.
-	## After you're done with a prepared statement, you deallocate it — like cleaning up temporary memory
+    -- Default to 'order-name' if NULL
+    IF inputOrderPreference IS NULL THEN
+        SET inputOrderPreference = 'order-name';
+    END IF;
 
-	-- Copy inputSectionID into a user-defined variable
+    -- Default to TRUE if NULL
+    IF includeHiddenSections IS NULL THEN
+        SET includeHiddenSections = TRUE;
+    END IF;
+
     SET @sectionID = inputSectionID;
-    
-    -- Build dynamic SQL string
+    SET @includeHidden = includeHiddenSections;
+
+    -- Start building query
     SET @queryText = CONCAT(
-        'SELECT * FROM GameRecords WHERE SectionID = ? ORDER BY ',
+        'SELECT * FROM GameRecords WHERE SectionID = ? AND ( ? = TRUE OR Hidden = FALSE ) ORDER BY ',
         CASE
             WHEN inputOrderPreference = 'order-name' THEN 'ListOrder ASC, Name ASC'
             WHEN inputOrderPreference = 'name' THEN 'Name ASC'
             WHEN inputOrderPreference = 'completed-order-name' THEN 'NumberAlreadyCompleted ASC, ListOrder ASC, Name ASC'
-            ELSE 'ListOrder ASC, Name ASC' -- fallback to default
+            ELSE 'ListOrder ASC, Name ASC'
         END
     );
 
-	-- Prepare, execute, and clean up
     PREPARE stmt FROM @queryText;
-    EXECUTE stmt USING @sectionID;
+    EXECUTE stmt USING @sectionID, @includeHidden;
     DEALLOCATE PREPARE stmt;
-END$$
+END $$
 DELIMITER ;
 
 
