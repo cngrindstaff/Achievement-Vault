@@ -36,33 +36,25 @@ router.get('/db/games/:gameId', async (req, res) => {
     }
 });
 
-// Route 3: Get all data for a game by ID
-router.get('/db/games/full/:gameId', async (req, res) => {
-    //console.log('made it here2');
-    const gameId = req.params.gameId;
-    //console.log('gameId: ' + gameId);
-    try {
-        const [rows] = await db.query('CALL GetAllGameDataByGameID(?)', [gameId]);
-        const result = rows[0];
-
-        if (result.length === 0) {
-            return res.status(404).json({ error: 'Game not found' });
-        }
-
-        res.json(result);
-    } catch (err) {
-        console.error(`Error fetching full gamedata  with ID ${gameId}:`, err);
-        res.status(500).json({ error: 'Internal server error' });
-    }
-});
 
 // Route 4: Get all sections for a game by ID
-router.get('/db/sections/:gameId', async (req, res) => {
+router.get('/db/sections/:gameId/:hiddenFilter', async (req, res) => {
     //console.log('made it here sections/gameid');
     const gameId = req.params.gameId;
-    //console.log('gameId: ' + gameId);
+    let hiddenFilter = req.params.hiddenFilter;
+
+    // Convert string 'true'/'false' to boolean 1/0
+    if (hiddenFilter === 'true') {
+        hiddenFilter = 1;
+    } else if (hiddenFilter === 'false') {
+        hiddenFilter = 0;
+    } else {
+        hiddenFilter = null; // Let SQL default it if invalid or missing
+    }
+    
+    //console.log('gameId: ' + gameId + ' hiddenFilter: ' + hiddenFilter);
     try {
-        const [rows] = await db.query('CALL GetAllGameSectionsByGameID(?)', [gameId]);
+        const [rows] = await db.query('CALL GetGameSectionsByGameID(?, ?)', [gameId, hiddenFilter]);
         const result = rows[0];
 
         if (result.length === 0) {
@@ -77,13 +69,25 @@ router.get('/db/sections/:gameId', async (req, res) => {
 });
 
 // Route 5: Get all records for a game section by section Id
-router.get('/db/records/:sectionId/order/:recordOrderPreference', async (req, res) => {
+router.get('/db/records/:sectionId/order/:recordOrderPreference/hiddenFilter/:hiddenFilter', async (req, res) => {
     //console.log('made it records/sectionId');
     const sectionId = req.params.sectionId;
     const recordOrderPreference = req.params.recordOrderPreference
-    console.log('sectionId: ' + sectionId + ' recordOrderPreference: ' + recordOrderPreference);
+
+    let hiddenFilter = req.params.hiddenFilter;
+
+    // Convert string 'true'/'false' to boolean 1/0
+    if (hiddenFilter === 'true') {
+        hiddenFilter = 1;
+    } else if (hiddenFilter === 'false') {
+        hiddenFilter = 0;
+    } else {
+        hiddenFilter = null; // Let SQL default it if invalid or missing
+    }
+    
+    // console.log('sectionId: ' + sectionId + ' recordOrderPreference: ' + recordOrderPreference + ' hiddenFilter: ' + hiddenFilter);
     try {
-        const [rows] = await db.query('CALL GetAllGameRecordsByGameSectionIDWithOrdering(?, ?)', [sectionId, recordOrderPreference]);
+        const [rows] = await db.query('CALL GetGameRecordsByGameSectionID(?, ?, ?)', [sectionId, recordOrderPreference, hiddenFilter]);
         const result = rows[0];
 
         if (result.length === 0) { 

@@ -22,27 +22,8 @@ export async function loadGameData(passed_gameId) {
 
     //document.querySelector('.game-name').textContent = passed_gameNameFriendly;
 }
-export async function loadFullGameData(passed_gameId) {
-    if (!passed_gameId) {
-        alert("Missing game ID in URL.");
-        return;
-    }
 
-    try {
-        const res = await fetch(`/api/db/games/full/${passed_gameId}`);
-        const data = await res.json();
-        //console.log('Game data:', data);
-        /*        return {
-                    gameId: data.ID,
-                    gameNameFriendly: data.FriendlyName || passed_gameName || passed_gameId,
-                    gameName: data.Name || passed_gameId,
-                };*/
-        return data;
-    } catch (err) {
-        console.error("Error fetching game data:", err);
-    }
-}
-export async function loadSectionsByGameId(gameId) {
+export async function loadSectionsByGameId(gameId, hiddenFilter) {
     if (!gameId) {
         alert("Missing game ID in URL.");
         return;
@@ -50,7 +31,7 @@ export async function loadSectionsByGameId(gameId) {
 
     try {
         //console.log('made it here loadSectionsByGameId');
-        const res = await fetch(`/api/db/sections/${gameId}`);
+        const res = await fetch(`/api/db/sections/${gameId}/${hiddenFilter}`);
         const data = await res.json();
         //console.log('Section data:', data);
         /*        return {
@@ -67,7 +48,7 @@ export async function loadSectionsByGameId(gameId) {
     }
 }
 
-export async function loadRecordsBySectionId(sectionId, recordOrderPreference) {
+export async function loadRecordsBySectionId(sectionId, recordOrderPreference, hiddenFilter) {
     if (!sectionId) {
         alert("Missing sectionId in URL.");
         return;
@@ -75,7 +56,7 @@ export async function loadRecordsBySectionId(sectionId, recordOrderPreference) {
     //console.log('sectionId: ' + sectionId + ' recordOrderPreference: ' + recordOrderPreference);
 
     try {
-        const res = await fetch(`/api/db/records/${sectionId}/order/${recordOrderPreference}`);
+        const res = await fetch(`/api/db/records/${sectionId}/order/${recordOrderPreference}/hiddenFilter/${hiddenFilter}`);
         const data = await res.json();
         //console.log('Records data:', data);
         /*        return {
