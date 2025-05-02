@@ -3,3 +3,8 @@ FROM GameRecords
 WHERE SectionID = 128
   AND Hidden = false
 ORDER BY NumberAlreadyCompleted, ListOrder, Name
+
+SELECT *
+FROM GameSections
+WHERE GameID=4
+ORDER BY ID, Name

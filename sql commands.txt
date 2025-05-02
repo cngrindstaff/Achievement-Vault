@@ -20,7 +20,7 @@ GRANT EXECUTE ON PROCEDURE achievement_vault.GetAllGameRecordsByGameSectionID TO
 GRANT EXECUTE ON PROCEDURE achievement_vault.GetAllGameTablesByGameID TO 'achievement_vault_user'@'%';
 GRANT EXECUTE ON PROCEDURE achievement_vault.GetAllTableRecordsByTableID TO 'achievement_vault_user'@'%';
 GRANT EXECUTE ON PROCEDURE achievement_vault.UpdateGameRecord TO 'achievement_vault_user'@'%';
-GRANT EXECUTE ON PROCEDURE achievement_vault.GetAllGameRecordsByGameSectionIDWithOrdering TO 'achievement_vault_user'@'%';
+GRANT EXECUTE ON PROCEDURE achievement_vault.GetGameRecordsByGameSectionID TO 'achievement_vault_user'@'%';
 
 ************************************************
 
