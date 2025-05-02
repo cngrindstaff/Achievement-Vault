@@ -151,3 +151,50 @@
 4,9,City Town,Crowbert,City Rooftop,"Evening, Night",Uncommon,
 4,9,City Town,Dust Bun,Dumpster Alley,"Day, Evening",Rare,
 4,9,City Town,Squeakle,Sewers,All,Common,
+6,1,Bellbutton,Regional,"white, yellow, blue",Ombre,Common,"If native, seed in Merry Meadow. Else, Mystery Seed Capsule"
+6,1,Dandelily,Regional,"white, red, yellow",Ombre,Common,"If native, seed in Merry Meadow. Else, Mystery Seed Capsule"
+6,1,Penstemum,Regional,"white, green, sky",Ombre,Common,"If native, seed in Merry Meadow. Else, Mystery Seed Capsule"
+6,1,Tulias,Regional,"red, yellow, violet",Ombre,Common,"If native, seed in Merry Meadow. Else, Mystery Seed Capsule"
+6,1,Hibiscus,Regional,hot pink,Ombre,Common,"Seed, Seaside Resort"
+6,1,Ghostgleam,Regional,white,Ombre,Common,"Seed, Spooky Swamp"
+6,1,Thistle,Regional,violet,Ombre,Common,"Seed, Gemstone Mountain"
+6,1,Heavy Nettle,Regional,orange,Ombre,Common,"Seed, Mount Hothead"
+6,1,Anemone,Regional,"lime, magenta",Ombre,Common,"Seed, Rainbow Reef"
+6,1,Dreampuff (AA only),Regional,"mint, cloud, periwinkle, cool pink",Ombre,Common,"Seed, Cloud Island"
+6,1,Frostfeather (AA only),Regional,ice,Frost,Common,"Seed, Icy Peak"
+6,1,Blazebulb (AA only),Regional,"coral, blush, peach, cream",Molten,Common,"Seed, Caldera"
+6,1,Marigold,Event: Colorblaze Carnival,orange,Trim,Uncommon,"Random spawns: Merry Meadow, Seaside Resort, Gemstone Mountain, Mount Hothead"
+6,1,Eggwort,Event: Month of Meh,"white, sky",Speckled,Uncommon,Random spawns: Everywhere?
+6,1,Petunia,Event: Jam Jamboree,magenta,Striped,Uncommon,Random spawns: Merry Meadow
+6,1,Bowblossom,Event: 50th Anniversary,"warm pink, seafoam, lilac",Iridescent,Uncommon,"Random spawns: Merry Meadow, Seaside Resort"
+6,1,Poinsettia,Event: Give & Gather,"white, red",Patch,Uncommon,Random spawns: Merry Meadow
+6,1,Glowbal,Event: Lighttime Jubilee,"yellow, sky, hot pink",Glow,Uncommon,Random spawns: Merry Meadow
+6,1,Rose,Event: Hugs & Hearts,"white, red, yellow, pink",Ring,Uncommon,"Random spawns: Merry Meadow, Seaside Resort"
+6,1,Happadil,Event: Happy Haven,"yellow, hot pink",Confetti,Uncommon,"Random spawns: Merry Meadow, Seaside Resort"
+7,1,Base Color: Red,primary transfer only,,,,
+7,1,Base Color: Coral,Red + Orange,,,,
+7,1,Base Color: Orange,Red + Yellow,,,,
+7,1,Base Color: Yellow,primary transfer only,,,,
+7,1,Base Color: Lime,Yellow + Green,,,,
+7,1,Base Color: Green,Yellow + Blue,,,,
+7,1,Base Color: Teal,Green + Sky,,,,
+7,1,Base Color: Sky,primary transfer only,,,,
+7,1,Base Color: Blue,primary transfer only,,,,
+7,1,Base Color: Indigo,Blue + Violet,,,,
+7,1,Base Color: Violet,Red + Blue,,,,
+7,1,Base Color: Magenta,Violet + Hot Pink,,,,
+7,1,Base Color: Hot Pink,primary transfer only,,,,
+7,1,Base Color: White,primary transfer only,,,,
+7,1,Tint Color: Warm Pink,Red + White,,,,
+7,1,Tint Color: Blush,Coral + White,,,,
+7,1,Tint Color: Peach,Orange + White,,,,
+7,1,Tint Color: Cream,Yellow + White,,,,
+7,1,Tint Color: Pistachio,Lime + White,,,,
+7,1,Tint Color: Mint,Green + White,,,,
+7,1,Tint Color: Seafoam,Teal + White,,,,
+7,1,Tint Color: Cloud,Sky + White,,,,
+7,1,Tint Color: Ice,Blue + White,,,,
+7,1,Tint Color: Periwinkle,Indigo + White,,,,
+7,1,Tint Color: Lilac,Violet + White,,,,
+7,1,Tint Color: Cool Pink,Magenta + White,,,,
+7,1,Tint Color: Pink,Hot Pink + White,,,,
