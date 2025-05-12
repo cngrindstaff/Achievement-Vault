@@ -28,7 +28,7 @@ body {
   padding: 20px;
 }
 
-.container , .game-list-container{
+.container, .game-list-container {
   max-width: 700px;
   width: 100%;
 }
@@ -39,7 +39,7 @@ h1 {
   margin-bottom: 20px;
 }
 
-.section-header, .game-list-item {
+.section-header, .game-list-item, .game-section-item {
   /*	background-color: $teal_bck_color-2;
   	color: $teal_font_dark;*/
   color: #CEF2F3;
@@ -60,7 +60,7 @@ h1 {
   display: flex;
 }
 
-.game-list-item:hover, .section-header:hover {
+.game-list-item:hover, .section-header:hover, .game-section-item:hover {
   background-color: #2FBFC6;
 }
 

@@ -346,6 +346,41 @@ GRANT EXECUTE ON PROCEDURE achievement_vault.UpdateGameRecord TO 'achievement_va
 
 ************************************************
 
+DELIMITER //
+
+CREATE PROCEDURE UpdateGameSectionsListOrder(
+    IN sectionUpdates JSON,
+    OUT rowsUpdated INT
+)
+BEGIN
+    DECLARE i INT DEFAULT 0;
+    DECLARE n INT DEFAULT JSON_LENGTH(sectionUpdates);
+    DECLARE sectionId INT;
+    DECLARE listOrder INT;
+    DECLARE totalRowsUpdated INT DEFAULT 0;
+
+    WHILE i < n DO
+        -- Extract the ID and ListOrder for this section
+        SET sectionId = JSON_UNQUOTE(JSON_EXTRACT(sectionUpdates, CONCAT('$[', i, '].ID')));
+        SET listOrder = JSON_UNQUOTE(JSON_EXTRACT(sectionUpdates, CONCAT('$[', i, '].ListOrder')));
+
+        -- Update the row and count the affected rows
+        UPDATE GameSections
+        SET ListOrder = listOrder
+        WHERE ID = sectionId;
+
+        SET totalRowsUpdated = totalRowsUpdated + ROW_COUNT();
+
+        SET i = i + 1;
+    END WHILE;
+
+    -- Return the total rows updated
+    SET rowsUpdated = totalRowsUpdated;
+END //
+
+DELIMITER ;
+
+GRANT EXECUTE ON PROCEDURE achievement_vault.UpdateGameSectionsListOrder TO 'achievement_vault_user'@'%';
 
 
 ************************************************

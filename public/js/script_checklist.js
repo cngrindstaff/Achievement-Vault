@@ -1,5 +1,6 @@
 import * as utils from './script_utilities.js';
 import * as dbUtils from './script_db_helper.js';
+import {updateRecordCompletionInDatabase} from "./script_db_helper.js";
 
 const sendGridUrl = '/api/send-email';
 const googleSheetsAppendUrl = '/api/google-sheets-append';
@@ -295,7 +296,7 @@ function updateCompletion() {
             else numberAlreadyCompleted = checkboxNumberClicked - 1;
             
         }
-        dbUtils.updateRecordInDatabase(recordId, numberAlreadyCompleted);
+        dbUtils.updateRecordCompletionInDatabase(recordId, numberAlreadyCompleted);
         if(numberOfCheckboxes > 1) {
             sendDataToSheets(gameNameFriendly, sectionTitle, checkboxItemName, action, checkboxNumberClicked);
         }
