@@ -16,7 +16,6 @@ let linkToGamePage = null;
 
 $(document).ready(async function () {
     var passed_gameId = utils.getQueryParam('id');
-    var passed_gameName = utils.getQueryParam('name');
 
     // Fetch game data first
     const gameData = await dbUtils.loadGameData(passed_gameId);
@@ -25,7 +24,7 @@ $(document).ready(async function () {
     gameName = gameData.Name;
     gameNameFriendly = gameData.FriendlyName;
     hasDataTables = gameData.HasDataTables;
-    linkToGamePage = '/game?id=' + gameId + '&name=' + gameName;
+    linkToGamePage = '/game?id=' + gameId;
 
     //set the title field that's in the head using the variable from the game's HTML
     const titleElement = document.querySelector('title');
