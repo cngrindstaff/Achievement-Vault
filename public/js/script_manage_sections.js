@@ -14,7 +14,6 @@ let linkToGamePage = null;
 let htmlTitle = null;
 $(document).ready(async function () {
     var passed_gameId = utils.getQueryParam('gameId');
-    var passed_gameName = utils.getQueryParam('gameName');
 
     // Fetch game data first
 
@@ -23,47 +22,148 @@ $(document).ready(async function () {
     gameId = gameData.ID;
     gameName = gameData.Name;
     gameNameFriendly = gameData.FriendlyName;
-    //hasDataTables = gameData.HasDataTables;
-    linkToGamePage = `/game?id=${gameId}&name=${gameName}`;
+    linkToGamePage = `/game?id=${gameId}`;
     htmlTitle = gameNameFriendly + ': Sections';
 
-    //set the title field that's in the head using the variable from the game's HTML
     $("title").text(htmlTitle);
-
-    // Add sibling elements before grid-checklist-container
-    //.append() puts data inside an element at last index and .prepend() puts the prepending elem at first index.
+    
     const mainContainer = $('#container');
-
-    mainContainer.prepend('<h1>' + htmlTitle + '</h1>');
-
-    mainContainer.prepend(`<div class="link-container"> </div>`);
-
+    mainContainer.append(`<div class="link-container"> </div>`);
+    
     const linkContainerDiv = $('.link-container');
-    linkContainerDiv.prepend('<div class="link-icon"><a href="' + linkToGamePage + '" class="link-icon-text" title="Return to Game Page"><i class="fa fa-arrow-left fa-lg fa-border" ></i></a></div>');
-    linkContainerDiv.prepend('<div class="link-icon"><a href="' + linkToHomePage + '" class="link-icon-text"><i class="fa fa-solid fa-house fa-lg fa-border" ></i></a></div>');
+    linkContainerDiv.append('<div class="link-icon"><a href="' + linkToHomePage + '" class="link-icon-text"><i class="fa fa-solid fa-house fa-lg fa-border" ></i></a></div>');
+    linkContainerDiv.append('<div class="link-icon"><a href="' + linkToGamePage + '" class="link-icon-text" title="Return to Game Page"><i class="fa fa-arrow-left fa-lg fa-border" ></i></a></div>');
 
-    const gridContainer = document.getElementById('grid-manage-sections-container');
-    gridContainer.innerHTML = ''; // Clear previous data
-    // get the game gameSections, including hidden gameSections
-    const gameSections = await dbUtils.loadSectionsByGameId(passed_gameId, null);
+    mainContainer.append('<h1>' + gameNameFriendly + ': Sections</h1>');
 
-    let gameSectionCount = gameSections.length;
-    if (gameSectionCount === 0) {
-        console.log('No game gameSections found for this game ID.');
-        //TODO show option to add
-        //showNoTablesMessage();
-        return;
-    }
-
-
-    for (const gameSection of gameSections) {
-        const index = gameSections.indexOf(gameSections);
-        const p = document.createElement('p');
-        p.className = 'game-section-item';
-        p.onclick = () => window.location.href = `manage_sectionRecords?sectionId=${gameSection.ID}`;
-        p.textContent = gameSection.Name;
-        gridContainer.appendChild(p);
-    }
+    mainContainer.append('<div id="grid-manage-sections-container"></div>');
+    mainContainer.append('<button id="save-button" class="save-button">Save Order</button>');
+    mainContainer.append('<button id="reset-button" class="reset-button">Reset Changes</button>');
+    
+    await initializeGameSectionsReorder(gameId, 'grid-manage-sections-container', 'reset-button');
+    
 })
 
-    
+
+function createSectionCard(section) {
+    const card = document.createElement('div');
+    card.className = 'section-card';
+    card.draggable = true;
+    card.dataset.id = section.ID;
+    card.dataset.originalOrder = section.ListOrder;
+    card.dataset.currentOrder = section.ListOrder;
+    card.innerHTML = `
+        <span class="section-name">${section.Name}</span>
+        <input type="number" class="list-order" value="${section.ListOrder}" readonly/>
+    `;
+    return card;
+}
+
+function renderSections(sections, container) {
+    container.innerHTML = '';
+    sections.forEach(section => container.appendChild(createSectionCard(section)));
+}
+
+function enableDragAndDrop(container) {
+    let draggedItem = null;
+
+    container.addEventListener('dragstart', (e) => {
+        if (e.target.classList.contains('section-card')) {
+            draggedItem = e.target;
+            setTimeout(() => e.target.classList.add('dragging'), 0);
+        }
+    });
+
+    container.addEventListener('dragend', (e) => {
+        if (draggedItem) {
+            draggedItem.classList.remove('dragging');
+            draggedItem.classList.add('dropped');
+            setTimeout(() => draggedItem.classList.remove('dropped'), 150);
+            draggedItem = null;
+            updateListOrders(container);
+            highlightChangedSections(container);
+        }
+    });
+
+    container.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        const afterElement = getDragAfterElement(container, e.clientY);
+        const draggingElement = document.querySelector('.dragging');
+        if (afterElement == null) {
+            container.appendChild(draggingElement);
+        } else {
+            container.insertBefore(draggingElement, afterElement);
+        }
+    });
+}
+
+function getDragAfterElement(container, y) {
+    const draggableElements = [...container.querySelectorAll('.section-card:not(.dragging)')];
+
+    return draggableElements.reduce((closest, child) => {
+        const box = child.getBoundingClientRect();
+        const offset = y - box.top - box.height / 2;
+        if (offset < 0 && offset > closest.offset) {
+            return { offset: offset, element: child };
+        } else {
+            return closest;
+        }
+    }, { offset: Number.NEGATIVE_INFINITY }).element;
+}
+
+function updateListOrders(container) {
+    const sectionCards = [...container.children];
+    sectionCards.forEach((card, index) => {
+        const orderInput = card.querySelector('.list-order');
+        if (orderInput) {
+            orderInput.value = index + 1;
+            card.dataset.currentOrder = index + 1;
+        }
+    });
+}
+
+function highlightChangedSections(container) {
+    const sectionCards = [...container.children];
+    sectionCards.forEach((card) => {
+        const originalOrder = Number(card.dataset.originalOrder);
+        const currentOrder = Number(card.dataset.currentOrder);
+        if (originalOrder !== currentOrder) {
+            card.classList.add('changed');
+        } else {
+            card.classList.remove('changed');
+        }
+    });
+}
+
+async function initializeGameSectionsReorder(gameId, containerId, resetButtonId) {
+    const container = document.getElementById(containerId);
+    const resetButton = document.getElementById(resetButtonId);
+    if (!container || !resetButton) return;
+
+    const sections = await dbUtils.loadSectionsByGameId(gameId);
+    renderSections(sections, container);
+    enableDragAndDrop(container);
+
+    resetButton.addEventListener('click', () => {
+        renderSections(sections, container);
+        highlightChangedSections(container);
+    });
+
+    document.getElementById('save-button').addEventListener('click', async () => {
+        const updatedSections = [...container.children]
+            .map((card) => ({
+                ID: Number(card.dataset.id),
+                ListOrder: Number(card.dataset.currentOrder),
+                OriginalOrder: Number(card.dataset.originalOrder)
+            }))
+            .filter((section) => section.ListOrder !== section.OriginalOrder);
+
+        if (updatedSections.length > 0) {
+            const success = await dbUtils.updateGameSectionsListOrder(gameId, updatedSections);
+            if (success) alert('List order updated successfully!');
+            else alert('Failed to update list order.');
+        } else {
+            alert('No changes to save.');
+        }
+    });
+}

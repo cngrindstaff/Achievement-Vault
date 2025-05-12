@@ -294,3 +294,92 @@ tr:nth-child(odd) {
 	background-color: $teal_bck_color-2; 
 	//color: $teal_font_light;
 }
+
+
+/*************************************** SECTIONS MANAGER *******************************/
+
+
+.sections-container {
+	width: 80%;
+	margin: auto;
+	margin-top: 20px;
+}
+
+.section-card {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	padding: 15px;
+	border: none;
+	border-radius: 5px;
+	font-size: 15px;
+	margin-bottom: 5px;
+	color: $teal_font_light;
+	background-color: $teal_bck_color-5;
+	cursor: grab;
+	transition: background-color 0.2s, transform 0.2s;
+}
+
+.section-card:hover {
+	background-color: $teal_bck_color-3;
+}
+
+.section-card.dragging {
+	opacity: 0.5;
+	cursor: grabbing;
+	transform: scale(1.02);
+}
+
+.section-card.dropped {
+	animation: shake 0.15s ease-out;
+}
+
+.section-card.changed {
+	background-color: $teal_bck_color_1;
+	color: $teal_font_dark;
+}
+
+@keyframes shake {
+	0% { transform: translateX(-2px); }
+	25% { transform: translateX(2px); }
+	50% { transform: translateX(-2px); }
+	75% { transform: translateX(2px); }
+	100% { transform: translateX(0); }
+}
+
+.list-order {
+	width: 40px;
+	text-align: center;
+	border: none;
+	border-radius: 5px;	
+}
+
+.save-button, .reset-button {
+	display: block;
+	width: 30%;
+	margin: 20px auto;
+	padding: 10px;
+	color: $teal_font_light;
+	background-color: $teal_bck_color-5;
+	border: none;
+	border-radius: 8px;
+	cursor: pointer;
+	transition: background-color 0.2s;
+}
+
+.save-button:hover, .reset-button:hover {
+	background-color: $teal_bck_color-3;
+}
+
+/* Remove up/down arrows on number input - Chrome, Edge, Safari */
+.list-order::-webkit-outer-spin-button,
+.list-order::-webkit-inner-spin-button {
+	-webkit-appearance: none;
+	margin: 0;
+}
+
+.list-order {
+	-moz-appearance: textfield; /* Firefox */
+}
+
+/*************************************** XXXXXXXXXXXXXXXXXXX *******************************/

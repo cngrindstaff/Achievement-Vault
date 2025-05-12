@@ -236,7 +236,7 @@ export async function insertGameSection(sectionData) {
 }
 
 
-export async function updateGameSectionsListOrder(sectionUpdates) {
+export async function updateGameSectionsListOrder(gameId, sectionUpdates) {
     if (!Array.isArray(sectionUpdates) || sectionUpdates.length === 0) {
         alert("Invalid section updates. Expected a non-empty array.");
         return;
