@@ -1,6 +1,5 @@
 import * as utils from './script_utilities.js';
 import * as dbUtils from './script_db_helper.js';
-import {updateRecordCompletionInDatabase} from "./script_db_helper.js";
 
 const sendGridUrl = '/api/send-email';
 const googleSheetsAppendUrl = '/api/google-sheets-append';
@@ -34,26 +33,42 @@ $(document).ready(async function () {
 
     //.append() puts data inside an element at last index and .prepend() puts the prepending elem at first index.
     const mainContainer = $('#container');
-    
-    mainContainer.prepend('<p id="total-completion">Total Completion: 0%</p>');
-    mainContainer.prepend('<h1>' + gameNameFriendly + ' 100% Completion Checklist</h1>');
 
-    mainContainer.prepend(`<div class="link-container"> </div>`);
+    mainContainer.append(`<div class="link-container"> </div>`);
     const linkContainerDiv = $('.link-container');
-    if(hasDataTables){
-        linkContainerDiv.prepend('<div class="link-icon"><a href="' + linkToGamePage + '" class="link-icon-text" title="Return to Game Page"><i class="fa fa-arrow-left fa-lg fa-border" ></i></a></div>');
+    linkContainerDiv.append('<div class="link-icon"><a href="' + linkToHomePage + '" class="link-icon-text"><i class="fa fa-solid fa-house fa-lg fa-border" ></i></a></div>');
+    if (hasDataTables) {
+        linkContainerDiv.append('<div class="link-icon"><a href="' + linkToGamePage + '" class="link-icon-text" title="Return to Game Page"><i class="fa fa-arrow-left fa-lg fa-border" ></i></a></div>');
     }
-    linkContainerDiv.prepend('<div class="link-icon"><a href="' + linkToHomePage + '" class="link-icon-text"><i class="fa fa-solid fa-house fa-lg fa-border" ></i></a></div>');
+
+    mainContainer.append('<h1>' + gameNameFriendly + ' 100% Completion Checklist</h1>');
+    mainContainer.append('<p id="total-completion">Total Completion: 0%</p>');
+
+    mainContainer.append('<div id="grid-checklist-container"></div>');
+    
+
+
+    /*
+        mainContainer.prepend('<p id="total-completion">Total Completion: 0%</p>');
+        mainContainer.prepend('<h1>' + gameNameFriendly + ' 100% Completion Checklist</h1>');
+    
+        mainContainer.prepend(`<div class="link-container"> </div>`);
+        const linkContainerDiv = $('.link-container');
+        if(hasDataTables){
+            linkContainerDiv.prepend('<div class="link-icon"><a href="' + linkToGamePage + '" class="link-icon-text" title="Return to Game Page"><i class="fa fa-arrow-left fa-lg fa-border" ></i></a></div>');
+        }
+        linkContainerDiv.prepend('<div class="link-icon"><a href="' + linkToHomePage + '" class="link-icon-text"><i class="fa fa-solid fa-house fa-lg fa-border" ></i></a></div>');
+    */
 
 
     // Fetch sections for that game
     const sections = await dbUtils.loadSectionsByGameId(passed_gameId, false);
-    
+
     await processData(sections);
     updateAllSectionsCompletion(); // Update section percentages
     updateTotalCompletion(); // Calculate initial total completion percentage    
 
-   
+
     //https://chatgpt.com/share/67c0f24e-db90-8004-be01-0dec495fc388
     // 🔥 This line prevents multiple event bindings by using event delegation
     //Previously, I was using Direct Binding, and every time new elements were added dynamically (i.e., checkboxes were added inside generateChecklist), the listener got 
