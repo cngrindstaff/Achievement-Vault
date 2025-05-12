@@ -290,6 +290,51 @@ router.put('/db/sections/updateListOrder', async (req, res) => {
     }
 });
 
+router.get('/db/section/:sectionId', async (req, res) => {
+    //console.log('made it here2');
+    const sectionId = req.params.sectionId;
+    //console.log('sectionId: ' + sectionId);
+    try {
+        const [rows] = await db.query('CALL GetSectionById(?)', [sectionId]);
+        const result = rows[0];
+
+        if (result.length === 0) {
+            return res.status(404).json({ error: 'Section not found' });
+        }
+
+        res.json(result[0]);
+    } catch (err) {
+        console.error(`Error fetching section with ID ${sectionId}:`, err);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
+router.put('/db/records/updateListOrder', async (req, res) => {
+    const recordUpdates = req.body;
+
+    // Validate the input is a non-empty array
+    if (!Array.isArray(recordUpdates) || recordUpdates.length === 0) {
+        return res.status(400).json({ error: 'Invalid input. Expected a non-empty array of section updates.' });
+    }
+
+    try {
+        // Convert the section updates to a JSON string for the stored procedure
+        const jsonString = JSON.stringify(recordUpdates);
+        const [result] = await db.query(
+            'CALL UpdateSectionRecordsListOrder(?, @rowsUpdated)',
+            [jsonString]
+        );
+
+        // Fetch the number of rows updated
+        const [rowsUpdatedResult] = await db.query('SELECT @rowsUpdated AS RowsUpdated');
+        const rowsUpdated = rowsUpdatedResult[0].RowsUpdated || 0;
+
+        res.json({ message: 'List orders updated successfully', rowsUpdated });
+    } catch (err) {
+        console.error('Error updating section record list orders:', err);
+        res.status(500).json({ error: 'Database error' });
+    }
+});
 
 
 export default router;

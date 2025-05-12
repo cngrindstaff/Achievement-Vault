@@ -47,6 +47,28 @@ export async function loadSectionsByGameId(gameId, hiddenFilter) {
         console.error("Error fetching game data:", err);
     }
 }
+export async function getSectionById(passed_sectionId) {
+    if (!passed_sectionId) {
+        alert("Missing section ID in URL.");
+        return;
+    }
+
+    try {
+        const res = await fetch(`/api/db/section/${passed_sectionId}`);
+        const data = await res.json();
+        //console.log('Game data:', data);
+        /*        return {
+                    gameId: data.ID,
+                    gameNameFriendly: data.FriendlyName || passed_gameName || passed_gameId,
+                    gameName: data.Name || passed_gameId,
+                };*/
+        return data;
+    } catch (err) {
+        console.error("Error fetching section data:", err);
+    }
+
+    //document.querySelector('.game-name').textContent = passed_gameNameFriendly;
+}
 
 export async function loadRecordsBySectionId(sectionId, recordOrderPreference, hiddenFilter) {
     if (!sectionId) {
@@ -236,7 +258,7 @@ export async function insertGameSection(sectionData) {
 }
 
 
-export async function updateGameSectionsListOrder(gameId, sectionUpdates) {
+export async function updateGameSectionsListOrder(sectionUpdates) {
     if (!Array.isArray(sectionUpdates) || sectionUpdates.length === 0) {
         alert("Invalid section updates. Expected a non-empty array.");
         return;
@@ -264,5 +286,32 @@ export async function updateGameSectionsListOrder(gameId, sectionUpdates) {
     }
 }
 
+export async function UpdateSectionRecordsListOrder(recordUpdates) {
+    if (!Array.isArray(recordUpdates) || recordUpdates.length === 0) {
+        alert("Invalid record updates. Expected a non-empty array.");
+        return;
+    }
+
+    try {
+        const res = await fetch(`/api/db/records/updateListOrder`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(recordUpdates)
+        });
+
+        if (!res.ok) {
+            console.error("Error updating game records list order. Status:", res.status);
+            return null;
+        }
+
+        const data = await res.json();
+        return data;
+    } catch (err) {
+        console.error("Error updating game records list order:", err);
+        return null;
+    }
+}
 
 

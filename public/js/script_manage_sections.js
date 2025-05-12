@@ -34,7 +34,7 @@ $(document).ready(async function () {
     linkContainerDiv.append('<div class="link-icon"><a href="' + linkToHomePage + '" class="link-icon-text"><i class="fa fa-solid fa-house fa-lg fa-border" ></i></a></div>');
     linkContainerDiv.append('<div class="link-icon"><a href="' + linkToGamePage + '" class="link-icon-text" title="Return to Game Page"><i class="fa fa-arrow-left fa-lg fa-border" ></i></a></div>');
 
-    mainContainer.append('<h1>' + gameNameFriendly + ': Sections</h1>');
+    mainContainer.append('<h1>' + htmlTitle + '</h1>');
 
     mainContainer.append('<div id="grid-manage-sections-container"></div>');
     mainContainer.append('<button id="save-button" class="save-button">Save Order</button>');
@@ -45,7 +45,7 @@ $(document).ready(async function () {
 })
 
 
-function createSectionCard(section) {
+function createSectionCard(section, gameId, container) {
     const card = document.createElement('div');
     card.className = 'section-card';
     card.draggable = true;
@@ -53,15 +53,33 @@ function createSectionCard(section) {
     card.dataset.originalOrder = section.ListOrder;
     card.dataset.currentOrder = section.ListOrder;
     card.innerHTML = `
-        <span class="section-name">${section.Name}</span>
-        <input type="number" class="list-order" value="${section.ListOrder}" readonly/>
+        <div class="section-card-content">
+            <input type="number" class="list-order" value="${section.ListOrder}" readonly />
+            <span class="section-name">${section.Name}</span>
+            <button class="manage-records-button">Manage Records</button>
+        </div>
     `;
+
+    // Handle the Manage Records button click
+    card.querySelector('.manage-records-button').addEventListener('click', () => {
+        const hasUnsavedChanges = [...container.children].some((card) => {
+            return card.dataset.currentOrder !== card.dataset.originalOrder;
+        });
+
+        const sectionId = section.ID;
+        const confirmNavigate = !hasUnsavedChanges || confirm("You have unsaved changes. Are you sure you want to leave this page?");
+
+        if (confirmNavigate) {
+            window.location.href = `/manage_sectionRecords?gameId=${gameId}&sectionId=${sectionId}`;
+        }
+    });
+    
     return card;
 }
 
-function renderSections(sections, container) {
+function renderSections(sections, container, gameId) {
     container.innerHTML = '';
-    sections.forEach(section => container.appendChild(createSectionCard(section)));
+    sections.forEach(section => container.appendChild(createSectionCard(section, gameId, container)));
 }
 
 function enableDragAndDrop(container) {
@@ -77,13 +95,23 @@ function enableDragAndDrop(container) {
     container.addEventListener('dragend', (e) => {
         if (draggedItem) {
             draggedItem.classList.remove('dragging');
+
+            // Add the "dropped" class for the snap-back animation
             draggedItem.classList.add('dropped');
-            setTimeout(() => draggedItem.classList.remove('dropped'), 150);
+
+            // Remove the "dropped" class after the animation completes
+            setTimeout(() => {
+                if (draggedItem && draggedItem.classList) {
+                    draggedItem.classList.remove('dropped');
+                }
+            }, 150);
+
             draggedItem = null;
             updateListOrders(container);
             highlightChangedSections(container);
         }
     });
+
 
     container.addEventListener('dragover', (e) => {
         e.preventDefault();
@@ -141,11 +169,11 @@ async function initializeGameSectionsReorder(gameId, containerId, resetButtonId)
     if (!container || !resetButton) return;
 
     const sections = await dbUtils.loadSectionsByGameId(gameId);
-    renderSections(sections, container);
+    renderSections(sections, container, gameId);
     enableDragAndDrop(container);
 
     resetButton.addEventListener('click', () => {
-        renderSections(sections, container);
+        renderSections(sections, container, gameId);
         highlightChangedSections(container);
     });
 
@@ -159,7 +187,7 @@ async function initializeGameSectionsReorder(gameId, containerId, resetButtonId)
             .filter((section) => section.ListOrder !== section.OriginalOrder);
 
         if (updatedSections.length > 0) {
-            const success = await dbUtils.updateGameSectionsListOrder(gameId, updatedSections);
+            const success = await dbUtils.updateGameSectionsListOrder(updatedSections);
             if (success) alert('List order updated successfully!');
             else alert('Failed to update list order.');
         } else {

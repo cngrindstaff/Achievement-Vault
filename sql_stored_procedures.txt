@@ -386,9 +386,51 @@ GRANT EXECUTE ON PROCEDURE achievement_vault.UpdateGameSectionsListOrder TO 'ach
 ************************************************
 
 
+DELIMITER $$
+CREATE DEFINER="doadmin"@"%" PROCEDURE "GetGameSectionById"(IN sectionId INT)
+BEGIN
+    SELECT * FROM GameSections
+    WHERE ID = sectionId;
+END$$
+DELIMITER ;
+
+GRANT EXECUTE ON PROCEDURE achievement_vault.GetGameSectionById TO 'achievement_vault_user'@'%';
 
 ************************************************
 
+DELIMITER $$
+CREATE DEFINER="doadmin"@"%" PROCEDURE "UpdateSectionRecordsListOrder"(
+    IN recordUpdates JSON,
+    OUT rowsUpdated INT
+)
+BEGIN
+    DECLARE i INT DEFAULT 0;
+    DECLARE n INT DEFAULT JSON_LENGTH(recordUpdates);
+    DECLARE recordId INT;
+    DECLARE listOrder INT;
+    DECLARE totalRowsUpdated INT DEFAULT 0;
+
+    WHILE i < n DO
+        -- Extract the ID and ListOrder for this record
+        SET recordId = JSON_UNQUOTE(JSON_EXTRACT(recordUpdates, CONCAT('$[', i, '].ID')));
+        SET listOrder = JSON_UNQUOTE(JSON_EXTRACT(recordUpdates, CONCAT('$[', i, '].ListOrder')));
+
+        -- Update the row and count the affected rows
+        UPDATE GameRecords
+        SET ListOrder = listOrder
+        WHERE ID = recordId;
+
+        SET totalRowsUpdated = totalRowsUpdated + ROW_COUNT();
+
+        SET i = i + 1;
+    END WHILE;
+
+    -- Return the total rows updated
+    SET rowsUpdated = totalRowsUpdated;
+END$$
+DELIMITER ;
+
+GRANT EXECUTE ON PROCEDURE achievement_vault.UpdateSectionRecordsListOrder TO 'achievement_vault_user'@'%';
 
 
 ************************************************
