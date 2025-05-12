@@ -139,7 +139,7 @@ DELIMITER ;
 
 DELIMITER $$
 
-CREATE PROCEDURE UpdateGameRecord(
+CREATE PROCEDURE UpdateGameRecordCompletion(
     IN inputRecordID INT,
     IN inputNumberAlreadyCompleted INT
 )
@@ -225,7 +225,142 @@ DELIMITER ;
 
 ************************************************
 
+DELIMITER //
+
+CREATE PROCEDURE InsertGameSection(
+    IN sectionName VARCHAR(100),
+    IN gameId INT,
+    IN listOrder INT,
+    IN recordOrderPreference VARCHAR(100),
+    IN hidden TINYINT
+)
+BEGIN
+    INSERT INTO GameSections
+    (Name, GameID, ListOrder, RecordOrderPreference, Hidden)
+    VALUES
+    (sectionName, gameId, listOrder, recordOrderPreference, hidden);
+END //
+
+DELIMITER ;
+
+
+GRANT EXECUTE ON PROCEDURE achievement_vault.InsertGameSection TO 'achievement_vault_user'@'%';
+
+
+
 
 ************************************************
+
+The COALESCE function returns the first non-null value. This ensures that only non-null input parameters update the fields, leaving existing values unchanged if the input is NULL.
+
+DELIMITER //
+
+CREATE PROCEDURE UpdateGameSection(
+    IN sectionId INT,
+    IN gameId INT,
+    IN sectionName VARCHAR(255),
+    IN listOrder INT,
+    IN recordOrderPreference VARCHAR(255),
+    IN hidden TINYINT
+)
+BEGIN
+    UPDATE GameSections
+    SET 
+        Name = COALESCE(sectionName, Name),
+        ListOrder = COALESCE(listOrder, ListOrder),
+        RecordOrderPreference = COALESCE(recordOrderPreference, RecordOrderPreference),
+        Hidden = COALESCE(hidden, Hidden)
+    WHERE 
+        ID = sectionId AND GameID = gameId;
+END //
+
+DELIMITER ;
+
+
+GRANT EXECUTE ON PROCEDURE achievement_vault.UpdateGameSection TO 'achievement_vault_user'@'%';
+
+
+************************************************
+
+
+DELIMITER //
+
+CREATE PROCEDURE InsertGameRecord(
+    IN recordName VARCHAR(100),
+	IN description VARCHAR(1000),
+	IN sectionId INT,
+    IN gameId INT,
+	IN numberOfCheckboxes INT,
+	IN numberAlreadyCompleted INT,
+    IN listOrder INT,
+	IN longDescription VARCHAR(1000),
+    IN hidden TINYINT
+)
+BEGIN
+    INSERT INTO GameRecords
+    (Name, Description, SectionId, GameID, NumberOfCheckboxes, NumberAlreadyCompleted, ListOrder, LongDescription, Hidden)
+    VALUES
+    (recordName, description, sectionId, GameID, numberOfCheckboxes, numberAlreadyCompleted, listOrder, longDescription, hidden);
+END //
+
+DELIMITER ;
+
+GRANT EXECUTE ON PROCEDURE achievement_vault.InsertGameRecord TO 'achievement_vault_user'@'%';
+
+
+************************************************
+
+
+DELIMITER //
+
+CREATE PROCEDURE UpdateGameRecord(
+    IN recordId INT,
+    IN sectionId INT,
+    IN recordName VARCHAR(100),
+    IN description VARCHAR(1000),
+    IN gameId INT,
+    IN numberOfCheckboxes INT,
+    IN numberAlreadyCompleted INT,
+    IN listOrder INT,
+    IN longDescription VARCHAR(1000),
+    IN hidden TINYINT
+)
+BEGIN
+    UPDATE GameRecords
+    SET 
+        Name = COALESCE(recordName, Name),
+        Description = COALESCE(description, Description),
+        GameID = COALESCE(gameId, GameID),
+        NumberOfCheckboxes = COALESCE(numberOfCheckboxes, NumberOfCheckboxes),
+        NumberAlreadyCompleted = COALESCE(numberAlreadyCompleted, NumberAlreadyCompleted),
+        ListOrder = COALESCE(listOrder, ListOrder),
+        LongDescription = COALESCE(longDescription, LongDescription),
+        Hidden = COALESCE(hidden, Hidden)
+    WHERE 
+        SectionId = sectionId AND RecordId = recordId;
+END //
+
+DELIMITER ;
+
+GRANT EXECUTE ON PROCEDURE achievement_vault.UpdateGameRecord TO 'achievement_vault_user'@'%';
+
+************************************************
+
+
+
+************************************************
+
+
+
+************************************************
+
+
+
+************************************************
+
+
+
+************************************************
+
 
 

@@ -119,7 +119,7 @@ router.put('/db/record/updateCompletion/:recordId', async (req, res) => {
 
     
     try {
-        await db.query('CALL UpdateGameRecord(?, ?)', [recordId, numberAlreadyCompleted]);
+        await db.query('CALL UpdateGameRecordCompletion(?, ?)', [recordId, numberAlreadyCompleted]);
         res.json({ message: 'Progress updated successfully' });
     } catch (err) {
         console.error('Error updating progress:', err);
