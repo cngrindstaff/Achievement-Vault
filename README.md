@@ -55,3 +55,9 @@ Sorting options:
 * completed-order-name = NumberAlreadyCompleted ASC, ListOrderASC, Name ASC
 * null = same as order-name
 
+# Future Updates
+* Edit Section Fields
+* Edit Record Fields
+* Delete Records
+* Make the header stuff more dynamic
+* Validate checkbox info on Adding records
