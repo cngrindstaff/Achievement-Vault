@@ -56,4 +56,4 @@ function removeDiacritics(str) {
 }
 
 // Example usage:
-console.log(createSlug("Hello Wórld! This --is a test_")); // Output: "hello-world-this-is-a-test"
+//console.log(createSlug("Hello Wórld! This --is a test_")); // Output: "hello-world-this-is-a-test"

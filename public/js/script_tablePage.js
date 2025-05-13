@@ -15,17 +15,15 @@ let linkToGamePage = null;
 let htmlTitle = null;
 $(document).ready(async function () {
     var passed_gameId = utils.getQueryParam('id');
-    var passed_gameName = utils.getQueryParam('name');
 
     // Fetch game data first
-    
     const gameData = await dbUtils.loadGameData(passed_gameId);
     //if(debugLogging) console.log('gameData:', gameData);
     gameId = gameData.ID;
     gameName = gameData.Name;
     gameNameFriendly = gameData.FriendlyName;
     hasDataTables = gameData.HasDataTables;
-    linkToGamePage = `/game?id=${gameId}&name=${gameName}`;
+    linkToGamePage = `/game?id=${gameId}`;
     htmlTitle = gameNameFriendly + ': Other Tables';
 
     //set the title field that's in the head using the variable from the game's HTML

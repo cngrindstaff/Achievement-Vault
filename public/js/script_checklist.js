@@ -16,7 +16,6 @@ let linkToGamePage = null;
 
 $(document).ready(async function () {
     var passed_gameId = utils.getQueryParam('id');
-    var passed_gameName = utils.getQueryParam('name');
 
     // Fetch game data first
     const gameData = await dbUtils.loadGameData(passed_gameId);
@@ -25,7 +24,7 @@ $(document).ready(async function () {
     gameName = gameData.Name;
     gameNameFriendly = gameData.FriendlyName;
     hasDataTables = gameData.HasDataTables;
-    linkToGamePage = '/game?id=' + gameId + '&name=' + gameName;
+    linkToGamePage = '/game?id=' + gameId;
 
     //set the title field that's in the head using the variable from the game's HTML
     const titleElement = document.querySelector('title');
@@ -33,26 +32,42 @@ $(document).ready(async function () {
 
     //.append() puts data inside an element at last index and .prepend() puts the prepending elem at first index.
     const mainContainer = $('#container');
-    
-    mainContainer.prepend('<p id="total-completion">Total Completion: 0%</p>');
-    mainContainer.prepend('<h1>' + gameNameFriendly + ' 100% Completion Checklist</h1>');
 
-    mainContainer.prepend(`<div class="link-container"> </div>`);
+    mainContainer.append(`<div class="link-container"> </div>`);
     const linkContainerDiv = $('.link-container');
-    if(hasDataTables){
-        linkContainerDiv.prepend('<div class="link-icon"><a href="' + linkToGamePage + '" class="link-icon-text" title="Return to Game Page"><i class="fa fa-arrow-left fa-lg fa-border" ></i></a></div>');
+    linkContainerDiv.append('<div class="link-icon"><a href="' + linkToHomePage + '" class="link-icon-text"><i class="fa fa-solid fa-house fa-lg fa-border" ></i></a></div>');
+    if (hasDataTables) {
+        linkContainerDiv.append('<div class="link-icon"><a href="' + linkToGamePage + '" class="link-icon-text" title="Return to Game Page"><i class="fa fa-arrow-left fa-lg fa-border" ></i></a></div>');
     }
-    linkContainerDiv.prepend('<div class="link-icon"><a href="' + linkToHomePage + '" class="link-icon-text"><i class="fa fa-solid fa-house fa-lg fa-border" ></i></a></div>');
+
+    mainContainer.append('<h1>' + gameNameFriendly + ' 100% Completion Checklist</h1>');
+    mainContainer.append('<p id="total-completion">Total Completion: 0%</p>');
+
+    mainContainer.append('<div id="grid-checklist-container"></div>');
+    
+
+
+    /*
+        mainContainer.prepend('<p id="total-completion">Total Completion: 0%</p>');
+        mainContainer.prepend('<h1>' + gameNameFriendly + ' 100% Completion Checklist</h1>');
+    
+        mainContainer.prepend(`<div class="link-container"> </div>`);
+        const linkContainerDiv = $('.link-container');
+        if(hasDataTables){
+            linkContainerDiv.prepend('<div class="link-icon"><a href="' + linkToGamePage + '" class="link-icon-text" title="Return to Game Page"><i class="fa fa-arrow-left fa-lg fa-border" ></i></a></div>');
+        }
+        linkContainerDiv.prepend('<div class="link-icon"><a href="' + linkToHomePage + '" class="link-icon-text"><i class="fa fa-solid fa-house fa-lg fa-border" ></i></a></div>');
+    */
 
 
     // Fetch sections for that game
     const sections = await dbUtils.loadSectionsByGameId(passed_gameId, false);
-    
+
     await processData(sections);
     updateAllSectionsCompletion(); // Update section percentages
     updateTotalCompletion(); // Calculate initial total completion percentage    
 
-   
+
     //https://chatgpt.com/share/67c0f24e-db90-8004-be01-0dec495fc388
     // 🔥 This line prevents multiple event bindings by using event delegation
     //Previously, I was using Direct Binding, and every time new elements were added dynamically (i.e., checkboxes were added inside generateChecklist), the listener got 
@@ -295,7 +310,7 @@ function updateCompletion() {
             else numberAlreadyCompleted = checkboxNumberClicked - 1;
             
         }
-        dbUtils.updateRecordInDatabase(recordId, numberAlreadyCompleted);
+        dbUtils.updateRecordCompletionInDatabase(recordId, numberAlreadyCompleted);
         if(numberOfCheckboxes > 1) {
             sendDataToSheets(gameNameFriendly, sectionTitle, checkboxItemName, action, checkboxNumberClicked);
         }

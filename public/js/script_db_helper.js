@@ -47,6 +47,28 @@ export async function loadSectionsByGameId(gameId, hiddenFilter) {
         console.error("Error fetching game data:", err);
     }
 }
+export async function getSectionById(passed_sectionId) {
+    if (!passed_sectionId) {
+        alert("Missing section ID in URL.");
+        return;
+    }
+
+    try {
+        const res = await fetch(`/api/db/section/${passed_sectionId}`);
+        const data = await res.json();
+        //console.log('Game data:', data);
+        /*        return {
+                    gameId: data.ID,
+                    gameNameFriendly: data.FriendlyName || passed_gameName || passed_gameId,
+                    gameName: data.Name || passed_gameId,
+                };*/
+        return data;
+    } catch (err) {
+        console.error("Error fetching section data:", err);
+    }
+
+    //document.querySelector('.game-name').textContent = passed_gameNameFriendly;
+}
 
 export async function loadRecordsBySectionId(sectionId, recordOrderPreference, hiddenFilter) {
     if (!sectionId) {
@@ -71,7 +93,7 @@ export async function loadRecordsBySectionId(sectionId, recordOrderPreference, h
 }
 
 
-export async function updateRecordInDatabase(recordId, numberAlreadyCompleted){
+export async function updateRecordCompletionInDatabase(recordId, numberAlreadyCompleted){
     try {
         const res = await fetch(`/api/db/record/updateCompletion/${recordId}`, {
             method: 'PUT',
@@ -120,3 +142,176 @@ export async function loadTableRecordsByTableId(tableId) {
         console.error("Error fetching table data:", err);
     }
 }
+
+export async function updateGameRecord(recordId, sectionId, updateData) {
+    if (!recordId || !sectionId || !updateData) {
+        alert("Missing record ID, section ID, or update data.");
+        return;
+    }
+
+    try {
+        const res = await fetch(`/api/db/record/update/${recordId}/${sectionId}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(updateData)
+        });
+
+        if (!res.ok) {
+            console.error("Error updating game record. Status:", res.status);
+            return null;
+        }
+
+        const data = await res.json();
+        return data;
+    } catch (err) {
+        console.error("Error updating game record:", err);
+        return null;
+    }
+}
+
+export async function insertGameRecord(recordData) {
+    if (!recordData) {
+        alert("Missing record data.");
+        return;
+    }
+
+    try {
+        const res = await fetch(`/api/db/record/insert`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(recordData)
+        });
+
+        if (!res.ok) {
+            console.error("Error inserting game record. Status:", res.status);
+            return null;
+        }
+
+        const data = await res.json();
+        return data;
+    } catch (err) {
+        console.error("Error inserting game record:", err);
+        return null;
+    }
+}
+
+
+export async function updateGameSection(sectionId, gameId, updateData) {
+    if (!sectionId || !gameId || !updateData) {
+        alert("Missing section ID, game ID, or update data.");
+        return;
+    }
+
+    try {
+        const res = await fetch(`/api/db/section/update/${sectionId}/${gameId}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(updateData)
+        });
+
+        if (!res.ok) {
+            console.error("Error updating game section. Status:", res.status);
+            return null;
+        }
+
+        const data = await res.json();
+        return data;
+    } catch (err) {
+        console.error("Error updating game section:", err);
+        return null;
+    }
+}
+
+
+export async function insertGameSection(sectionData) {
+    if (!sectionData) {
+        alert("Missing section data.");
+        return;
+    }
+
+    try {
+        const res = await fetch(`/api/db/section/insert`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(sectionData)
+        });
+
+        if (!res.ok) {
+            console.error("Error inserting game section. Status:", res.status);
+            return null;
+        }
+
+        const data = await res.json();
+        return data;
+    } catch (err) {
+        console.error("Error inserting game section:", err);
+        return null;
+    }
+}
+
+
+export async function updateGameSectionsListOrder(sectionUpdates) {
+    if (!Array.isArray(sectionUpdates) || sectionUpdates.length === 0) {
+        alert("Invalid section updates. Expected a non-empty array.");
+        return;
+    }
+
+    try {
+        const res = await fetch(`/api/db/sections/updateListOrder`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(sectionUpdates)
+        });
+
+        if (!res.ok) {
+            console.error("Error updating game sections list order. Status:", res.status);
+            return null;
+        }
+
+        const data = await res.json();
+        return data;
+    } catch (err) {
+        console.error("Error updating game sections list order:", err);
+        return null;
+    }
+}
+
+export async function UpdateSectionRecordsListOrder(recordUpdates) {
+    if (!Array.isArray(recordUpdates) || recordUpdates.length === 0) {
+        alert("Invalid record updates. Expected a non-empty array.");
+        return;
+    }
+
+    try {
+        const res = await fetch(`/api/db/records/updateListOrder`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(recordUpdates)
+        });
+
+        if (!res.ok) {
+            console.error("Error updating game records list order. Status:", res.status);
+            return null;
+        }
+
+        const data = await res.json();
+        return data;
+    } catch (err) {
+        console.error("Error updating game records list order:", err);
+        return null;
+    }
+}
+
+

@@ -42,6 +42,17 @@ app.get('/checklist', (req, res) => {
 app.get('/table', (req, res) => {
     res.sendFile(path.join(__dirname, '../public/table.html'));
 });
+app.get('/manage_sections', (req, res) => {
+    res.sendFile(path.join(__dirname, '../public/manage_sections.html'));
+});
+app.get('/manage_sectionRecords', (req, res) => {
+    res.sendFile(path.join(__dirname, '../public/manage_sectionRecords.html'));
+});
+app.get('/manage_addRecord', (req, res) => {
+    res.sendFile(path.join(__dirname, '../public/manage_addRecord.html'));
+});
+
+
 
 // Run the server on port
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));

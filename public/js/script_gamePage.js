@@ -26,14 +26,17 @@ $(document).ready(async function () {
     //Set the .game-name element
     document.querySelector('.game-name').textContent = gameNameFriendly;
     //Generate the URLs
-    var linkToChecklistPage = `/checklist?id=${gameId}&name=${gameName}`;
-    var linkToTablesPage = `/table?id=${gameId}&name=${gameName}`;
+    var linkToChecklistPage = `/checklist?id=${gameId}`;
+    var linkToTablesPage = `/table?id=${gameId}`;
+    var linkToManageSectionsPage = `/manage_sections?gameId=${gameId}`;
 
     $('#grid-link-container').append(`<a class="section-header link-checklist" href="${linkToChecklistPage}">100% Checklist</a>`);
     
     if(hasDataTables){
         $('#grid-link-container').append(`<a class="section-header link-tables" href="${linkToTablesPage}">Other Tables</a>`);
     }
+    
+    $('#grid-link-container').append(`<a class="section-header link-checklist" href="${linkToManageSectionsPage}">Admin</a>`);
 
 });
 

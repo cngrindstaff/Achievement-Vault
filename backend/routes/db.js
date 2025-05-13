@@ -104,7 +104,7 @@ router.get('/db/records/:sectionId/order/:recordOrderPreference/hiddenFilter/:hi
     }
 });
 
-// Route 6: Update Record
+// Route 6: Update Record Completion
 router.put('/db/record/updateCompletion/:recordId', async (req, res) => {
     const recordId = req.params.recordId;
     const { numberAlreadyCompleted } = req.body;
@@ -148,7 +148,7 @@ router.get('/db/gameTables/:gameId', async (req, res) => {
     }
 });
 
-
+//GET table Record by ID
 router.get('/db/tableRecords/:tableId', async (req, res) => {
     const gameId = req.params.tableId;
     try {
@@ -171,5 +171,170 @@ router.get('/db/tableRecords/:tableId', async (req, res) => {
         res.status(500).json({ error: 'Internal server error' });
     }
 });
+
+// Insert Game Record
+router.post('/db/record/insert', async (req, res) => {
+    const { recordName, description, sectionId, gameId, numberOfCheckboxes, numberAlreadyCompleted, listOrder, longDescription, hidden } = req.body;
+
+    if (!recordName || sectionId === undefined || gameId === undefined || numberOfCheckboxes === undefined || numberAlreadyCompleted === undefined || listOrder === undefined || hidden === undefined) {
+        return res.status(400).json({ error: 'Missing required fields' });
+    }
+
+    try {
+        await db.query(
+            'CALL InsertGameRecord(?, ?, ?, ?, ?, ?, ?, ?, ?)',
+            [recordName, description, sectionId, gameId, numberOfCheckboxes, numberAlreadyCompleted, listOrder, longDescription, hidden]
+        );
+        res.json({ message: 'Game record inserted successfully' });
+    } catch (err) {
+        console.error('Error inserting game record:', err);
+        res.status(500).json({ error: 'Database error' });
+    }
+});
+
+// Update Game Record
+router.put('/db/record/update/:recordId/:sectionId', async (req, res) => {
+    const { recordId, sectionId } = req.params;
+    const { recordName, description, gameId, numberOfCheckboxes, numberAlreadyCompleted, listOrder, longDescription, hidden } = req.body;
+
+    try {
+        await db.query(
+            'CALL UpdateGameRecord(?, ?, ?, ?, ?, ?, ?, ?, ?)',
+            [recordId, sectionId, recordName, description, gameId, numberOfCheckboxes, numberAlreadyCompleted, listOrder, longDescription, hidden]
+        );
+        res.json({ message: 'Game record updated successfully' });
+    } catch (err) {
+        console.error('Error updating game record:', err);
+        res.status(500).json({ error: 'Database error' });
+    }
+});
+
+// Insert Game Section
+router.post('/db/section/insert', async (req, res) => {
+    const { sectionName, gameId, listOrder, recordOrderPreference, hidden } = req.body;
+
+    if (!sectionName || gameId === undefined || listOrder === undefined || hidden === undefined) {
+        return res.status(400).json({ error: 'Missing required fields' });
+    }
+
+    try {
+        await db.query(
+            'CALL InsertGameSection(?, ?, ?, ?, ?)',
+            [sectionName, gameId, listOrder, recordOrderPreference, hidden]
+        );
+        res.json({ message: 'Game section inserted successfully' });
+    } catch (err) {
+        console.error('Error inserting game section:', err);
+        res.status(500).json({ error: 'Database error' });
+    }
+});
+
+// Update Game Section
+router.put('/db/section/update/:sectionId/:gameId', async (req, res) => {
+    const { sectionId, gameId } = req.params;
+    const { sectionName, listOrder, recordOrderPreference, hidden } = req.body;
+
+    try {
+        await db.query(
+            'CALL UpdateGameSection(?, ?, ?, ?, ?)',
+            [sectionId, gameId, sectionName, listOrder, recordOrderPreference, hidden]
+        );
+        res.json({ message: 'Game section updated successfully' });
+    } catch (err) {
+        console.error('Error updating game section:', err);
+        res.status(500).json({ error: 'Database error' });
+    }
+});
+
+
+// Update multiple game sections' list orders
+/*
+Expected input: 
+[
+    { "ID": 1234, "ListOrder": 4 },
+    { "ID": 5678, "ListOrder": 5 },
+    { "ID": 9999, "ListOrder": 6 }
+]
+
+Expected response: 
+{
+    "message": "List orders updated successfully",
+    "rowsUpdated": 2
+}
+
+ */
+router.put('/db/sections/updateListOrder', async (req, res) => {
+    const sectionUpdates = req.body;
+
+    // Validate the input is a non-empty array
+    if (!Array.isArray(sectionUpdates) || sectionUpdates.length === 0) {
+        return res.status(400).json({ error: 'Invalid input. Expected a non-empty array of section updates.' });
+    }
+
+    try {
+        // Convert the section updates to a JSON string for the stored procedure
+        const jsonString = JSON.stringify(sectionUpdates);
+        const [result] = await db.query(
+            'CALL UpdateGameSectionsListOrder(?, @rowsUpdated)',
+            [jsonString]
+        );
+
+        // Fetch the number of rows updated
+        const [rowsUpdatedResult] = await db.query('SELECT @rowsUpdated AS RowsUpdated');
+        const rowsUpdated = rowsUpdatedResult[0].RowsUpdated || 0;
+
+        res.json({ message: 'List orders updated successfully', rowsUpdated });
+    } catch (err) {
+        console.error('Error updating game section list orders:', err);
+        res.status(500).json({ error: 'Database error' });
+    }
+});
+
+router.get('/db/section/:sectionId', async (req, res) => {
+    //console.log('made it here2');
+    const sectionId = req.params.sectionId;
+    //console.log('sectionId: ' + sectionId);
+    try {
+        const [rows] = await db.query('CALL GetSectionById(?)', [sectionId]);
+        const result = rows[0];
+
+        if (result.length === 0) {
+            return res.status(404).json({ error: 'Section not found' });
+        }
+
+        res.json(result[0]);
+    } catch (err) {
+        console.error(`Error fetching section with ID ${sectionId}:`, err);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
+router.put('/db/records/updateListOrder', async (req, res) => {
+    const recordUpdates = req.body;
+
+    // Validate the input is a non-empty array
+    if (!Array.isArray(recordUpdates) || recordUpdates.length === 0) {
+        return res.status(400).json({ error: 'Invalid input. Expected a non-empty array of section updates.' });
+    }
+
+    try {
+        // Convert the section updates to a JSON string for the stored procedure
+        const jsonString = JSON.stringify(recordUpdates);
+        const [result] = await db.query(
+            'CALL UpdateSectionRecordsListOrder(?, @rowsUpdated)',
+            [jsonString]
+        );
+
+        // Fetch the number of rows updated
+        const [rowsUpdatedResult] = await db.query('SELECT @rowsUpdated AS RowsUpdated');
+        const rowsUpdated = rowsUpdatedResult[0].RowsUpdated || 0;
+
+        res.json({ message: 'List orders updated successfully', rowsUpdated });
+    } catch (err) {
+        console.error('Error updating section record list orders:', err);
+        res.status(500).json({ error: 'Database error' });
+    }
+});
+
 
 export default router;
