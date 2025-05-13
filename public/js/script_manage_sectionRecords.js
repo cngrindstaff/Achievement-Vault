@@ -49,6 +49,7 @@ $(document).ready(async function () {
     mainContainer.append('<div id="grid-manage-records-container"></div>');
     mainContainer.append('<button id="save-button" class="save-button">Save Order</button>');
     mainContainer.append('<button id="reset-button" class="reset-button">Reset Changes</button>');
+    mainContainer.append('<button id="add-record-button" class="add-record-button">Add Record</button>');
 
     await initializeGameRecordsReorder(sectionId, 'grid-manage-records-container', 'reset-button');
 
@@ -171,6 +172,23 @@ async function initializeGameRecordsReorder(sectionId, containerId, resetButtonI
         renderRecords(records, container, gameId);
         highlightChangedRecords(container);
     });
+
+
+    // Handle the Manage Records button click
+    const addRecordButton = document.getElementById('add-record-button');
+
+    addRecordButton.addEventListener('click', () => {
+        const hasUnsavedChanges = [...container.children].some((card) => {
+            return card.dataset.currentOrder !== card.dataset.originalOrder;
+        });
+
+        const confirmNavigate = !hasUnsavedChanges || confirm("You have unsaved changes. Are you sure you want to leave this page?");
+
+        if (confirmNavigate) {
+            window.location.href = `/manage_addRecord?gameId=${gameId}&sectionId=${sectionId}`;
+        }
+    });
+    
 
     document.getElementById('save-button').addEventListener('click', async () => {
         const updatedRecords = [...container.children]

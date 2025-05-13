@@ -48,5 +48,11 @@ app.get('/manage_sections', (req, res) => {
 app.get('/manage_sectionRecords', (req, res) => {
     res.sendFile(path.join(__dirname, '../public/manage_sectionRecords.html'));
 });
+app.get('/manage_addRecord', (req, res) => {
+    res.sendFile(path.join(__dirname, '../public/manage_addRecord.html'));
+});
+
+
+
 // Run the server on port
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
