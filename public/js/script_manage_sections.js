@@ -17,7 +17,7 @@ $(document).ready(async function () {
 
     // Fetch game data first
 
-    const gameData = await dbUtils.loadGameData(passed_gameId);
+    const gameData = await dbUtils.getGameData(passed_gameId);
     //if(debugLogging) console.log('gameData:', gameData);
     gameId = gameData.ID;
     gameName = gameData.Name;
@@ -168,7 +168,7 @@ async function initializeGameSectionsReorder(gameId, containerId, resetButtonId)
     const resetButton = document.getElementById(resetButtonId);
     if (!container || !resetButton) return;
 
-    const sections = await dbUtils.loadSectionsByGameId(gameId);
+    const sections = await dbUtils.getSectionsByGameId(gameId);
     renderSections(sections, container, gameId);
     enableDragAndDrop(container);
 

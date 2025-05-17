@@ -434,6 +434,19 @@ GRANT EXECUTE ON PROCEDURE achievement_vault.UpdateSectionRecordsListOrder TO 'a
 
 
 ************************************************
+DELIMITER //
+
+CREATE PROCEDURE DeleteGameRecord(
+    IN recordId INT
+)
+BEGIN
+    DELETE FROM GameRecords
+    WHERE ID = recordId;
+END //
+
+DELIMITER ;
+
+GRANT EXECUTE ON PROCEDURE achievement_vault.DeleteGameRecord TO 'achievement_vault_user'@'%';
 
 
 

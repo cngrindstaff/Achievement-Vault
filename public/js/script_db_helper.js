@@ -1,6 +1,10 @@
 ﻿import {getQueryParam} from "./script_utilities.js";
 
-export async function loadGameData(passed_gameId) {
+var debugLogging = false;
+
+
+//************************************ GET GAME BY ID ************************************//
+export async function getGameData(passed_gameId) {
     if (!passed_gameId) {
         alert("Missing game ID in URL.");
         return;
@@ -23,7 +27,8 @@ export async function loadGameData(passed_gameId) {
     //document.querySelector('.game-name').textContent = passed_gameNameFriendly;
 }
 
-export async function loadSectionsByGameId(gameId, hiddenFilter) {
+//************************************ GET ALL SECTIONS FOR A GAME BY GAME ID ************************************//
+export async function getSectionsByGameId(gameId, hiddenFilter) {
     if (!gameId) {
         alert("Missing game ID in URL.");
         return;
@@ -47,6 +52,7 @@ export async function loadSectionsByGameId(gameId, hiddenFilter) {
         console.error("Error fetching game data:", err);
     }
 }
+//************************************ GET SECTION BY SECTION ID ************************************//
 export async function getSectionById(passed_sectionId) {
     if (!passed_sectionId) {
         alert("Missing section ID in URL.");
@@ -70,7 +76,8 @@ export async function getSectionById(passed_sectionId) {
     //document.querySelector('.game-name').textContent = passed_gameNameFriendly;
 }
 
-export async function loadRecordsBySectionId(sectionId, recordOrderPreference, hiddenFilter) {
+//************************************ GET ALL RECORDS FOR A SECTION BY SECTION ID ************************************//
+export async function getRecordsBySectionId(sectionId, recordOrderPreference, hiddenFilter) {
     if (!sectionId) {
         alert("Missing sectionId in URL.");
         return;
@@ -93,7 +100,8 @@ export async function loadRecordsBySectionId(sectionId, recordOrderPreference, h
 }
 
 
-export async function updateRecordCompletionInDatabase(recordId, numberAlreadyCompleted){
+//************************************ UPDATE RECORD COMPLETION ************************************//
+export async function updateRecordCompletion(recordId, numberAlreadyCompleted){
     try {
         const res = await fetch(`/api/db/record/updateCompletion/${recordId}`, {
             method: 'PUT',
@@ -110,7 +118,8 @@ export async function updateRecordCompletionInDatabase(recordId, numberAlreadyCo
     }
 }
 
-export async function loadGameTablesByGameId(gameId) {
+//************************************ GET ALL GAME TABLES BY GAME ID ************************************//
+export async function getGameTablesByGameId(gameId) {
     if (!gameId) {
         alert("Missing game ID in URL.");
         return;
@@ -124,7 +133,8 @@ export async function loadGameTablesByGameId(gameId) {
         console.error("Error fetching game data:", err);
     }
 }
-export async function loadTableRecordsByTableId(tableId) {
+//************************************ GET TABLE RECORDS BY TABLE ID ************************************//
+export async function getTableRecordsByTableId(tableId) {
     if (!tableId) {
         alert("Missing table ID in URL.");
         return;
@@ -143,6 +153,7 @@ export async function loadTableRecordsByTableId(tableId) {
     }
 }
 
+//************************************ UPDATE GAME RECORD ************************************//
 export async function updateGameRecord(recordId, sectionId, updateData) {
     if (!recordId || !sectionId || !updateData) {
         alert("Missing record ID, section ID, or update data.");
@@ -171,6 +182,7 @@ export async function updateGameRecord(recordId, sectionId, updateData) {
     }
 }
 
+//************************************ INSERT GAME RECORD ************************************//
 export async function insertGameRecord(recordData) {
     if (!recordData) {
         alert("Missing record data.");
@@ -200,6 +212,7 @@ export async function insertGameRecord(recordData) {
 }
 
 
+//************************************ UPDATE GAME SECTION ************************************//
 export async function updateGameSection(sectionId, gameId, updateData) {
     if (!sectionId || !gameId || !updateData) {
         alert("Missing section ID, game ID, or update data.");
@@ -229,6 +242,7 @@ export async function updateGameSection(sectionId, gameId, updateData) {
 }
 
 
+//************************************ INSERT GAME SECTION************************************//
 export async function insertGameSection(sectionData) {
     if (!sectionData) {
         alert("Missing section data.");
@@ -258,6 +272,7 @@ export async function insertGameSection(sectionData) {
 }
 
 
+//************************************ UPDATE THE ORDER OF GAME SECTIONS ************************************//
 export async function updateGameSectionsListOrder(sectionUpdates) {
     if (!Array.isArray(sectionUpdates) || sectionUpdates.length === 0) {
         alert("Invalid section updates. Expected a non-empty array.");
@@ -286,6 +301,7 @@ export async function updateGameSectionsListOrder(sectionUpdates) {
     }
 }
 
+//************************************ UPDATE THE ORDER OF RECORDS IN A SECTION ************************************//
 export async function UpdateSectionRecordsListOrder(recordUpdates) {
     if (!Array.isArray(recordUpdates) || recordUpdates.length === 0) {
         alert("Invalid record updates. Expected a non-empty array.");
@@ -311,6 +327,27 @@ export async function UpdateSectionRecordsListOrder(recordUpdates) {
     } catch (err) {
         console.error("Error updating game records list order:", err);
         return null;
+    }
+}
+
+
+//************************************ DELETE A RECORD ITEM ************************************//
+export async function deleteGameRecord(recordId) {
+    try {
+        if (debugLogging) console.log('deleteGameRecord called with ID:', recordId);
+        const res = await fetch(`/api/db/record/delete/${recordId}`, {
+            method: 'DELETE'
+        });
+
+        if (res.ok) {
+            return true;
+        } else {
+            console.error("Failed to delete record. Status:", res.status);
+            return false;
+        }
+    } catch (err) {
+        console.error("Error deleting record:", err);
+        return false;
     }
 }
 

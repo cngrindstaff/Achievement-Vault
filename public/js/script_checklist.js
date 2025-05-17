@@ -18,7 +18,7 @@ $(document).ready(async function () {
     var passed_gameId = utils.getQueryParam('id');
 
     // Fetch game data first
-    const gameData = await dbUtils.loadGameData(passed_gameId);
+    const gameData = await dbUtils.getGameData(passed_gameId);
     //console.log('gameData:', gameData);
     gameId = gameData.ID;
     gameName = gameData.Name;
@@ -61,7 +61,7 @@ $(document).ready(async function () {
 
 
     // Fetch sections for that game
-    const sections = await dbUtils.loadSectionsByGameId(passed_gameId, false);
+    const sections = await dbUtils.getSectionsByGameId(passed_gameId, false);
 
     await processData(sections);
     updateAllSectionsCompletion(); // Update section percentages
@@ -86,7 +86,7 @@ async function processData(sections) {
 
     // Pre-fetch all records in parallel
     const recordsPromises = sections.map(section =>
-        dbUtils.loadRecordsBySectionId(section.ID, section.RecordOrderPreference || null, false)
+        dbUtils.getRecordsBySectionId(section.ID, section.RecordOrderPreference || null, false)
             .catch(err => {
                 console.error(`Failed to load records for section ${section.Name} (ID: ${section.ID})`, err);
                 return []; // Fallback to empty array on error
@@ -310,7 +310,7 @@ function updateCompletion() {
             else numberAlreadyCompleted = checkboxNumberClicked - 1;
             
         }
-        dbUtils.updateRecordCompletionInDatabase(recordId, numberAlreadyCompleted);
+        dbUtils.updateRecordCompletion(recordId, numberAlreadyCompleted);
         if(numberOfCheckboxes > 1) {
             sendDataToSheets(gameNameFriendly, sectionTitle, checkboxItemName, action, checkboxNumberClicked);
         }

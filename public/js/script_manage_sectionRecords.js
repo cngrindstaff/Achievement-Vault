@@ -21,7 +21,7 @@ $(document).ready(async function () {
 
     // Fetch game data first
 
-    const gameData = await dbUtils.loadGameData(passed_gameId);
+    const gameData = await dbUtils.getGameData(passed_gameId);
     const sectionData = await dbUtils.getSectionById(passed_sectionId);
     //if(debugLogging) console.log('gameData:', gameData);
     gameId = gameData.ID;
@@ -67,9 +67,26 @@ function createRecordCard(record, gameId, container) {
         <div class="record-card-content">
             <input type="number" class="list-order" value="${record.ListOrder}" readonly />
             <span class="record-name">${record.Name}</span>
-        </div>
+             <button class="delete-button" data-id="${record.ID}">Delete</button>
+       </div>
     `;
 
+    // Handle the Delete button click
+    card.querySelector('.delete-button').addEventListener('click', async (event) => {
+        event.stopPropagation();
+        const recordId = event.target.dataset.id;
+        const confirmDelete = confirm("Are you sure you want to delete this record?");
+
+        if (confirmDelete) {
+            const success = await dbUtils.deleteGameRecord(recordId);
+            if (success) {
+                alert("Record deleted successfully!");
+                card.remove(); // Remove the card from the DOM
+            } else {
+                alert("Failed to delete record. Please try again.");
+            }
+        }
+    });
     return card;
 }
 
@@ -164,7 +181,7 @@ async function initializeGameRecordsReorder(sectionId, containerId, resetButtonI
     const resetButton = document.getElementById(resetButtonId);
     if (!container || !resetButton) return;
 
-    const records = await dbUtils.loadRecordsBySectionId(sectionId, null);
+    const records = await dbUtils.getRecordsBySectionId(sectionId, null);
     renderRecords(records, container, gameId);
     enableDragAndDrop(container);
 

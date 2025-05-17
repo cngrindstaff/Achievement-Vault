@@ -1,4 +1,4 @@
-import { loadGameData } from "./script_db_helper.js";
+import { getGameData } from "./script_db_helper.js";
 import { getQueryParam } from "./script_utilities.js";
 
 // Define these at the top level so they can be reused
@@ -12,7 +12,7 @@ $(document).ready(async function () {
     var passed_gameName = getQueryParam('name');
 
     // Fetch game data first
-    const result = await loadGameData(passed_gameId);
+    const result = await getGameData(passed_gameId);
     //console.log('result:', result);
     gameId = result.ID;
     gameName = result.Name;
