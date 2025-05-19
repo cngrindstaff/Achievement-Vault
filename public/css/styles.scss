@@ -401,6 +401,25 @@ tr:nth-child(odd) {
 	}
 }
 
+/* Invalid Input Styles */
+.invalid-input {
+	border-color: #dc3545 !important;
+	background-color: #f8d7da !important;
+}
+
+/* Shake Effect for Error */
+.invalid-input.shake {
+	animation: shake 0.2s ease-in-out;
+}
+
+@keyframes shake {
+	0% { transform: translateX(-5px); }
+	25% { transform: translateX(5px); }
+	50% { transform: translateX(-5px); }
+	75% { transform: translateX(5px); }
+	100% { transform: translateX(0); }
+}
+
 /* Remove up/down arrows on number input - Chrome, Edge, Safari */
 .list-order::-webkit-outer-spin-button,
 .list-order::-webkit-inner-spin-button {
@@ -429,6 +448,21 @@ tr:nth-child(odd) {
 }
 
 
+/* Delete Button Styles */
+.delete-button {
+	background-color: #dc3545;
+	color: #fff;
+	border: none;
+	padding: 5px 10px;
+	border-radius: 5px;
+	cursor: pointer;
+	margin-left: auto;
+	transition: background-color 0.2s;
+}
+
+.delete-button:hover {
+	background-color: #c82333;
+}
 
 
 

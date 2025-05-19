@@ -22,7 +22,7 @@ $(document).ready(async function () {
 
     // Fetch game data first
 
-    const gameData = await dbUtils.loadGameData(passed_gameId);
+    const gameData = await dbUtils.getGameData(passed_gameId);
     const sectionData = await dbUtils.getSectionById(passed_sectionId);
     //if(debugLogging) console.log('gameData:', gameData);
     gameId = gameData.ID;
@@ -73,17 +73,47 @@ $(document).ready(async function () {
     $('#new-record-form').on("submit", async (event) => {
         event.preventDefault();
 
+        const recordName = document.getElementById("recordName").value.trim();
+        const description = document.getElementById("description").value.trim();
+        const numberOfCheckboxes = parseInt(document.getElementById("numberOfCheckboxes").value);
+        const numberAlreadyCompleted = parseInt(document.getElementById("numberAlreadyCompleted").value);
+        const listOrder = parseInt(document.getElementById("listOrder").value);
+        const longDescription = document.getElementById("longDescription").value.trim();
+        const hidden = document.getElementById("hidden").checked ? 1 : 0;
+
+        // Add visual feedback for invalid inputs
+        if (numberAlreadyCompleted > numberOfCheckboxes) {
+            const completedInput = document.getElementById("numberAlreadyCompleted");
+            const checkboxesInput = document.getElementById("numberOfCheckboxes");
+
+            completedInput.classList.add("invalid-input", "shake");
+            checkboxesInput.classList.add("invalid-input", "shake");
+
+            setTimeout(() => {
+                completedInput.classList.remove("shake");
+                checkboxesInput.classList.remove("shake");
+            }, 300);
+
+            alert("Error: 'Number Already Completed' cannot be greater than 'Number of Checkboxes'.");
+            return;
+        } else {
+            // Remove any existing error styles
+            document.getElementById("numberAlreadyCompleted").classList.remove("invalid-input");
+            document.getElementById("numberOfCheckboxes").classList.remove("invalid-input");
+        }
+
         const recordData = {
-            recordName: document.getElementById("recordName").value.trim(),
-            description: document.getElementById("description").value.trim(),
+            recordName,
+            description,
             sectionId: parseInt(sectionId),
             gameId: parseInt(gameId),
-            numberOfCheckboxes: parseInt(document.getElementById("numberOfCheckboxes").value),
-            numberAlreadyCompleted: parseInt(document.getElementById("numberAlreadyCompleted").value),
-            listOrder: parseInt(document.getElementById("listOrder").value),
-            longDescription: document.getElementById("longDescription").value.trim(),
-            hidden: document.getElementById("hidden").checked ? 1 : 0
+            numberOfCheckboxes,
+            numberAlreadyCompleted,
+            listOrder,
+            longDescription,
+            hidden
         };
+        
         if (debugLogging) console.log('Record Data:', recordData);
 
         const spinner = $('#loading-spinner');

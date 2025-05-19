@@ -17,7 +17,7 @@ $(document).ready(async function () {
     var passed_gameId = utils.getQueryParam('id');
 
     // Fetch game data first
-    const gameData = await dbUtils.loadGameData(passed_gameId);
+    const gameData = await dbUtils.getGameData(passed_gameId);
     //if(debugLogging) console.log('gameData:', gameData);
     gameId = gameData.ID;
     gameName = gameData.Name;
@@ -44,7 +44,7 @@ $(document).ready(async function () {
     const gridContainer = document.getElementById('grid-tables-container');
     gridContainer.innerHTML = ''; // Clear previous data
     // get the game tables
-    const gameTables = await dbUtils.loadGameTablesByGameId(passed_gameId);
+    const gameTables = await dbUtils.getGameTablesByGameId(passed_gameId);
     
     let gameTableCount = gameTables.length;
     if(gameTableCount === 0){
@@ -102,7 +102,7 @@ async function createTableSection(gameTable, tableIndex) {
     sectionDiv.dataset.section = tableIndex;
 
     // Populate section with table
-    var tableRecords = await dbUtils.loadTableRecordsByTableId(gameTable.ID);
+    var tableRecords = await dbUtils.getTableRecordsByTableId(gameTable.ID);
     if(tableRecords === null){
         return;
     }

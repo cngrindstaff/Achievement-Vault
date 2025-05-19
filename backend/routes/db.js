@@ -1,9 +1,13 @@
 ﻿// backend/routes/games.js
 import express from "express";
 const router = express.Router();
-import db from '../config/mysqlConnector.js'; 
+import db from '../config/mysqlConnector.js';
 
-// Route 1: Get all games
+var debugLogging = false;
+
+
+//#region Games
+//************************************ GET ALL GAMES ************************************//
 router.get('/db/games/all', async (req, res) => {
     //console.log('made it here');
     try {
@@ -16,7 +20,7 @@ router.get('/db/games/all', async (req, res) => {
     }
 });
 
-// Route 2: Get a single game by ID
+//************************************ GET GAME BY ID ************************************//
 router.get('/db/games/:gameId', async (req, res) => {
     //console.log('made it here2');
     const gameId = req.params.gameId;
@@ -36,8 +40,13 @@ router.get('/db/games/:gameId', async (req, res) => {
     }
 });
 
+//#endregion 
 
-// Route 4: Get all sections for a game by ID
+
+//#region Sections
+
+
+//************************************ GET ALL SECTIONS FOR A GAME BY GAME ID ************************************//
 router.get('/db/sections/:gameId/:hiddenFilter', async (req, res) => {
     //console.log('made it here sections/gameid');
     const gameId = req.params.gameId;
@@ -51,7 +60,7 @@ router.get('/db/sections/:gameId/:hiddenFilter', async (req, res) => {
     } else {
         hiddenFilter = null; // Let SQL default it if invalid or missing
     }
-    
+
     //console.log('gameId: ' + gameId + ' hiddenFilter: ' + hiddenFilter);
     try {
         const [rows] = await db.query('CALL GetGameSectionsByGameID(?, ?)', [gameId, hiddenFilter]);
@@ -68,148 +77,28 @@ router.get('/db/sections/:gameId/:hiddenFilter', async (req, res) => {
     }
 });
 
-// Route 5: Get all records for a game section by section Id
-router.get('/db/records/:sectionId/order/:recordOrderPreference/hiddenFilter/:hiddenFilter', async (req, res) => {
-    //console.log('made it records/sectionId');
+//************************************ GET SECTION BY SECTION ID ************************************//
+
+router.get('/db/section/:sectionId', async (req, res) => {
+    //console.log('made it here2');
     const sectionId = req.params.sectionId;
-    const recordOrderPreference = req.params.recordOrderPreference
-
-    let hiddenFilter = req.params.hiddenFilter;
-
-    // Convert string 'true'/'false' to boolean 1/0
-    if (hiddenFilter === 'true') {
-        hiddenFilter = 1;
-    } else if (hiddenFilter === 'false') {
-        hiddenFilter = 0;
-    } else {
-        hiddenFilter = null; // Let SQL default it if invalid or missing
-    }
-    
-    // console.log('sectionId: ' + sectionId + ' recordOrderPreference: ' + recordOrderPreference + ' hiddenFilter: ' + hiddenFilter);
+    //console.log('sectionId: ' + sectionId);
     try {
-        const [rows] = await db.query('CALL GetGameRecordsByGameSectionID(?, ?, ?)', [sectionId, recordOrderPreference, hiddenFilter]);
-        const result = rows[0];
-
-        if (result.length === 0) { 
-            console.error(`Section or records not found ${sectionId}`);
-            res.json();
-        }
-        else {
-            res.json(result);
-        }
-
-    } catch (err) { 
-        console.error(`Error fetching section data with section ID ${sectionId}:`, err);
-        res.status(500).json({ error: 'Internal server error' });
-    }
-});
-
-// Route 6: Update Record Completion
-router.put('/db/record/updateCompletion/:recordId', async (req, res) => {
-    const recordId = req.params.recordId;
-    const { numberAlreadyCompleted } = req.body;
-
-    //console.log('recordId: ' + recordId + ". numberAlreadyCompleted: " + numberAlreadyCompleted);
-
-    if (numberAlreadyCompleted === undefined) {
-        return res.status(400).json({ error: 'Missing required field: numberAlreadyCompleted' });
-    }
-
-    //console.log('made it here2 - recordId ' + recordId + ' numberAlreadyCompleted ' + numberAlreadyCompleted);
-
-    
-    try {
-        await db.query('CALL UpdateGameRecordCompletion(?, ?)', [recordId, numberAlreadyCompleted]);
-        res.json({ message: 'Progress updated successfully' });
-    } catch (err) {
-        console.error('Error updating progress:', err);
-        res.status(500).json({ error: 'Database error' });
-    }
-});
-
-
-//get all game Tables by gameId
-router.get('/db/gameTables/:gameId', async (req, res) => {
-    //console.log('made it here sections/gameid');
-    const gameId = req.params.gameId;
-    //console.log('gameId: ' + gameId);
-    try {
-        const [rows] = await db.query('CALL GetAllGameTablesByGameID(?)', [gameId]);
+        const [rows] = await db.query('CALL GetSectionById(?)', [sectionId]);
         const result = rows[0];
 
         if (result.length === 0) {
-            return res.status(404).json({ error: 'Game not found' });
+            return res.status(404).json({ error: 'Section not found' });
         }
 
-        res.json(result);
+        res.json(result[0]);
     } catch (err) {
-        console.error(`Error fetching game tables with game ID ${gameId}:`, err);
+        console.error(`Error fetching section with ID ${sectionId}:`, err);
         res.status(500).json({ error: 'Internal server error' });
     }
 });
 
-//GET table Record by ID
-router.get('/db/tableRecords/:tableId', async (req, res) => {
-    const gameId = req.params.tableId;
-    try {
-        const [rows] = await db.query('CALL GetAllTableRecordsByTableID(?)', [gameId]);
-        //console.log('rows:', rows);
-        if (!rows || rows.length === 0 || (Array.isArray(rows[0]) && rows[0].length === 0)) {
-            console.log("No records returned.");
-            return null;
-        }
-        
-        const result = rows[0];
-
-        if (result.length === 0) {
-            return res.status(404).json({ error: 'Game not found' });
-        }
-
-        res.json(result);
-    } catch (err) {
-        console.error(`Error fetching game tables with game ID ${gameId}:`, err);
-        res.status(500).json({ error: 'Internal server error' });
-    }
-});
-
-// Insert Game Record
-router.post('/db/record/insert', async (req, res) => {
-    const { recordName, description, sectionId, gameId, numberOfCheckboxes, numberAlreadyCompleted, listOrder, longDescription, hidden } = req.body;
-
-    if (!recordName || sectionId === undefined || gameId === undefined || numberOfCheckboxes === undefined || numberAlreadyCompleted === undefined || listOrder === undefined || hidden === undefined) {
-        return res.status(400).json({ error: 'Missing required fields' });
-    }
-
-    try {
-        await db.query(
-            'CALL InsertGameRecord(?, ?, ?, ?, ?, ?, ?, ?, ?)',
-            [recordName, description, sectionId, gameId, numberOfCheckboxes, numberAlreadyCompleted, listOrder, longDescription, hidden]
-        );
-        res.json({ message: 'Game record inserted successfully' });
-    } catch (err) {
-        console.error('Error inserting game record:', err);
-        res.status(500).json({ error: 'Database error' });
-    }
-});
-
-// Update Game Record
-router.put('/db/record/update/:recordId/:sectionId', async (req, res) => {
-    const { recordId, sectionId } = req.params;
-    const { recordName, description, gameId, numberOfCheckboxes, numberAlreadyCompleted, listOrder, longDescription, hidden } = req.body;
-
-    try {
-        await db.query(
-            'CALL UpdateGameRecord(?, ?, ?, ?, ?, ?, ?, ?, ?)',
-            [recordId, sectionId, recordName, description, gameId, numberOfCheckboxes, numberAlreadyCompleted, listOrder, longDescription, hidden]
-        );
-        res.json({ message: 'Game record updated successfully' });
-    } catch (err) {
-        console.error('Error updating game record:', err);
-        res.status(500).json({ error: 'Database error' });
-    }
-});
-
-// Insert Game Section
+//************************************ INSERT GAME SECTION************************************//
 router.post('/db/section/insert', async (req, res) => {
     const { sectionName, gameId, listOrder, recordOrderPreference, hidden } = req.body;
 
@@ -229,6 +118,7 @@ router.post('/db/section/insert', async (req, res) => {
     }
 });
 
+//************************************ UPDATE GAME SECTION ************************************//
 // Update Game Section
 router.put('/db/section/update/:sectionId/:gameId', async (req, res) => {
     const { sectionId, gameId } = req.params;
@@ -247,7 +137,7 @@ router.put('/db/section/update/:sectionId/:gameId', async (req, res) => {
 });
 
 
-// Update multiple game sections' list orders
+//************************************ UPDATE THE ORDER OF GAME SECTIONS ************************************//
 /*
 Expected input: 
 [
@@ -290,25 +180,119 @@ router.put('/db/sections/updateListOrder', async (req, res) => {
     }
 });
 
-router.get('/db/section/:sectionId', async (req, res) => {
-    //console.log('made it here2');
+//#endregion 
+
+
+//#region Records
+
+//************************************ GET ALL RECORDS FOR A SECTION BY SECTION ID ************************************//
+router.get('/db/records/:sectionId/order/:recordOrderPreference/hiddenFilter/:hiddenFilter', async (req, res) => {
+    //console.log('made it records/sectionId');
     const sectionId = req.params.sectionId;
-    //console.log('sectionId: ' + sectionId);
+    const recordOrderPreference = req.params.recordOrderPreference
+
+    let hiddenFilter = req.params.hiddenFilter;
+
+    // Convert string 'true'/'false' to boolean 1/0
+    if (hiddenFilter === 'true') {
+        hiddenFilter = 1;
+    } else if (hiddenFilter === 'false') {
+        hiddenFilter = 0;
+    } else {
+        hiddenFilter = null; // Let SQL default it if invalid or missing
+    }
+    
+    // console.log('sectionId: ' + sectionId + ' recordOrderPreference: ' + recordOrderPreference + ' hiddenFilter: ' + hiddenFilter);
     try {
-        const [rows] = await db.query('CALL GetSectionById(?)', [sectionId]);
+        const [rows] = await db.query('CALL GetGameRecordsByGameSectionID(?, ?, ?)', [sectionId, recordOrderPreference, hiddenFilter]);
         const result = rows[0];
 
-        if (result.length === 0) {
-            return res.status(404).json({ error: 'Section not found' });
+        if (result.length === 0) { 
+            console.error(`Section or records not found ${sectionId}`);
+            res.json();
+        }
+        else {
+            res.json(result);
         }
 
-        res.json(result[0]);
-    } catch (err) {
-        console.error(`Error fetching section with ID ${sectionId}:`, err);
+    } catch (err) { 
+        console.error(`Error fetching section data with section ID ${sectionId}:`, err);
         res.status(500).json({ error: 'Internal server error' });
     }
 });
 
+//************************************ UPDATE RECORD COMPLETION ************************************//
+router.put('/db/record/updateCompletion/:recordId', async (req, res) => {
+    const recordId = req.params.recordId;
+    const { numberAlreadyCompleted } = req.body;
+
+    //console.log('recordId: ' + recordId + ". numberAlreadyCompleted: " + numberAlreadyCompleted);
+
+    if (numberAlreadyCompleted === undefined) {
+        return res.status(400).json({ error: 'Missing required field: numberAlreadyCompleted' });
+    }
+    
+    try {
+        await db.query('CALL UpdateGameRecordCompletion(?, ?)', [recordId, numberAlreadyCompleted]);
+        res.json({ message: 'Progress updated successfully' });
+    } catch (err) {
+        console.error('Error updating progress:', err);
+        res.status(500).json({ error: 'Database error' });
+    }
+});
+
+
+//************************************ INSERT GAME RECORD ************************************//
+router.post('/db/record/insert', async (req, res) => {
+    const { recordName, description, sectionId, gameId, numberOfCheckboxes, numberAlreadyCompleted, listOrder, longDescription, hidden } = req.body;
+
+    if (!recordName || sectionId === undefined || gameId === undefined || numberOfCheckboxes === undefined || numberAlreadyCompleted === undefined || listOrder === undefined || hidden === undefined) {
+        return res.status(400).json({ error: 'Missing required fields' });
+    }
+
+    try {
+        await db.query(
+            'CALL InsertGameRecord(?, ?, ?, ?, ?, ?, ?, ?, ?)',
+            [recordName, description, sectionId, gameId, numberOfCheckboxes, numberAlreadyCompleted, listOrder, longDescription, hidden]
+        );
+        res.json({ message: 'Game record inserted successfully' });
+    } catch (err) {
+        console.error('Error inserting game record:', err);
+        res.status(500).json({ error: 'Database error' });
+    }
+});
+
+//************************************ UPDATE GAME RECORD ************************************//
+router.put('/db/record/update/:recordId/:sectionId', async (req, res) => {
+    const { recordId, sectionId } = req.params;
+    const { recordName, description, gameId, numberOfCheckboxes, numberAlreadyCompleted, listOrder, longDescription, hidden } = req.body;
+
+    try {
+        await db.query(
+            'CALL UpdateGameRecord(?, ?, ?, ?, ?, ?, ?, ?, ?)',
+            [recordId, sectionId, recordName, description, gameId, numberOfCheckboxes, numberAlreadyCompleted, listOrder, longDescription, hidden]
+        );
+        res.json({ message: 'Game record updated successfully' });
+    } catch (err) {
+        console.error('Error updating game record:', err);
+        res.status(500).json({ error: 'Database error' });
+    }
+});
+
+//************************************ DELETE A RECORD ITEM ************************************//
+router.delete('/db/record/delete/:recordId', async (req, res) => {
+    const recordId = req.params.recordId;
+
+    try {
+        await db.query('CALL DeleteGameRecord(?)', [recordId]);
+        res.status(200).json({ message: 'Record deleted successfully' });
+    } catch (err) {
+        console.error("Error deleting record:", err);
+        res.status(500).json({ error: 'Database error' });
+    }
+});
+
+//************************************ UPDATE THE ORDER OF RECORDS IN A SECTION ************************************//
 router.put('/db/records/updateListOrder', async (req, res) => {
     const recordUpdates = req.body;
 
@@ -336,5 +320,58 @@ router.put('/db/records/updateListOrder', async (req, res) => {
     }
 });
 
+//#endregion 
+
+
+//#region Tables
+
+//************************************ GET ALL GAME TABLES BY GAME ID ************************************//
+router.get('/db/gameTables/:gameId', async (req, res) => {
+    //console.log('made it here sections/gameid');
+    const gameId = req.params.gameId;
+    //console.log('gameId: ' + gameId);
+    try {
+        const [rows] = await db.query('CALL GetAllGameTablesByGameID(?)', [gameId]);
+        const result = rows[0];
+
+        if (result.length === 0) {
+            return res.status(404).json({ error: 'Game not found' });
+        }
+
+        res.json(result);
+    } catch (err) {
+        console.error(`Error fetching game tables with game ID ${gameId}:`, err);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
+//************************************ GET TABLE RECORDS BY TABLE ID ************************************//
+router.get('/db/tableRecords/:tableId', async (req, res) => {
+    const gameId = req.params.tableId;
+    try {
+        const [rows] = await db.query('CALL GetAllTableRecordsByTableID(?)', [gameId]);
+        //console.log('rows:', rows);
+        if (!rows || rows.length === 0 || (Array.isArray(rows[0]) && rows[0].length === 0)) {
+            console.log("No records returned.");
+            return null;
+        }
+
+        const result = rows[0];
+
+        if (result.length === 0) {
+            return res.status(404).json({ error: 'Game not found' });
+        }
+
+        res.json(result);
+    } catch (err) {
+        console.error(`Error fetching game tables with game ID ${gameId}:`, err);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
+//#endregion 
+
+
+//************************************  ************************************//
 
 export default router;
