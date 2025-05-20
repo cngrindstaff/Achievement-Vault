@@ -189,8 +189,19 @@ router.put('/db/sections/updateListOrder', async (req, res) => {
 router.get('/db/records/:sectionId/order/:recordOrderPreference/hiddenFilter/:hiddenFilter', async (req, res) => {
     //console.log('made it records/sectionId');
     const sectionId = req.params.sectionId;
-    const recordOrderPreference = req.params.recordOrderPreference
-
+    var recordOrderPreference = req.params.recordOrderPreference
+    var inputOrderQuery = '';
+    if(!recordOrderPreference) recordOrderPreference = 'order-name';
+    if(recordOrderPreference === "order-name"){
+        inputOrderQuery = 'ListOrder ASC, Name ASC';
+    }
+    else if(recordOrderPreference === "name"){
+        inputOrderQuery = 'Name ASC';
+    }
+    else if(recordOrderPreference === "completed-order-name"){
+        inputOrderQuery = 'NumberAlreadyCompleted ASC, ListOrder ASC, Name ASC';
+    }
+    //console.log('inputOrderQuery: ' + inputOrderQuery);
     let hiddenFilter = req.params.hiddenFilter;
 
     // Convert string 'true'/'false' to boolean 1/0
@@ -204,7 +215,7 @@ router.get('/db/records/:sectionId/order/:recordOrderPreference/hiddenFilter/:hi
     
     // console.log('sectionId: ' + sectionId + ' recordOrderPreference: ' + recordOrderPreference + ' hiddenFilter: ' + hiddenFilter);
     try {
-        const [rows] = await db.query('CALL GetGameRecordsByGameSectionID(?, ?, ?)', [sectionId, recordOrderPreference, hiddenFilter]);
+        const [rows] = await db.query('CALL GetGameRecordsByGameSectionIDV2(?, ?, ?)', [sectionId, inputOrderQuery, hiddenFilter]);
         const result = rows[0];
 
         if (result.length === 0) { 
