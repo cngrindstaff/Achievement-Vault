@@ -1,6 +1,7 @@
 ﻿import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
+import "dotenv/config";
 
 
 //This doesn't work bc googleapis is not an ES6 module - //import google from "googleapis";

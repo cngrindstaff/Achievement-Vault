@@ -86,7 +86,7 @@ async function processData(sections) {
 
     // Pre-fetch all records in parallel
     const recordsPromises = sections.map(section =>
-        dbUtils.getRecordsBySectionId(section.ID, section.RecordOrderPreference || null, false)
+        dbUtils.getRecordsBySectionIdV2(section.ID, section.RecordOrderPreference || null, false)
             .catch(err => {
                 console.error(`Failed to load records for section ${section.Name} (ID: ${section.ID})`, err);
                 return []; // Fallback to empty array on error

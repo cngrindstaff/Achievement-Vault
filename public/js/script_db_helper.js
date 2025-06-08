@@ -76,7 +76,7 @@ export async function getSectionById(passed_sectionId) {
     //document.querySelector('.game-name').textContent = passed_gameNameFriendly;
 }
 
-//************************************ GET ALL RECORDS FOR A SECTION BY SECTION ID ************************************//
+//************************************ GET ALL RECORDS FOR A SECTION BY SECTION ID, ordering done in stored proc ************************************//
 export async function getRecordsBySectionId(sectionId, recordOrderPreference, hiddenFilter) {
     if (!sectionId) {
         alert("Missing sectionId in URL.");
@@ -93,6 +93,80 @@ export async function getRecordsBySectionId(sectionId, recordOrderPreference, hi
                     gameNameFriendly: data.FriendlyName || passed_gameName || passed_gameId,
                     gameName: data.Name || passed_gameId,
                 };*/
+        return data;
+    } catch (err) {
+        console.error("Error fetching game data:", err);
+    }
+}
+
+//************************************ GET ALL RECORDS FOR A SECTION BY SECTION ID, V2, manual ordering ************************************//
+export async function getRecordsBySectionIdV2(sectionId, recordOrderPreference, hiddenFilter) {
+    if (!sectionId) {
+        alert("Missing sectionId in URL.");
+        return;
+    }
+    //console.log('sectionId: ' + sectionId );
+
+    try {
+        const res = await fetch(`/api/db/records/v2/${sectionId}/hiddenFilter/${hiddenFilter}`);
+        const data = await res.json();
+        //console.log('Records data:', data);
+        /*        return {
+                    gameId: data.ID,
+                    gameNameFriendly: data.FriendlyName || passed_gameName || passed_gameId,
+                    gameName: data.Name || passed_gameId,
+                };*/
+
+        if(recordOrderPreference === "" || recordOrderPreference === null) {
+            recordOrderPreference = "order-name";
+        }
+
+        if(recordOrderPreference === "order-name")
+        {
+            data.sort((a, b) => {
+                // First, sort by Order (ascending)
+                if (a.ListOrder !== b.ListOrder) {
+                    return a.ListOrder - b.ListOrder;
+                }
+                // If they're equal, sort by Name (case-insensitive ascending)
+                return a.Name.localeCompare(b.Name, undefined, { sensitivity: 'base' });
+            });
+        }  
+        else if(recordOrderPreference === "completed-order-name")
+        {
+            data.sort((a, b) => {
+                // First, sort by NumberAlreadyCompleted (ascending)
+                if (a.NumberAlreadyCompleted !== b.NumberAlreadyCompleted) {
+                    return a.NumberAlreadyCompleted - b.NumberAlreadyCompleted;
+                }
+                // If they're equal, sort by Order (ascending)
+                if (a.ListOrder !== b.ListOrder) {
+                    return a.ListOrder - b.ListOrder;
+                }
+                // If they're equal, sort by Name (case-insensitive ascending)
+                return a.Name.localeCompare(b.Name, undefined, { sensitivity: 'base' });
+            });
+        }
+        else if (recordOrderPreference === "completed-name")
+        {
+            data.sort((a, b) => {
+                // First, sort by NumberAlreadyCompleted (ascending)
+                if (a.NumberAlreadyCompleted !== b.NumberAlreadyCompleted) {
+                    return a.NumberAlreadyCompleted - b.NumberAlreadyCompleted;
+                }
+                // If they're equal, sort by Name (case-insensitive ascending)
+                return a.Name.localeCompare(b.Name, undefined, { sensitivity: 'base' });
+            });
+        }
+
+        else if (recordOrderPreference === "name")
+        {
+            data.sort((a, b) => {
+                // sort by Name (case-insensitive ascending)
+                return a.Name.localeCompare(b.Name, undefined, { sensitivity: 'base' });
+            });
+        }       
+        
         return data;
     } catch (err) {
         console.error("Error fetching game data:", err);
