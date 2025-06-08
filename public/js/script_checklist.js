@@ -36,9 +36,7 @@ $(document).ready(async function () {
     mainContainer.append(`<div class="link-container"> </div>`);
     const linkContainerDiv = $('.link-container');
     linkContainerDiv.append('<div class="link-icon"><a href="' + linkToHomePage + '" class="link-icon-text"><i class="fa fa-solid fa-house fa-lg fa-border" ></i></a></div>');
-    if (hasDataTables) {
-        linkContainerDiv.append('<div class="link-icon"><a href="' + linkToGamePage + '" class="link-icon-text" title="Return to Game Page"><i class="fa fa-arrow-left fa-lg fa-border" ></i></a></div>');
-    }
+    linkContainerDiv.append('<div class="link-icon"><a href="' + linkToGamePage + '" class="link-icon-text" title="Return to Game Page"><i class="fa fa-arrow-left fa-lg fa-border" ></i></a></div>');
 
     mainContainer.append('<h1>' + gameNameFriendly + ' 100% Completion Checklist</h1>');
     mainContainer.append('<p id="total-completion">Total Completion: 0%</p>');
@@ -86,7 +84,7 @@ async function processData(sections) {
 
     // Pre-fetch all records in parallel
     const recordsPromises = sections.map(section =>
-        dbUtils.getRecordsBySectionId(section.ID, section.RecordOrderPreference || null, false)
+        dbUtils.getRecordsBySectionIdV2(section.ID, section.RecordOrderPreference || null, false)
             .catch(err => {
                 console.error(`Failed to load records for section ${section.Name} (ID: ${section.ID})`, err);
                 return []; // Fallback to empty array on error

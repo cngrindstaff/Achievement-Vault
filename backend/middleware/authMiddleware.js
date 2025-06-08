@@ -1,4 +1,5 @@
-﻿const AV_USERNAME = process.env.AV_USERNAME;
+﻿import "dotenv/config";
+const AV_USERNAME = process.env.AV_USERNAME;
 const AV_PASSWORD = process.env.AV_PASSWORD;
 
 export default function basicAuthMiddleware(req, res, next) {

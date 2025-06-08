@@ -6,3 +6,4 @@ credentials.json
 **/~$*.xlsx
 
 .env.old
+env

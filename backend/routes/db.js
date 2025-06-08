@@ -185,7 +185,7 @@ router.put('/db/sections/updateListOrder', async (req, res) => {
 
 //#region Records
 
-//************************************ GET ALL RECORDS FOR A SECTION BY SECTION ID ************************************//
+//************************************ GET ALL RECORDS FOR A SECTION BY SECTION ID, WITH ORDERING ************************************//
 router.get('/db/records/:sectionId/order/:recordOrderPreference/hiddenFilter/:hiddenFilter', async (req, res) => {
     //console.log('made it records/sectionId');
     const sectionId = req.params.sectionId;
@@ -216,6 +216,41 @@ router.get('/db/records/:sectionId/order/:recordOrderPreference/hiddenFilter/:hi
         }
 
     } catch (err) { 
+        console.error(`Error fetching section data with section ID ${sectionId}:`, err);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
+//************************************ GET ALL RECORDS FOR A SECTION BY SECTION ID, V2, WITHOUT ORDERING ************************************//
+router.get('/db/records/v2/:sectionId/hiddenFilter/:hiddenFilter', async (req, res) => {
+    //console.log('made it records/sectionId');
+    const sectionId = req.params.sectionId;
+
+    let hiddenFilter = req.params.hiddenFilter;
+
+    // Convert string 'true'/'false' to boolean 1/0
+    if (hiddenFilter === 'true') {
+        hiddenFilter = 1;
+    } else if (hiddenFilter === 'false') {
+        hiddenFilter = 0;
+    } else {
+        hiddenFilter = null; // Let SQL default it if invalid or missing
+    }
+
+    // console.log('sectionId: ' + sectionId  + ' hiddenFilter: ' + hiddenFilter);
+    try {
+        const [rows] = await db.query('CALL GetGameRecordsByGameSectionIDV2(?, ?)', [sectionId, hiddenFilter]);
+        const result = rows[0];
+
+        if (result.length === 0) {
+            console.error(`Section or records not found ${sectionId}`);
+            res.json();
+        }
+        else {
+            res.json(result);
+        }
+
+    } catch (err) {
         console.error(`Error fetching section data with section ID ${sectionId}:`, err);
         res.status(500).json({ error: 'Internal server error' });
     }
