@@ -13,7 +13,7 @@ Hades increase in level up to 3 times, so for each of these, there are 3 checkbo
 ## Node server
 This requires a node server for authentication and database management.
 
-##
+## Variables
 This project requires environment variables. See ```sample.env``` for the fields that are needed. 
 Fill them out and rename the file to ```.env``` 
 Alternatively, these can be set up as actual Environment Variables.
@@ -47,7 +47,7 @@ Each item listed will link to the game page - `game?id=${game.ID}`.
 
 The `game.html` file creates a landing page for the game. It then calls `script_gamePage.js`, which creates links to the main checklist - `checklist?id=${gameId}` - and the page with additional tables - `tables?id=${gameId}`.
 
-Sorting options:
+**Sorting options:**
 * order-name  = ListOrder ASC, Name ASC
 * name = Name ASC
 * completed-order-name = NumberAlreadyCompleted ASC, ListOrderASC, Name ASC
@@ -60,4 +60,4 @@ Sorting options:
 -[ ] Edit Record Fields
 -[x] Delete Records
 -[ ] Validate checkbox info on Adding records
--[ ] Trim beginning/ending whitespace when adding new sections/records
+-[x] Trim beginning/ending whitespace when adding new sections/records
