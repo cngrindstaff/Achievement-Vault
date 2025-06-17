@@ -311,9 +311,7 @@ GRANT EXECUTE ON PROCEDURE achievement_vault.InsertGameRecord TO 'achievement_va
 ************************************************
 
 
-DELIMITER //
-
-CREATE PROCEDURE UpdateGameRecord(
+CREATE DEFINER="doadmin"@"%" PROCEDURE "UpdateGameRecord"(
     IN recordId INT,
     IN sectionId INT,
     IN recordName VARCHAR(100),
@@ -326,6 +324,29 @@ CREATE PROCEDURE UpdateGameRecord(
     IN hidden TINYINT
 )
 BEGIN
+    -- Declare all variables first
+    DECLARE matchCount INT;
+
+    -- Input validation
+    IF recordId IS NULL OR sectionId IS NULL THEN
+        SIGNAL SQLSTATE '45000' 
+            SET MESSAGE_TEXT = 'recordId and sectionId cannot be NULL';
+    END IF;
+
+    -- Pre-check how many rows match
+    SELECT COUNT(*) INTO matchCount
+    FROM GameRecords
+    WHERE SectionId = sectionId AND Id = recordId;
+
+    IF matchCount = 0 THEN
+        SIGNAL SQLSTATE '02000'
+            SET MESSAGE_TEXT = 'No matching record found to update';
+    ELSEIF matchCount > 1 THEN
+        SIGNAL SQLSTATE '45000'
+            SET MESSAGE_TEXT = 'Error: multiple records match the given RecordId and SectionId';
+    END IF;
+
+    -- Proceed to update exactly one row
     UPDATE GameRecords
     SET 
         Name = COALESCE(recordName, Name),
@@ -337,10 +358,8 @@ BEGIN
         LongDescription = COALESCE(longDescription, LongDescription),
         Hidden = COALESCE(hidden, Hidden)
     WHERE 
-        SectionId = sectionId AND RecordId = recordId;
-END //
-
-DELIMITER ;
+        SectionId = sectionId AND Id = recordId;
+END
 
 GRANT EXECUTE ON PROCEDURE achievement_vault.UpdateGameRecord TO 'achievement_vault_user'@'%';
 
@@ -452,5 +471,20 @@ GRANT EXECUTE ON PROCEDURE achievement_vault.DeleteGameRecord TO 'achievement_va
 
 ************************************************
 
+DELIMITER $$
+
+CREATE PROCEDURE GetGameRecordByRecordID(IN inputRecordID INT)
+BEGIN
+    SELECT * FROM GameRecords
+    WHERE ID = inputRecordID;
+    
+END $$
+
+DELIMITER ;
 
 
+
+GRANT EXECUTE ON PROCEDURE achievement_vault.GetGameRecordByRecordID TO 'achievement_vault_user'@'%';
+
+
+************************************************

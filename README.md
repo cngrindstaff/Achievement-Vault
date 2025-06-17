@@ -56,8 +56,12 @@ The `game.html` file creates a landing page for the game. It then calls `script_
 
 # Future Updates
 -[ ] Refresh Section Order page on save
--[ ] Edit Section Fields
--[ ] Edit Record Fields
--[x] Delete Records
+-[ ] Allow editing of existing Sections
+-[ ] Allow editing of existing Records
+-[ ] Allow deleting existing Sections
+-[x] Allow deleting existing Records
 -[ ] Validate checkbox info on Adding records
 -[x] Trim beginning/ending whitespace when adding new sections/records
+-[ ] Optimize how records/sections are auto-numbered when re-ordering
+-[ ] Change New Record/Section pages to modals?
+-[ ] Auto-fill new Record/Section form with 0 completed, 1 available, and order set to 1

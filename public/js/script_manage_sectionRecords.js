@@ -63,9 +63,15 @@ $(document).ready(async function () {
                     <label class="add-record">Number Already Completed:<input type="number" id="numberAlreadyCompleted" class="add-record" min="0" required></label>
                     <label class="add-record">List Order:<input type="number" id="listOrder" class="add-record" min="0" required></label>
                     <label class="add-record">Long Description:<textarea id="longDescription" class="add-record" rows="5"></textarea></label>
-                    <label class="add-record">Hidden:<input type="checkbox" id="hidden" class="add-record"></label>
-                    <button type="submit" id="save-record-button" class="save-button">Save Record</button>
-                    <button type="button" id="reset-record-button" class="reset-button">Reset Changes</button>
+                    <label class="modern-checkbox add-record">
+                        <input type="checkbox" id="hidden">
+                        <span class="checkmark"></span>
+                        Hidden
+                    </label>
+                    <div class="button-container">
+                        <button type="submit" id="save-record-button" class="save-button">Save Record</button>
+                        <button type="button" id="reset-record-button" class="reset-button">Reset Changes</button>
+                    </div>
                     <div id="loading-spinner" class="spinner hidden"></div>
                     <div id="success-message" class="success-message hidden">Record saved successfully!</div>
                 </form>
@@ -161,16 +167,27 @@ $(document).ready(async function () {
         successMessage.classList.add('hidden');
 
         try {
-            const success = await dbUtils.insertGameRecord(recordData);
+            let success;
+            const editId = newRecordForm.dataset.editId;
+            
+            if (editId) {
+                // Update existing record
+                success = await dbUtils.updateGameRecord(editId, recordData);
+            } else {
+                // Insert new record
+                success = await dbUtils.insertGameRecord(recordData);
+            }
+
             if (success) {
                 successMessage.classList.remove('hidden');
 
-                // Fade out after 1.5 seconds, then close modal and refresh records
                 setTimeout(async () => {
                     successMessage.classList.add('fade-out');
                     setTimeout(async () => {
                         modal.classList.add('hidden');
                         newRecordForm.reset();
+                        // Clear the edit ID
+                        delete newRecordForm.dataset.editId;
                         // Refresh only the grid container
                         const gridContainer = document.getElementById('grid-manage-records-container');
                         const records = await dbUtils.getRecordsBySectionId(sectionId, null);
@@ -191,6 +208,8 @@ $(document).ready(async function () {
     // Handle reset button
     document.getElementById('reset-record-button').addEventListener('click', () => {
         newRecordForm.reset();
+        // Clear the edit ID when resetting
+        delete newRecordForm.dataset.editId;
     });
 
     document.getElementById('save-button').addEventListener('click', async () => {
@@ -224,9 +243,36 @@ function createRecordCard(record, gameId, container) {
         <div class="record-card-content">
             <input type="number" class="list-order" value="${record.ListOrder}" readonly />
             <span class="record-name">${record.Name}</span>
-             <button class="delete-button" data-id="${record.ID}">Delete</button>
+            <button class="edit-button" data-id="${record.ID}">Edit</button>
+            <button class="delete-button" data-id="${record.ID}">Delete</button>
        </div>
     `;
+
+    // Handle the Edit button click
+    card.querySelector('.edit-button').addEventListener('click', async (event) => {
+        event.stopPropagation();
+        const recordId = event.target.dataset.id;
+        const recordData = await dbUtils.getGameRecordById(recordId);
+        
+        if (recordData) {
+            // Populate the form with existing data
+            document.getElementById("recordName").value = recordData.Name;
+            document.getElementById("description").value = recordData.Description || '';
+            document.getElementById("numberOfCheckboxes").value = recordData.NumberOfCheckboxes;
+            document.getElementById("numberAlreadyCompleted").value = recordData.NumberAlreadyCompleted;
+            document.getElementById("listOrder").value = recordData.ListOrder;
+            document.getElementById("longDescription").value = recordData.LongDescription || '';
+            document.getElementById("hidden").checked = recordData.Hidden === 1;
+
+            // Show the modal
+            const modal = document.getElementById('add-record-modal');
+            modal.classList.remove('hidden');
+
+            // Store the record ID in the form for editing
+            const form = document.getElementById('new-record-form');
+            form.dataset.editId = recordId;
+        }
+    });
 
     // Handle the Delete button click
     card.querySelector('.delete-button').addEventListener('click', async (event) => {
