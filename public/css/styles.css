@@ -470,7 +470,7 @@ tr:nth-child(odd) {
 }
 
 .save-button:hover, .reset-button:hover, .add-record-button:hover {
-  background-color: #2FBFC6;
+  background-color: #175F63;
 }
 
 .save-button.bounce {
@@ -674,74 +674,183 @@ tr:nth-child(odd) {
   display: none;
 }
 
-/* Modal Styles */
+/*************************************** XXXXXXXXXXXXXXXXXXX *******************************/
+/*************************************** MODAL STYLES *******************************/
 .modal {
+  display: none;
   position: fixed;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
   background-color: rgba(0, 0, 0, 0.5);
-  display: flex;
-  justify-content: center;
-  align-items: center;
   z-index: 1000;
+  -webkit-box-pack: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+}
+
+.modal:not(.hidden) {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
 }
 
 .modal.hidden {
   display: none;
 }
 
-.modal-content {
+.modal .modal-content {
   background-color: #6AD6DC;
-  padding: 20px;
-  border-radius: 10px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+  padding: 20px 30px;
+  border-radius: 5px;
+  position: relative;
   width: 90%;
   max-width: 500px;
   max-height: 90vh;
   overflow-y: auto;
-  position: relative;
 }
 
-.close-modal {
+.modal .close-modal {
   position: absolute;
+  right: 10px;
   top: 10px;
-  right: 15px;
   font-size: 24px;
   cursor: pointer;
   color: #104042;
+  background: none;
+  border: none;
+  padding: 0;
+  line-height: 1;
 }
 
-.close-modal:hover {
-  color: #1F7F84;
+.modal .close-modal:hover {
+  color: #2FBFC6;
 }
 
-/* Ensure form elements in modal are properly styled */
 .modal .add-record-container {
-  margin-top: 20px;
+  padding-right: 10px;
 }
 
 .modal .add-record {
-  margin-bottom: 15px;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+      -ms-flex-direction: column;
+          flex-direction: column;
+}
+
+.modal .modern-checkbox.add-record {
+  -webkit-box-orient: horizontal;
+  -webkit-box-direction: normal;
+      -ms-flex-direction: row;
+          flex-direction: row;
+  -webkit-box-pack: start;
+      -ms-flex-pack: start;
+          justify-content: flex-start;
+  width: 100%;
 }
 
 .modal input[type="text"],
 .modal input[type="number"],
 .modal textarea {
-  width: 100%;
   padding: 8px;
-  margin-top: 5px;
+  margin: 5px 0;
   border: 1px solid #ccc;
-  border-radius: 5px;
+  border-radius: 4px;
+  font-size: 14px;
+  width: 100%;
+  -webkit-box-sizing: border-box;
+          box-sizing: border-box;
+}
+
+.modal input[type="text"]:focus,
+.modal input[type="number"]:focus,
+.modal textarea:focus {
+  outline: none;
+  border-color: #2FBFC6;
 }
 
 .modal .save-button,
 .modal .reset-button {
-  width: auto;
-  margin: 10px 5px;
-  display: inline-block;
+  padding: 8px 15px;
+  margin: 5px;
 }
 
-/*************************************** XXXXXXXXXXXXXXXXXXX *******************************/
+.modal #hidden {
+  margin-top: 5px;
+}
+
+.modal .button-container {
+  margin-top: 20px;
+  text-align: center;
+}
+
+.modal .modern-checkbox {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  cursor: pointer;
+  -webkit-user-select: none;
+     -moz-user-select: none;
+      -ms-user-select: none;
+          user-select: none;
+  margin: 15px 0;
+  color: #104042;
+  -webkit-box-pack: start;
+      -ms-flex-pack: start;
+          justify-content: flex-start;
+}
+
+.modal .modern-checkbox .checkmark {
+  width: 20px;
+  height: 20px;
+  background-color: #f0f0f0;
+  border: 2px solid #ccc;
+  border-radius: 4px;
+  margin-right: 10px;
+  position: relative;
+  -webkit-transition: all 0.3s ease;
+  transition: all 0.3s ease;
+}
+
+.modal .modern-checkbox:hover .checkmark {
+  background-color: #e0e0e0;
+  border-color: #888;
+}
+
+.modal .modern-checkbox input:checked + .checkmark {
+  background-color: #2FBFC6;
+  border-color: #28A2A8;
+}
+
+.modal .modern-checkbox .checkmark::after {
+  content: '';
+  position: absolute;
+  width: 6px;
+  height: 12px;
+  border: solid white;
+  border-width: 0 2px 2px 0;
+  -webkit-transform: rotate(45deg);
+          transform: rotate(45deg);
+  top: 2px;
+  left: 7px;
+  opacity: 0;
+  -webkit-transition: opacity 0.3s ease;
+  transition: opacity 0.3s ease;
+}
+
+.modal .modern-checkbox input:checked + .checkmark::after {
+  opacity: 1;
+}
+
+/*************************************** END MODAL STYLES *******************************/
 /*# sourceMappingURL=styles.css.map */

@@ -63,9 +63,15 @@ $(document).ready(async function () {
                     <label class="add-record">Number Already Completed:<input type="number" id="numberAlreadyCompleted" class="add-record" min="0" required></label>
                     <label class="add-record">List Order:<input type="number" id="listOrder" class="add-record" min="0" required></label>
                     <label class="add-record">Long Description:<textarea id="longDescription" class="add-record" rows="5"></textarea></label>
-                    <label class="add-record">Hidden:<input type="checkbox" id="hidden" class="add-record"></label>
-                    <button type="submit" id="save-record-button" class="save-button">Save Record</button>
-                    <button type="button" id="reset-record-button" class="reset-button">Reset Changes</button>
+                    <label class="modern-checkbox add-record">
+                        <input type="checkbox" id="hidden">
+                        <span class="checkmark"></span>
+                        Hidden
+                    </label>
+                    <div class="button-container">
+                        <button type="submit" id="save-record-button" class="save-button">Save Record</button>
+                        <button type="button" id="reset-record-button" class="reset-button">Reset Changes</button>
+                    </div>
                     <div id="loading-spinner" class="spinner hidden"></div>
                     <div id="success-message" class="success-message hidden">Record saved successfully!</div>
                 </form>
