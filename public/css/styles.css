@@ -555,11 +555,19 @@ tr:nth-child(odd) {
   /* Firefox */
 }
 
+.manage-records-button, .edit-button {
+  background-color: #6AD6DC;
+  color: #104042;
+}
+
+.manage-records-button:hover, .edit-button:hover {
+  background-color: #1F7F84;
+  color: #CEF2F3;
+}
+
 .manage-records-button {
   margin-left: auto;
   padding: 5px 10px;
-  background-color: #2FBFC6;
-  color: #CEF2F3;
   border: none;
   border-radius: 5px;
   cursor: pointer;
@@ -567,25 +575,31 @@ tr:nth-child(odd) {
   transition: background-color 0.2s;
 }
 
-.manage-records-button:hover {
-  background-color: #1F7F84;
-}
-
 /* Delete Button Styles */
 .delete-button {
-  background-color: #dc3545;
-  color: #fff;
+  background-color: #ff6b6b;
+  color: white;
   border: none;
   padding: 5px 10px;
-  border-radius: 5px;
+  border-radius: 4px;
   cursor: pointer;
-  margin-left: auto;
+  margin-left: 10px;
   -webkit-transition: background-color 0.2s;
   transition: background-color 0.2s;
 }
 
 .delete-button:hover {
-  background-color: #c82333;
+  background-color: #ff5252;
+}
+
+.edit-button {
+  border: none;
+  padding: 5px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-left: 10px;
+  -webkit-transition: background-color 0.2s;
+  transition: background-color 0.2s;
 }
 
 /*************************************** ADD RECORD *******************************/

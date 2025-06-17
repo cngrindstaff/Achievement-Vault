@@ -256,6 +256,26 @@ router.get('/db/records/v2/:sectionId/hiddenFilter/:hiddenFilter', async (req, r
     }
 });
 
+//************************************ GET RECORD BY RECORD ID ************************************//
+
+router.get('/db/record/:recordId', async (req, res) => {
+    //console.log('made it here2');
+    const recordId = req.params.recordId;
+    //console.log('recordId: ' + recordId);
+    try {
+        const [rows] = await db.query('CALL GetGameRecordByRecordID(?)', [recordId]);
+        const result = rows[0];
+
+        if (result.length === 0) {
+            return res.status(404).json({ error: 'Record not found' });
+        }
+
+        res.json(result[0]);
+    } catch (err) {
+        console.error(`Error fetching record with ID ${recordId}:`, err);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
 //************************************ UPDATE RECORD COMPLETION ************************************//
 router.put('/db/record/updateCompletion/:recordId', async (req, res) => {
     const recordId = req.params.recordId;
@@ -298,13 +318,14 @@ router.post('/db/record/insert', async (req, res) => {
 });
 
 //************************************ UPDATE GAME RECORD ************************************//
-router.put('/db/record/update/:recordId/:sectionId', async (req, res) => {
-    const { recordId, sectionId } = req.params;
-    const { recordName, description, gameId, numberOfCheckboxes, numberAlreadyCompleted, listOrder, longDescription, hidden } = req.body;
-
+router.put('/db/record/update/:recordId', async (req, res) => {
+    const { recordId } = req.params;
+    const { recordName, description, gameId, numberOfCheckboxes, numberAlreadyCompleted, 
+        listOrder, longDescription, hidden, sectionId } = req.body;
+    console.log('recordId: ' + recordId + ' sectionId: ' + sectionId + ' recordName: ' + recordName + ' description: ' + description + ' gameId: ' + gameId + ' numberOfCheckboxes: ' + numberOfCheckboxes + ' numberAlreadyCompleted: ' + numberAlreadyCompleted + ' listOrder: ' + listOrder + ' longDescription: ' + longDescription + ' hidden: ' + hidden);
     try {
         await db.query(
-            'CALL UpdateGameRecord(?, ?, ?, ?, ?, ?, ?, ?, ?)',
+            'CALL UpdateGameRecord(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
             [recordId, sectionId, recordName, description, gameId, numberOfCheckboxes, numberAlreadyCompleted, listOrder, longDescription, hidden]
         );
         res.json({ message: 'Game record updated successfully' });

@@ -431,37 +431,52 @@ tr:nth-child(odd) {
 	-moz-appearance: textfield; /* Firefox */
 }
 
+.manage-records-button, .edit-button {
+	background-color: $teal_bck_color-2;
+	color: $teal_font_dark;
+
+	&:hover {
+		background-color: $teal_bck_color_5;
+		color: $teal_font_light;
+}
+}
 
 .manage-records-button {
+	//background and font handled elsewhere
 	margin-left: auto;
 	padding: 5px 10px;
-	background-color: $teal_bck_color-3;
-	color: $teal_font_light;
 	border: none;
 	border-radius: 5px;
 	cursor: pointer;
 	transition: background-color 0.2s;
 }
 
-.manage-records-button:hover {
-	background-color: $teal_bck_color-5;
-}
 
 
 /* Delete Button Styles */
 .delete-button {
-	background-color: #dc3545;
-	color: #fff;
+	background-color: #ff6b6b;
+	color: white;
 	border: none;
 	padding: 5px 10px;
-	border-radius: 5px;
+	border-radius: 4px;
 	cursor: pointer;
-	margin-left: auto;
+	margin-left: 10px;
 	transition: background-color 0.2s;
+
+	&:hover {
+		background-color: #ff5252;
+	}
 }
 
-.delete-button:hover {
-	background-color: #c82333;
+.edit-button {
+	//background and font handled elsewhere
+	border: none;
+	padding: 5px 10px;
+	border-radius: 4px;
+	cursor: pointer;
+	margin-left: 10px;
+	transition: background-color 0.2s;
 }
 
 

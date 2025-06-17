@@ -173,6 +173,31 @@ export async function getRecordsBySectionIdV2(sectionId, recordOrderPreference, 
     }
 }
 
+//************************************ GET GAME RECORD BY ID ************************************//
+
+export async function getGameRecordById(passed_recordId) {
+    if (!passed_recordId) {
+        alert("Missing record ID in URL.");
+        return;
+    }
+
+    try {
+        const res = await fetch(`/api/db/record/${passed_recordId}`);
+        const data = await res.json();
+        //console.log('Game data:', data);
+        /*        return {
+                    gameId: data.ID,
+                    gameNameFriendly: data.FriendlyName || passed_gameName || passed_gameId,
+                    gameName: data.Name || passed_gameId,
+                };*/
+        return data;
+    } catch (err) {
+        console.error("Error fetching record data:", err);
+    }
+
+    //document.querySelector('.game-name').textContent = passed_gameNameFriendly;
+}
+
 
 //************************************ UPDATE RECORD COMPLETION ************************************//
 export async function updateRecordCompletion(recordId, numberAlreadyCompleted){
@@ -228,14 +253,14 @@ export async function getTableRecordsByTableId(tableId) {
 }
 
 //************************************ UPDATE GAME RECORD ************************************//
-export async function updateGameRecord(recordId, sectionId, updateData) {
-    if (!recordId || !sectionId || !updateData) {
-        alert("Missing record ID, section ID, or update data.");
+export async function updateGameRecord(recordId, updateData) {
+    if (!recordId || !updateData) {
+        alert("Missing record ID or update data.");
         return;
     }
 
     try {
-        const res = await fetch(`/api/db/record/update/${recordId}/${sectionId}`, {
+        const res = await fetch(`/api/db/record/update/${recordId}`, {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json'
@@ -376,7 +401,7 @@ export async function updateGameSectionsListOrder(sectionUpdates) {
 }
 
 //************************************ UPDATE THE ORDER OF RECORDS IN A SECTION ************************************//
-export async function UpdateSectionRecordsListOrder(recordUpdates) {
+export async function updateSectionRecordsListOrder(recordUpdates) {
     if (!Array.isArray(recordUpdates) || recordUpdates.length === 0) {
         alert("Invalid record updates. Expected a non-empty array.");
         return;
