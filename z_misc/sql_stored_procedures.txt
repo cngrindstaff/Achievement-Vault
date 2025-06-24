@@ -236,9 +236,9 @@ CREATE PROCEDURE InsertGameSection(
 )
 BEGIN
     INSERT INTO GameSections
-    (Name, GameID, ListOrder, RecordOrderPreference, Hidden)
+    (Name, GameID, ListOrder, RecordOrderPreference, Hidden, DateCreated)
     VALUES
-    (sectionName, gameId, listOrder, recordOrderPreference, hidden);
+    (sectionName, gameId, listOrder, recordOrderPreference, hidden, utc_timestamp());
 END //
 
 DELIMITER ;
@@ -298,9 +298,9 @@ CREATE PROCEDURE InsertGameRecord(
 )
 BEGIN
     INSERT INTO GameRecords
-    (Name, Description, SectionId, GameID, NumberOfCheckboxes, NumberAlreadyCompleted, ListOrder, LongDescription, Hidden)
+    (Name, Description, SectionId, GameID, NumberOfCheckboxes, NumberAlreadyCompleted, ListOrder, LongDescription, Hidden, DateCreated)
     VALUES
-    (recordName, description, sectionId, GameID, numberOfCheckboxes, numberAlreadyCompleted, listOrder, longDescription, hidden);
+    (recordName, description, sectionId, GameID, numberOfCheckboxes, numberAlreadyCompleted, listOrder, longDescription, hidden, utc_timestamp());
 END //
 
 DELIMITER ;
