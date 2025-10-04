@@ -1,4 +1,4 @@
-﻿Name,Description,NumberOfCheckboxes,NumberAlreadyCompleted,SectionID,GameID,ListOrder,LongDescription,
+﻿Name,Description,NumberOfCheckboxes,NumberAlreadyCompleted,SectionID,GameID,ListOrder,LongDescription,Hidden
 Perfectionist,Fully complete every order,8,5,1,0,2,,
 "Knock, knock",I am the one who knocks - Hit the front door of the Huckster's House with the sledgehammer a few times to knock.,8,5,1,0,3,,
 Estate Agent,Sell 20 houses.  Buy and sell 20 houses. Renovations not required.,8,5,1,0,5,,
@@ -4410,3 +4410,874 @@ Papercraft Dresser,2025,1,0,115,4,2,,0
 Papercraft Mirror,2025,1,0,115,4,2,,0
 Papercraft Ottoman,2025,1,0,115,4,2,,0
 Papercraft Potted Plant,2025,1,0,115,4,2,,0
+Beachcomber Hat (2025),,1,1,116,4,2,,
+Grass Skirt (2025),,1,1,116,4,2,,
+Wooden Sunglasses (2025),,1,1,116,4,2,,
+Ukelele (2025),,1,1,116,4,2,,
+Foral Grass Skirt (2025),,1,1,116,4,2,,
+Tropical Shirt (2025),,1,1,116,4,2,,
+Tube Top (2025),,1,1,116,4,2,,
+Floral Beachcomber Hat (2025),,1,1,116,4,2,,
+Beach Arch (2025),,1,1,116,4,3,,
+Beach Bar (2025),,1,1,116,4,3,,
+Beach Column (2025),,1,1,116,4,3,,
+Beach Dining Table (2025),,1,1,116,4,3,,
+Beach Drum (2025),,1,1,116,4,3,,
+Hot Tub (2025),,1,1,116,4,3,,
+Palm Tree Cutout (2025),,1,1,116,4,3,,
+Palm Trees Cutout (2025),,1,1,116,4,3,,
+Beach Side Table (2025),,1,1,116,4,3,,
+Beach Sign Post (2025),,1,1,116,4,3,,
+Beach Stool (2025),,1,1,116,4,3,,
+Ukulele Stand (2025),,1,1,116,4,3,,
+Straw Rug (2025),,1,1,116,4,3,,
+Sunshine Celebration Wooden Flooring (2025),,1,1,116,4,3,,
+Sunshine Celebration Wooden Wallpaper (2025),,1,1,116,4,3,,
+Sunshine Celebration (Music Disc),,1,1,116,4,4,,
+Friendship My Melody Boa Dress (2025),,1,1,117,4,2,,
+Friendship Kuromi Boa Dress (2025),,1,1,117,4,2,,
+Friendship My Melody Feather Clip (2025),,1,1,117,4,2,,
+Friendship Kuromi Feather Clip (2025),,1,1,117,4,2,,
+Friendship Festival Armchair (2025),,1,1,117,4,3,,
+Friendship Festival Armoire (2025),,1,1,117,4,3,,
+Friendship Festival Bed (2025),,1,1,117,4,3,,
+Friendship Festival Double Bed (2025),,1,1,117,4,3,,
+Friendship Festival Bookshelf (2025),,1,1,117,4,3,,
+Friendship Festival Coffee Table (2025),,1,1,117,4,3,,
+Friendship Festival Dining Chair (2025),,1,1,117,4,3,,
+Friendship Festival Dining Table (2025),,1,1,117,4,3,,
+Friendship Festival Flooring (2025),,1,1,117,4,3,,
+Friendship Festival Lamp (2025),,1,1,117,4,3,,
+Friendship Festival Mirror (2025),,1,1,117,4,3,,
+Friendship Festival Ottoman (2025),,1,1,117,4,3,,
+Friendship Festival Side Table (2025),,1,1,117,4,3,,
+Friendship Festival Sofa (2025),,1,1,117,4,3,,
+Friendship Festival Wallpaper (2025),,1,1,117,4,3,,
+My Melody & Kuromi Decorating Kit (Crafting Plans) (2025),,1,1,117,4,4,,
+My Melody & Kuromi Macarons (2025),,1,1,117,4,4,,
+My Melody & Kuromi Cupcakes (2025),,1,1,117,4,4,,
+My Melody & Kuromi Soda (2025),,1,1,117,4,4,,
+My Melody & Kuromi Ice Cream (2025),,1,1,117,4,4,,
+Moon - Comet Hopper,"RARITY: Uncommon /// TIME: Morning, Day /// LOCATION: Ground level, near structures",1,1,98,4,9,,
+Moon - Cosmouse,"RARITY: Common /// TIME: All /// LOCATION: Ground level, near structures",1,1,98,4,9,,
+Moon - Starlien,"RARITY: Rare /// TIME: Evening, Night /// LOCATION: Floating rocks",1,0,98,4,9,,
+Moon - Habitat Hurdle,Crater northwest of central (photo op) habitat,3,,96,4,10,,
+Moon - Moon Rock Rally,"Floating rock near ground, south of southern habitat	",3,,96,4,10,,
+Moon - Lunar Leap,"Ground level, below eastern floating rocks	",3,,96,4,10,,
+Moon - Space Skip,"Floating rocks at end of Lunar Leap route	",3,,96,4,10,,
+Trophy - Icy Peak - Bronze,,1,,125,4,28,,
+Trophy - Icy Peak - Gold,,1,,125,4,29,,
+Trophy - Icy Peak - Silver,,1,,125,4,30,,
+Floating Rocks,Moon,1,,131,4,9,,
+Planting Area,Moon,1,,131,4,9,,
+Big Challenges Birthday Cake,,1,0,130,4,3,,
+Big Challenges Birthday Cake Recipe,,1,0,130,4,3,,
+Big Challenges Decorating Kit,,1,0,130,4,3,,
+Chococat Birthday Cake,,1,1,130,4,4,,
+Chococat Birthday Cake Recipe,,1,1,130,4,4,,
+Chococat Decorating Kit,,1,1,130,4,4,,
+Hello Kitty Birthday Cake,,1,0,130,4,1,,
+Hello Kitty Birthday Cake Recipe,,1,0,130,4,1,,
+Hello Kitty Decorating Kit,,1,0,130,4,1,,
+Keroppi Birthday Cake,,1,0,130,4,7,,
+Keroppi Birthday Cake Recipe,,1,0,130,4,7,,
+Keroppi Decorating Kit,,1,0,130,4,7,,
+Kuromi Birthday Cake,,1,0,130,4,8,,
+Kuromi Birthday Cake Recipe,,1,0,130,4,8,,
+Kuromi Decorating Kit,,1,0,130,4,8,,
+Little Twin Stars Birthday Cake,,1,0,130,4,9,,
+Little Twin Stars Birthday Cake Recipe,,1,0,130,4,9,,
+Little Twin Stars Decorating Kit,,1,0,130,4,9,,
+My Melody Birthday Cake,,1,0,130,4,10,,
+My Melody Birthday Cake Recipe,,1,0,130,4,10,,
+My Melody Decorating Kit,,1,0,130,4,10,,
+My Sweet Piano Birthday Cake,,1,0,130,4,11,,
+My Sweet Piano Birthday Cake Recipe,,1,1,130,4,11,,
+My Sweet Piano Decorating Kit,,1,1,130,4,11,,
+Pekkle Birthday Cake,,1,1,130,4,12,,
+Pekkle Birthday Cake Recipe,,1,1,130,4,12,,
+Pekkle Decorating Kit,,1,1,130,4,12,,
+Pochacco Birthday Cake,,1,0,130,4,13,,
+Pochacco Birthday Cake Recipe,,1,0,130,4,13,,
+Pochacco Decorating Kit,,1,0,130,4,13,,
+Retsuko Birthday Cake,,1,0,130,4,15,,
+Retsuko Birthday Cake Recipe,,1,0,130,4,15,,
+Retsuko Decorating Kit,,1,0,130,4,15,,
+TOPHAT Birthday Cake,,1,0,130,4,16,,
+TOPHAT Birthday Cake Recipe,,1,0,130,4,16,,
+TOPHAT Decorating Kit,,1,0,130,4,16,,
+Tuxedosam Birthday Cake,,1,1,130,4,17,,
+Tuxedosam Birthday Cake Recipe,,1,1,130,4,17,,
+Tuxedosam Decorating Kit,,1,1,130,4,17,,
+Wish me mell Birthday Cake,,1,0,130,4,18,,
+Wish me mell Birthday Cake Recipe,,1,0,130,4,18,,
+Wish me mell Decorating Kit,,1,0,130,4,18,,
+My Melody - My Melody Alarm Clock,,1,0,105,4,1,,0
+My Melody - My Melody Armchair,,1,0,105,4,1,,0
+My Melody - My Melody Chair,,1,0,105,4,1,,0
+My Melody - My Melody Coat Rack,,1,0,105,4,1,,0
+My Melody - My Melody Dining Table,,1,0,105,4,1,,0
+My Melody - My Melody Mirror,,1,0,105,4,1,,0
+My Melody - My Melody Pillow,,1,0,105,4,1,,0
+My Melody - My Melody Potted Plant,,1,0,105,4,1,,0
+My Melody - My Melody Rug,,1,0,105,4,1,,0
+My Melody - My Melody Sleeping Bag,,1,0,105,4,1,,0
+My Melody - My Melody Standing Lamp,,1,0,105,4,1,,0
+My Melody - My Melody Stool,,1,0,105,4,1,,0
+My Melody - My Melody Stuffie,,1,0,105,4,1,,0
+My Melody - My Melody Table,,1,0,105,4,1,,0
+My Melody - My Melody Tea Set,,1,0,105,4,1,,0
+My Melody - My Melody Wallpaper,,1,0,105,4,1,,0
+My Melody - My Melody Flooring,,1,0,105,4,1,,0
+Wander and Wonder (Base Mix),,1,0,102,4,1,,1
+Wander and Wonder (Chill Mix),,1,0,102,4,1,,1
+Wander and Wonder (Full Mix),,1,0,102,4,1,,1
+Wander and Wonder (Twilight Mix),,1,0,102,4,1,,1
+Daydream Days (Base Mix),,1,0,102,4,1,,1
+Daydream Days (Chill Mix),,1,0,102,4,1,,1
+Daydream Days (Full Mix),,1,0,102,4,1,,1
+Daydream Days (Twilight Mix),,1,0,102,4,1,,1
+Uptown Upbeat (Base Mix),,1,0,102,4,1,,1
+Uptown Upbeat (Chill Mix),,1,0,102,4,1,,1
+Uptown Upbeat (Full Mix),,1,0,102,4,1,,1
+Uptown Upbeat (Twilight Mix),,1,0,102,4,1,,1
+Side by Sidewalk (Base Mix),,1,0,102,4,1,,1
+Side by Sidewalk (Chill Mix),,1,0,102,4,1,,1
+Side by Sidewalk (Full Mix),,1,0,102,4,1,,1
+Side by Sidewalk (Twilight Mix),,1,0,102,4,1,,1
+"Hello, Friend!",Quest - Island Spirit,1,0,102,4,100,,0
+Lumière,Embark on the Expedition.,1,1,155,11,1,,0
+Spring Meadows,Find your way through Spring Meadows (secret),1,0,155,11,2,,0
+Flying Waters,Find your way through Flying Waters,1,0,155,11,3,,0
+Ancient Sanctuary,Find your way through the Ancient Sanctuary,1,0,155,11,4,,0
+Gestral Village,Find your way through the Gestral Village,1,0,155,11,5,,0
+Esquie’s Nest,Find your way through Esquie's Nest,1,0,155,11,6,,0
+Stone Wave Cliffs,Find your way through the Stone Wave Cliffs,1,0,155,11,7,,0
+Forgotten Battlefield,Find your way through the Forgotten Battlefield,1,0,155,11,8,,0
+Monoco's Station,Find your way through Monoco's Station,1,0,155,11,9,,0
+Old Lumiere,Find your way through Old Lumiere,1,0,155,11,10,,0
+First Axon,Defeat the first Axon,1,0,155,11,11,,0
+Second Axon,Defeat the second Axon,1,0,155,11,12,,0
+Monolith,Reach the Monolith,1,0,155,11,13,,0
+Paintress,Defeat the Paintress,1,0,155,11,14,,0
+Back to Lumière,Return to Lumière,1,0,155,11,15,,0
+The End,Reach the end,1,0,155,11,16,,0
+"Plane, Train, and Submarine",Discover all of Esquie’s abilities.,1,0,155,11,17,,0
+Follow the Trail,Find all of the journals from prior expeditions.,1,0,155,11,18,,0
+Aiding the Enemy,Finish all of the Nevron quests.,1,0,155,11,19,,0
+Peace at Last,Beat Simon.,1,0,155,11,20,,0
+Gestral Games,Win all of the Gestral games.,1,0,155,11,21,,0
+Clea,Beat Clea.,1,0,155,11,22,,0
+Endless,Reach the top of the Endless Tower.,1,0,155,11,23,,0
+Lost Gestrals,Find all of the Lost Gestrals.,1,0,155,11,24,,0
+A On,Beat the Serpenphare.,1,0,155,11,25,,0
+Sprong,"Defeat Sprong, an optional boss in shallow waters northeast of the Forgotten Battlefield.",1,0,155,11,26,,0
+Noir et Blanc,Solve the Painting Workshop’s mystery.,1,0,155,11,27,,0
+Sciel,Solve the Painting Workshop’s mystery.,1,0,155,11,28,,0
+Monoco,Reach relationship level 7 with Sciel.,1,0,155,11,29,,0
+Maelle,Reach relationship level 7 with Maelle ,1,0,155,11,30,,0
+Lune,Reach relationship level 7 with  Lune,1,0,155,11,31,,0
+Esquie,Reach relationship level 7 with Esquie,1,0,155,11,32,,0
+Weapon Upgrade,Upgrade a weapon once.,1,0,155,11,33,,0
+Weapon Mastery,Fully upgrade a weapon.,1,0,155,11,34,,0
+Lumina,Consume a Lumina point.,1,0,155,11,35,,0
+Expeditioner,Reach level 33 with any character.,1,0,155,11,36,,0
+Trailbreaker,Reach level 66 with any character.,1,0,155,11,37,,0
+Survivor,Reach level 99 with any character.,1,0,155,11,38,,0
+Overcharge,"With Gustave, use a fully charged Overcharge that Breaks an enemy.",1,0,155,11,39,,0
+Perfect Flow,"With Lune, consume Stains 4 turns in a row.",1,0,155,11,40,,0
+Synergy,"With Maelle, use Percée on a Marked enemy while in Virtuose Stance.",1,0,155,11,41,,0
+Maximisation,"With Sciel, consume 20 Foretell on a single target during Twilight.",1,0,155,11,42,,0
+Perection,"With Verso, reach Rank S.",1,0,155,11,43,,0
+Wheel Control,"With Monoco, cast an Upgraded Skill 4 turns in a row.",1,0,155,11,44,,0
+Carreau Parfait,Defeat the optional boss Chromatic Pétank on the eastern island after gaining Esquie’s flight ability.,1,0,155,11,45,,0
+Feet Collection,Acquire all of Monoco’s skills.,1,0,155,11,46,,0
+Expedition 33,Unlock all playable characters.,1,0,155,11,47,,0
+Chroma Proficiency,Use a level 3 Gradient Attack.,1,0,155,11,48,,0
+Connoisseur,Find all 33 music records.,1,0,155,11,49,,0
+Paint Cage,Break a Paint Cage.,1,0,155,11,50,,0
+Time to Spill Some Ink,Break an enemy.,1,0,155,11,51,,0
+Professional,Defeat a boss without taking any damage.,1,0,155,11,52,,0
+Curious,Witness an optional scene at camp.,1,0,155,11,53,,0
+Legend,Unlock Esquie.,1,0,155,11,54,,0
+A Peculiar Encounter,Defeat the Mime in Lumière.,1,0,155,11,55,,0
+A Uniform for Richard's Son,"Lumiere (Prologue, Missable)",1,0,156,11,1,#NAME?,0
+Blanche,The Fountain (Missable),1,0,156,11,2,"- Quest mentioned at the top for visibility, even if has to be done later in the game. WARNING: Do not kill any friendly Nevron for the rewards\n- Complete every friendly Nevron side quest (marked as NEVRON in this list) and speak to Blanche to get your reward\n- If any friendly Nevron is killed or every other Nevron side quest hasn't been completed, instead a boss fight with Blanche will trigger\n- Untested if you can obtain the main rewards and then fight Blanche",0
+Jar Nevron,Spring Meadows,1,1,156,11,3,- From Abandoned Expeditionary Camp: Acquire Resin; which is located behind some crates in the area to the left\n- Return to the Jar Nevron and give the Resin\n- Shoot at the tip of its lamp to light it\n- Speak with them,0
+Demineur Nevron,Flying Waters,1,1,156,11,4,"- From Noco's Hut: Quest giver located at the crash site area of the Expedition 68's boat, go to the east, to an entrance similar to the Demineurs head\n- Aquire Intact Mine; from the quest giver, jump across the platforms and go to the right, jump across to another set of platforms and pick up the item\n- Return to the Demineur Nevron and give the Intact Mine",0
+Bourgeon Nevron,The Small Bourgeon,1,1,156,11,5,"- Quest giver located northwest to Flying Waters on the overworld map\n- Acquire Burgeon Skin from defeating a Bourgeon boss (please refer to the Boss section of the checklist for locations)\n- Give the item to the Nevron and wait (progress with the main story, another side quest or simply rest at a flag)\n- Come back later and talk to them to claim the rewards, additionally it can be attacked to fight the ""Grown Bourgeon"" Boss",0
+Karatom The Gestral,Gestral Village (Missable),1,0,156,11,6,"- Do before entering Act II. In the Gestral Village, past the Gestral Bazaar, talk to a kid named Karatom\n- Acquire Mushroom; at Esquie's Nest. Pass through the guard, go right and jump down, go left from the Mime and pick up the item from the mushrooms\n- Return to the Gestral Village and give the item to the quest giver\n- Fight the Ultimate Sakapatate with Gustave and win",0
+Ono-Puncho Challenge,Gestral Village,1,0,156,11,7,"- Quest giver located on an isolated path in Gestral Village, talk to a big pink gestral.\n- He will ask you to do 9999 damage on one attack.\n- This can be achieved by: buffing Maelle with Gustave, then a second party member use an Energy Tint on Maelle. Maelle has to have the Medallum weapon and the Roulette and Marking Shots pictos. Additionally, she can have both the Burning Shots and Critical Burn Pictos/Lumina. On Maelle's turn, shoot Ono-Puncho until it gets marked (or marked+burnt) and the cast Percee. You can get lucky and do this in 2 tries or do 20 times and not get it.",0
+Help Alexaundro,Gestral Village,1,0,156,11,8,"- Quest giver located near Karatom, talk to them to start the quest\n- Reach the kid in the column: head north toward the Arena, take an immediate right to march down the southeastern path, then take a slight left at the end of the eastern passage, use the rope to climb onto an overhead platform, take a few steps west and use the grapple point to clear the gap head north and use the handholds on the wall, mantle over the short wall, and with a running start, leap onto the column to reach Alexsoundro's patate\n- Talk to the kid and then talk to Alexaundro",0
+The Fountain (Nevron),Red Woods,1,0,156,11,9,"- Quest giver located west to the Ancient Sanctuary (needed for Blanche quest)\n- Interact with the fountain and pay 5k, 10k, 25k and 50k chroma (total of 90k chroma)\n- Talk to the nevron to acquire the rewards",0
+Hexga Nevron,Stone Wave Cliffs,1,1,156,11,10,"- Quest giver located in the Old Farm, outside the Tide Caverns, talk to them and answer ""How did this happen?"" then probe more questions\n- Aquire 3 Rock Crystals from the Tide Cavern. Two are inside glowing rocks and the last one is obtained by defeating the Rocher Boss in the right section\n- Return where the Nevron was and give the Rock Crystals\n- Pick the rewards from where it was sitting",0
+Trobadour Nevron,Stone Quarry,1,0,156,11,11,"- Quest giver located northeast of the Forgotten Battlefield on the overworld map\n- Talk to them and accept their challenges (3)\n- Parry or dodge the red orbs, get hit by the green orbs\n- Talk again to claim the rewards",0
+Grandis,The Carousel,1,0,156,11,12,- Quest giver located northeast of Monoco's Station on the overworld map\n- Talk to them and accept their quest\n- Use the Paint Break ability to break the ice\n- Talk again to claim the rewards,0
+Portier Nevron,Esoteric Ruins,1,0,156,11,13,#NAME?,0
+Danseuse Teacher (Nevron),Frozen Hearts,1,0,156,11,14,#NAME?,0
+Chalier Nevron,Floating Cemetery,1,0,156,11,15,#NAME?,0
+Fading Spirit,Falling Leaves,1,0,156,11,16,#NAME?,0
+Hidden Gestral Arena,,1,1,156,11,17,,0
+Sastro's Lost Gestrals,,1,0,156,11,18,,0
+Gestral Beach - Parkour Challenge,,1,0,156,11,19,,0
+Jar's Light,,1,1,157,11,1,,0
+Demineur,,1,1,157,11,2,,0
+The Small Bourgeon,,1,1,157,11,3,,0
+Hexga,,1,1,157,11,4,,0
+Benisseur,,1,0,157,11,5,,0
+Portier,,1,0,157,11,6,,0
+Danseuse Teacher,,1,0,157,11,7,,0
+Chalier,,1,0,157,11,8,,0
+Blanche,,1,0,157,11,9,,0
+Troubadour,,1,1,157,11,10,,0
+Mime (Lumiére),,1,1,158,11,1,,0
+Mime (Spring Meadows),,1,0,158,11,2,,0
+Mime (Flying Waters),,1,1,158,11,3,,0
+Mime (Ancient Sanctuary),,1,0,158,11,4,,0
+Mime (Esquie’s Nest),,1,0,158,11,5,,0
+Mime (Yellow Harvest),,1,0,158,11,6,,0
+Mime (Continent),,1,0,158,11,7,,0
+Mime (Old Lumiere),,1,0,158,11,8,,0
+Mime (Visages),,1,0,158,11,9,,0
+Mime (Sirene),,1,0,158,11,10,,0
+Mime (Frozen Hearts),,1,0,158,11,11,,0
+Mime (The Monolith),,1,0,158,11,12,,0
+Mime (The Reacher),,1,0,158,11,13,,0
+Mime (Sunless Cliffs),,1,0,158,11,14,,0
+Mime (Flying Manor),,1,0,158,11,15,,0
+Spring Meadows - Chromatic Lancelier,,1,0,159,11,1,,0
+Flying Waters - Bourgeon (Flying Waters),,1,0,159,11,2,,0
+Flying Waters - Flame Évêque (Flying Manor),,1,0,159,11,3,,0
+Flying Waters - Clea (Flying Manor),,1,0,159,11,4,,0
+Flying Waters - Chromatic Troubadour (Flying Waters),,1,0,159,11,5,,0
+Flying Waters - Flame Eveque (Flying Manor),,1,0,159,11,6,,0
+Stone Wave Cliffs - Chromatic Hexga (Stone Wave Cliffs Cave),,1,0,159,11,7,,0
+Forgotten Battlefield - Chromatic Luster (Forgotten Battlefield),,1,0,159,11,8,,0
+Old Lumiere - Chromatic Ballet (Falling Leaves),,1,0,159,11,9,,0
+Old Lumiere - Scavenger (Falling Leaves),,1,0,159,11,10,,0
+Visages - Chromatic Ramasseur (Visages),,1,0,159,11,11,,0
+Sirene - Chromatic Chalier (Sinister Cave),,1,0,159,11,12,,0
+Sirene - Chromatic Greatsword Cultist (Sirene),,1,0,159,11,13,,0
+Sirene - Chromatic Glissando (Sirene's Dress),,1,0,159,11,14,,0
+The Monolith - Clair Obscur (The Monolith),,1,0,159,11,15,,0
+The Monolith - Chromatic Clair Obscur (The Monolith),,1,0,159,11,16,,0
+Lumiere - Chromatic Echassier (Lumiere),,1,0,159,11,17,,0
+Old Lumiere - Chromatic Danseuse (Old Lumiere),,1,0,159,11,18,,0
+The Continent - Chromatic Abbest (Abbest Cave),,1,0,159,11,19,,0
+The Continent - Grosse Tete (The Continent),,1,0,159,11,20,,0
+The Continent - Sprong (The Continent),,1,0,159,11,21,,0
+The Continent - Giant Sapling (Crushing Cavern),,1,0,159,11,22,,0
+The Continent - Chromatic Jar (The Continent),,1,0,159,11,23,,0
+The Continent - Bourgeon (The Continent),,1,0,159,11,24,,0
+The Continent - Chromatic Reaper Cultist (The Continent),,1,0,159,11,25,,0
+The Continent - Frost Évêque (The Continent),,1,0,159,11,26,,0
+The Continent - Chromatic Chapelier (The Crows),,1,0,159,11,27,,0
+The Continent - Chromatic Veilleur (Frozen Hearts),,1,0,159,11,28,,0
+The Continent - Gargant (Frozen Hearts),,1,0,159,11,29,,0
+The Continent - Chromatic Boucheclier (Isle of the Eyes),,1,0,159,11,30,,0
+The Continent - Chromatic Goblu (The Continent),,1,0,159,11,31,,0
+The Continent - Chromatic Catapult Sakapatate (Dark Gestral Arena),,1,0,159,11,32,,0
+The Continent - Chromatic Ranger Sakapatate (Dark Gestral Arena),,1,0,159,11,33,,0
+The Continent - Chromatic Robust Sakapatate (Dark Gestral Arena),,1,0,159,11,34,,0
+The Continent - Golgra (Dark Gestral Arena),,1,0,159,11,35,,0
+The Continent - Chromatic Portier (The Continent),,1,0,159,11,36,,0
+The Continent - Thunder Évêque (The Continent),,1,0,159,11,37,,0
+The Continent - Chromatic Aberration (The Continent),,1,0,159,11,38,,0
+The Continent - Serpenphare (The Continent),,1,0,159,11,39,,0
+The Continent - Chromatic Glaise (Sky Island),,1,0,159,11,40,,0
+The Continent - Painted Love (Endless Tower),,1,0,159,11,41,,0
+The Continent - Chromatic Cruler (Endless Night Sanctuary),,1,0,159,11,42,,0
+The Continent - Alicia (The Reacher),,1,0,159,11,43,,0
+The Continent - Chromatic Braseleur (The Reacher),,1,0,159,11,44,,0
+The Continent - Chromatic Création (Renoir’s Drafts),,1,0,159,11,45,,0
+The Continent - Chromatic Bruler (The Continent),,1,0,159,11,46,,0
+The Continent - Glaise (Yellow Harvest),,1,0,159,11,47,,0
+The Continent - Chromatic Moissonneuse (The Continent),,1,0,159,11,48,,0
+The Continent - Frost Eveque (The Continent),,1,0,159,11,49,,0
+The Continent - Chromatic Benisseur (The Continent),,1,0,159,11,50,,0
+The Continent - Thunder Eveque (The Continent),,1,0,159,11,51,,0
+The Continent - Chromatic Gold Chevaliere (Crimson Forest),,1,0,159,11,52,,0
+Dodger,Gain 1 AP after Perfect Dodge. Once per turn.,1,0,160,11,1,Spring Meadows (Meadows Corridor)\nDefeat the Portier after Lune joins the party.,0
+Critical Burn,25% increased Critical Chance on Burning Enemies,1,0,160,11,2,"Spring Meadows (Meadows Corridor)\nAfter getting Lanceram, look for a path on the right that leads to a small cave.",0
+Augmented Attack,50% increased Base Attack damage,1,0,160,11,3,Spring Meadows (Meadows Corridor)\nDefeat the Chromatic Lancelier after learning about flying enemies.,0
+Burning Shots,20% Chance to burn on free Aim Shot,1,0,160,11,4,"Spring Meadows (Abandoned Expeditioner)\nFrom the campsite, go through the cave path until you're outside, and then head left towards the cliff.",0
+Dead Energy II,+3 AP on killing an enemy,1,0,160,11,5,"Spring Meadows (Abandoned Expeditioner)\nFrom the campsite, go through the cave path. When you're outside, turn right and follow the path.",0
+Cleansing Tint,Healing Tints also remove all Status Effects from the target,1,0,160,11,6,"Spring Meadows (The Indigo Tree)\nDefeat Eveque, the boss of the area, to get this Pictos.",0
+Empowering Attack,Gain Powerful for 1 turn on Base Attack,1,0,160,11,7,"Spring Meadows (The Indigo Tree)\nInstead of leaving Spring Meadows after the Eveque fight, turn around and follow the path on the right.",0
+SOS Shell,Apply Shell when falling below 50% Health,1,0,160,11,8,"Flying Waters (Before Any Flag)\nImmediately upon loading the map, enter the path to the left of the anchor. The Pictos is on the ground at the end of the path.",0
+Marking Shots,20% Chance to apply Mark on Free Aim shot,1,0,160,11,9,Flying Waters (Before Any Flag)\nFollow the path beyond the Paint Cage to reach a fork that is marked with several lanterns on the ground. Head left at the fork and defeat the two enemies at the end of the path. The Pictos is on the ground just past those enemies.,0
+Exposing Attack,Base Attack applies Defenceless for 1 turn,1,0,160,11,10,"Flying Waters (Noco's Hut)\nAfter Gustave and Lune extract Maelle from the Manor, speak with the Gestral Merchant who appears in front of the hut. Fight and defeat that merchant to add this Pictos to their wares.",0
+Staggering Attack,50% Increased Break Damage on Base Attack,1,0,160,11,11,Flying Waters (Coral Cave)\nPass the Flag and immediately look to the right to find this Pictos on the ground.,0
+Rewarding Mark,+2 AP on dealing damage to a Marked target. Once per turn.,1,0,160,11,12,"Flying Waters (Coral Cave)\n(1) Players will encounter a mass from which several lanterns extend just past the Expedition Flag. After passing that mass, players should look for a short ramp on their left, which leads to an alcove with this Pictos. (2) Buy from Merchant for 53,880 Chroma from Sacred River.",0
+Augmented Counter I,25% increased Counterattack damage,1,0,160,11,13,"Flying Waters (Coral Cave)\nPlayers can now climb the aforementioned two-handhold wall and follow the path forward. Before reaching the buildings on this path, players should enter a small corridor on their right and fight the Bourgeon that they encounter to obtain the Pictos, weapon, and quest item.",0
+Energising Break,+3 AP on Breaking a target.,1,0,160,11,14,Flying Waters (Lumieran Street)\nThis Pictos is on the ground just past the Chromatic Troubadour.,0
+Versatile,"After a Free Aim hit, base attack damage is increased by 50% for 1 turn.",1,0,160,11,15,Flying Waters (Lumieran Street)\nPlayers who head straight forward from the Flag will find that there are two buildings emerging from the ground. Players should get on top of those buildings and then use their grappling hooks to reach the buildings on the side of the area. Players should then go right and grab this Pictos from the ground.,0
+Energising Jump,+1 AP on Jump Counterattack,1,0,160,11,16,Ancient Sanctuary (Entrance)\nFind this Pictos on the ground to the left of the illuminated spot that was used to trap the local Petank.,0
+Burning Mark,Apply Burn on hitting a Marked enemy,1,0,160,11,17,"Ancient Sanctuary (Entrance)\nPlayers should follow the stream in the area with the Petank to reach a wall with handholds, which they can shimmy across. This action will lead players to a small area with this Pictos.",0
+Energising Start II,+1 AP on battle start,1,0,160,11,18,"Ancient Sanctuary (Sanctuary Maze)\nAfter passing the Sanctuary Maze Expedition Flag, players should go right at the fork and look for a small alcove on their right. There is a low gap in this alcove through which players can crawl, and they should go right when they emerge. Players should then make their way to the far end of the area and use the two handholds on the left to climb a small wall. There is a path at the top that leads directly to this Pictos.",0
+Attack Lifesteal,Recover 15% Health on base attack,1,0,160,11,19,"Ancient Sanctuary (Sanctuary Maze)\nPlayers should now descend the handholds that they used to reach the Energising Start II Pictos and enter the tunnel that is ahead. This tunnel leads to a Catapult Sakapatate, who is guarding this Pictos in a small alcove.",0
+Piercing Shot,25% increased Free Aim damage. Free Aim shots ignore Shields,1,0,160,11,20,"Ancient Sanctuary (Sanctuary Maze)\nIn the area just before the area with the blue statues, use paint break to destroy a root. Head forward to the Gestral Totem expedition flag. Jump into the water and follow it into an alcove with the Pictos.",0
+Breaker,25% Increased Break Damage,1,0,160,11,21,"Ancient Sanctuary (Giant Bell Alley)\nPlayers will encounter the Ultimate Sakapatate, the map's final boss, not long after passing the Giant Bell Alley Expedition Flag, and they will receive this Pictos upon besting the foe in combat.",0
+Stun Boost,30% increased damage on Stunned targets,1,0,160,11,22,"Ancient Sanctuary (Giant Bell Alley)\nThere is a tunnel through which players can crawl next to the Energy Tint Shard, and the path that is beyond that tunnel leads directly to this Pictos.",0
+Critical Moment,50% increased Critical Chance if Health is below 30%.,1,0,160,11,23,Gestral Village\nBuy from the Bazaar,0
+Roulette,Every hit has a 50% chance to deal either 50% or 200% of its damage,1,0,160,11,24,Gestral Village\nSpeak to the Gambler,0
+Healing Mark,Recover 25% Health on hitting a Marked enemy. Once per turn.,1,0,160,11,25,"Gestral Village\nIn the Bazaar, enter the alcove to trigger a duel with a black market Gestral. Defeat to unlock in shop.",0
+Last Stand Critical,100% Critical Chance while fighting alone.,1,0,160,11,26,Hidden Gestral Arena\nBeat Matthieu,0
+Accelerating Last Stand,Gain Rush if fighting alone.,1,0,160,11,27,Hidden Gestral Arena\nBeat Bertrand,0
+Protecting Last Stand,Gain Shell if fighting alone.,1,0,160,11,28,Hidden Gestral Arena\nBeat Dominique,0
+Solo Fighter,Deal 50% more damage if fighting alone.,1,0,160,11,29,Hidden Gestral Arena\nBeat Julien,0
+Empowering Last Stand,Gain Powerful if fighting alone.,1,0,160,11,30,Hidden Gestral Arena\nBeat all opponents,0
+Augmented Aim,50% increased Free Aim damage.,1,0,160,11,31,Gestral Village\nSpeak with Merchant in Bazaar after completing Forgotten Battlefield.,0
+Augmented First Strike,50% Increased damage on the first hit. Once per battle,1,0,160,11,32,Esquie's Nest\nDefeat Francois.,0
+Energising Start III,+1 AP on battle start,1,0,160,11,33,"Esquie's Nest\nLeave the cave after Esquie makes the path for you, and the Pictos will be outside in the front entrance.",0
+Defensive Mode,"On receiving damage, consume 1 AP to take 30% less damage, if possible.",1,0,160,11,34,Stone Wave Cliffs\nEnter through the portal on the beach. Look forward and to the left.,0
+Confident,"Take 50% less damage, but can't be healed",1,0,160,11,35,Stone Wave Cliffs (Rest Point)\nDefeat the big rock monster 'Hexga' on the path after the entrance rest point.,0
+Breaking Counter,50% Increased Break damage on Counterattack,1,0,160,11,36,Stone Wave Cliffs (Rest Point)\nLook to the left of the rock monster to find an old ship. Inside the ship is the Pictos,0
+Energising Pain,No longer gain AP on Parry. +1 AP on getting hit,1,0,160,11,37,"Stone Wave Cliffs (Rest Point)\nAfter beating the rock monster, Hexga, continue forward to find some more monsters in the next area. Beat the enemy on the left side of the area to find the Pictos.",0
+First Strike,Play first,1,0,160,11,38,"Stone Wave Cliffs (Paintress Shrine)\nBefore using the grappling point that leads to the Paintress Shrine rest area, hop on the platforms to the right to find a side area with an enemy and a secret Pictos.",0
+SOS Power,Apply Powerful when falling below 50% health,1,0,160,11,39,"Stone Wave Cliffs (Paintress Shrine)\nWhen a monster jumps out at you, hug the right wall to find a slope leading to the Pictos.",0
+Breaking Shots,50% increased Break damage with Free Aim shots,1,0,160,11,40,"Stone Wave Cliffs (Tide Caverns)\nWhen you're looking for the three rock crystals in a cave, you need to jump across some tall platforms with careful timing.",0
+Perilous Parry,"+1 AP on Parry, but damage received is doubled.",1,0,160,11,41,Stone Wave Cliffs (Tide Caverns)\nDefeat the enemy on the bottom level of the caverns.,0
+Auto Shell,Apply Shell for 3 turns on battle start.,1,0,160,11,42,Stone Wave Cliffs (Tide Caverns)\nGive three crystals to Hexga.,0
+Healing Tint Energy,Healing Tints also give 1 AP,1,0,160,11,43,"Stone Wave Cliffs - Flooded Buildings\nGrapple back across, return to the bottom of the building, and use the grapple point to the left to cross the gap. Continue along the path to encounter two Nevrons. The Healing Tint Energy Pictos is on the ground just past those enemies.",0
+Enfeebling Mark,Marked Targets deal 30% less damage,1,0,160,11,44,Stone Wave Cliffs - Flooded Buildings\nDescend through the structure and follow the path to enter yet another building. Climb to the top and look left upon exiting the building to find a grapple point that can be used to reach an area with the Enfeebling Mark Pictos.,0
+At Death's Door,Deal 50% more damage if health is below 10%,1,0,160,11,45,Stone Wave Cliffs (Basalt Waves)\nDefeat the Lampmaster boss,0
+Dead Energy I,+3 AP on killing an enemy,1,0,160,11,46,"The Continent\nFound on the Continent, in front of the entrance to Dark Shores, about 100 feet away is a cluster of crates you can break apart, containing the Picto.",0
+Healing Parry,Recover 3% health on parry,1,0,160,11,47,"The Continent\nThere is a Bourgeon between Esquie's Nest and Stone Wave Cliffs. There is a Lost Gestral just past it, and this Pictos is in a camp nearby.",0
+Energising Start I,+1 AP on battle start.,1,0,160,11,48,The Continent\nBeach north of Gestral Village,0
+Protecting Heal,Healing an ally also applies Shell for a turn,1,0,160,11,49,Esoteric Ruins/Continent (Near Old Lumiere Entrance)\nFind the Wood Boards and give it to the spirit by the entrance,0
+Accelerating Heal,Healing an ally also applies Rush for 1 turn,1,0,160,11,50,The Continent\nOn the first Painting Workshop isle. Walk to the opposite side past the monsters.,0
+Shared Care,"When healing an ally, also Heal self for 50% of that value",1,0,160,11,51,The Continent\nOn the island with the portal into White Tree.,0
+Energising Heal,"On Healing an ally, also give 2 AP",1,0,160,11,52,The Continent\nSmall beach north of the island with the portal into White Tree.,0
+Empowering Dodge,5% increased damage for each consecutive successful dodge. Can stack up to 10 times.,1,0,160,11,53,The Continent\nWalk a little north of Endless Night Sanctuary to find this on the ground.,0
+Fueling Break,Breaking a target doubles its burn amount,1,0,160,11,54,"The Continent\n(1) Near the entrance to The Carousel. (2) Complete Stage 7, Trial 3 of the Endless Tower 
+",0
+Charging Tint,+5% of a Gradient Charge on using an item.,1,0,160,11,55,The Continent\nIn a camp next to the merchant on small beach southeast of Gestral Beach (NW). Surrounded by enemies.,0
+Burning Death,Apply 3 Burn to all enemies on Death,1,0,160,11,56,The Continent\nBeat Bourgeon that is near Merchant NW of Gestral Beach (NW).,0
+Breaking Burn,25% increased Break damage on Burning enemies,1,0,160,11,57,The Continent\nPast Burning Death Bourgeon.,0
+Cheater,Always play twice in a row,1,0,160,11,58,The Continent\nDefeat Sprong. It's a huge enemy walking in the water next to Blades' Graveyard/Crimson Forest.,0
+Longer Burn,Burn duration is increased by 2,1,0,160,11,59,The Continent\nBeat the Chromatic Aberration on floating island between Dark Shores and The Fountain.,0
+Breaking Death,Fully charge enemy's Break Bar on death,1,0,160,11,60,The Continent\nDefeat the Eveque east of Stone Wave Cliffs Cave.,0
+Breaking Slow,25% increased Break damage against Slowed enemies.,1,0,160,11,61,The Continent\nPaint Break a root southeast of Abbest Cave in the area filled with statues.,0
+Energising Shell,Give 2 AP on applying Shell.,1,0,160,11,62,"The Continent\nThe Picto can be found in a paint spike in the area of the Chromatic Petank to the east of The Meadows on the world map (accessible via Esquie flight). 
+",0
+Energising Gradient,+1 AP per Gradient Charge consumed,1,0,160,11,63,The Continent\nBeat the Frost Eveque northeast of Forgotten Battlefield exit.,0
+Warming Up,5% increased damage per turn. Can stack up to 5 times.,1,0,160,11,64,The Continent\nBeat the Grosse Tete in front of Coastal Cave (northeast of Forgotten Battlefield),0
+Energy Master,Every AP gain is increased by 1.,1,0,160,11,65,The Continent\nDefeat the Serpenphare (flying dragon boss).,0
+Longer Rush,"On applying Rush, its duration is increased by 2.",1,0,160,11,66,The Continent\nLook east of Monoco's Station/south of Frozen Hearts to find an ice monster near a broken camp.,0
+Anti-Stun,Immune to Stun.,1,0,160,11,67,The Continent\nBeat the Chromatic Petank in the field southeast of Forgotten Battlefield/East of Gestral Village.,0
+Longer Shell,"On applying Shell, its duration is increased by 2",1,0,160,11,68,Forgotten Battlefield (Main Gate)\nDefeat the first wild enemy after entering the gates of Forgotten Battlefield.,0
+Sweet Kill,Recover 50% health on killing an enemy,1,0,160,11,69,"Forgotten Battlefield (Main Gate)\nAfter entering the main area, enter a side area to the left that leads you to some items, including the Pictos.",0
+Energising Start IV,+1 AP on battle start.,1,0,160,11,70,Forgotten Battlefield (Main Gate)\nRight side of the big open area. In the trenches.,0
+Energising Death,"On death, +4 AP to allies",1,0,160,11,71,"Forgotten Battlefield (Fort Ruins)\nFrom the Flag, use the footholds, follow the path until you see a staircase to the right. Defeat the enemy patrol and look to the left to find a hidden item.",0
+Energising Parry,+1 AP on successful parry,1,0,160,11,72,"Forgotten Battlefield (Battlefield)\nWhen you see the Faded Woman near the flag, turn to the right and go through the hall, and then take the second right to find a special enemy called Chromatic Luster. It'll drop the Pictos.",0
+Empowering Tint,Healing Tints also apply Powerful,1,0,160,11,73,"Forgotten Battlefield (Battlefield)\n(1) Same area as above. Turn right at the woman, take the first right to find a magic rope. (2) Complete Stage 8, Trial 3 of Endless Tower",0
+Inverted Affinity,Apply Inverted on self for three turns at battle start. 50 % increased damage while inverted.,1,0,160,11,74,"Forgotten Battlefield (Ancient Bridge)\nWhen you pick up the Expedition 57 journal, look nearby to find stairs leading to a rope. You'll find the trader Kasumi.",0
+Combo Attack I,Base attack has one extra hit,1,0,160,11,75,Forgotten Battlefield (Ancient Bridge)\nFight the boss after passing this flag.,0
+Revive Tint Energy,Revive Tints also give 3 AP,1,0,160,11,76,"Forgotten Battlefield (Ancient Bridge)\nFrom the flag, cross the bridge using the grapple, turn right to enter a new woodsy area to find the Pictos in the middle.",0
+Healing Counter,Recover 25% Health on Counterattack,1,0,160,11,77,"Old Lumiere (Entrance)\nBuy from Merchant near Entrance rest point - 20,400 Chroma.",0
+Longer Powerful,"On applying Powerful, its duration is increased by 2",1,0,160,11,78,"Old Lumiere (Entrance)\nBuy from Merchant near Entrance rest point - 20,400 Chroma.",0
+Time Tint,Energy Tints also apply Rush,1,0,160,11,79,"Old Lumiere (Right Street)\nPass the grappling point, you'll eventually have to jump over a gap before reaching the next area, but if you drop down a ledge to the right, you'll find this Pictos. If you've reached the faded man, you've gone too far.",0
+Auto Rush,Apply Rush for three turns on battle start,1,0,160,11,80,"Old Lumiere (Right Street)\nWhen Maelle and Verso split, you're gonna use a grapple point to cross a broken bridge. Turn left after walking forward a bit to find three enemies huddled around the Pictos.",0
+Healing Death,"On death, the rest of the Expedition recovers all Health.",1,0,160,11,81,"Old Lumiere (Manor Gardens)\nAfter Renoir is defeated, follow the path beyond the Paint Cage to access a section that is filled with grapple points, threads, and handholds. After traversing that section, descend the slope and defeat the Nevron at the bottom to obtain the Perilous Parry Pictos. The Healing Death Pictos is on the ground next to that Nevron.",0
+Revive Paradox,Play immediately when revived,1,0,160,11,82,"Old Lumiere (Train Station Ruins)\nAfter beating Renoir, return to the Entrance expedition flag and follow the critical path to reach a ledge where two gold threads can be activated. Head right at the ledge to reach the Train Station Ruins expedition flag, and continue forward, descending a gold thread when necessary, to reach the Chromatic Danseuse.",0
+Healing Share,Revive 15% of all Heals affecting other characters,1,0,160,11,83,"Visages (Plazza)\nBuy from Merchant nearby for 19,200 Chroma.",0
+Confident Fighter,"30% increased damage, but can't be healed",1,0,160,11,84,"Visages (Joy Vale)\nFrom the flag, pass the first group of dancing monsters, keep heading right until you see a big moving face with closed eyes. Head up the hill to the right to find an enemy near the pictos.",0
+Double Burn,"On applying a Burn stack, apply a second one",1,0,160,11,85,"Visages (Anger Vale)\nFrom the Flag, head to the right towards the big face. Look to the right to find a little cave. Walk inside and then towards the left to find some enemies standing near the Pictos.",0
+Powered Attack,"On every damage dealt, try to consume 1 AP. If successful, increase damage by 20%",1,0,160,11,86,"Visages (Anger Vale)\nFrom the Flag, head right towards the big face, but head left into a corridor that leads to a magic rope and a Pictos.",0
+Augmented Counter II,50% increased counterattack damage,1,0,160,11,87,"Visages (Anger Vale)\nFrom the flag, head straight and then right to find a hidden area leading to Chromatic Ramasseur. Defeat it to get the Pictos.",0
+Glass Canon,"Deal 25% more damage, but take 25% more damage",1,0,160,11,88,Visages (Anger Vale)\nRight next to where the Chromatic Ramasseur is (same as above),0
+Immaculate,30% increased damage until a hit is received,1,0,160,11,89,Visages (Plazza)\nBeat the Axon boss (Visages / Mask Keeper),0
+Shield Affinity,"30% increased damage while having Shields, but receiving any damage always removes all shields.",1,0,160,11,90,"Sirene (Dancing Classes)\nGo forward on the main path up the stairs, and then go inside the room to the left to find stairs. Go down to find a magic rope. Use the grapple to reach a paint cage. Destroy its parts to get the Pictos.",0
+Effective Heal,Double all Heals received,1,0,160,11,91,"Sirene (Dancing Classes)\nGo forward on the main path up the stairs, and then go inside the room to the left to find stairs. Go down to find a magic rope. Use the grapple to reach a paint cage. Use the magic platform to reach a new area and then turn right to find the Pictos behind the Chromatic Greatsword Cultist.",0
+Greater Shell,+10% to Shell damage reduction,1,0,160,11,92,"Sirene (Dancing Classes)\nWhen you get off the moving platform to land in the area where the Chromatic enemy is, go to the opposite end to find this Pictos and some handholds.",0
+Powerful on Shell,Apply Powerful on applying Shell,1,0,160,11,93,"Sirene (Dancing Classes)\nWhen you get to the room with the large statue in the middle, head to the right to enter a multi tiered room that looks like the inside of an organ. Head to the bottom of this area to find the Benisseur. Defeat it to get the pictos.",0
+Auto Regen,Apply Regen for three more turns on battle start,1,0,160,11,94,"Sirene (Dancing Classes)\nWhen you get to the room with the large statue in the middle, head to the right to enter a multi-tiered room that looks like the inside of an organ. Head to the bottom of this area.",0
+Protecting Death,"On Death, allies gain Shell",1,0,160,11,95,"Sirene (Dancing Classes)\nGo past the door to the Manor, and then take a right before the next grapple point.",0
+Anti-Charm,Immune to Charm,1,0,160,11,96,Sirene (Sewing Atelier)\nDefeat the Tisseur (large optional weaver boss),0
+Healing Fire,Recover 25% of health when attacking a Burning foe. Once a turn,1,0,160,11,97,"Sirene (Crumbling Path)\nHead to the right from the flag to find a magic rope. Head down, use the grapple point, and follow the trail to find this Pictos.",0
+Double Mark,Mark requires 1 more hit to be removed,1,0,160,11,98,"Sirene (Crumbling Path)\nFrom the flag, head to the area on the left to find handholds. Use them to reach a magic rope. Follow the path to find a Merchant at the end of it.",0
+Energising Attack II,+1 AP on base attack,1,0,160,11,99,Sirene (Crumbling Path)\nSame as above,0
+Greater Powerful,+15% to Powerful damage increase,1,0,160,11,100,Sirene (Crumbling Path)\nSame as above,0
+Energising Turn,+1 AP on turn start,1,0,160,11,101,"Sirene\nBeat the boss, Sirene, at the end of the map.",0
+Energising Cleanse,Dispel the first negative Status Effect received and gain 2 AP.,1,0,160,11,102,"Inside the Monolith (Tainted Meadows)\nHead into the watery area after the second black and white scene with the Paintress. Look on the path to the left to find the merchant. Fight him to buy the Pictos for 40,800 Chroma.",0
+Stay Marked,50% chance to apply Mark when attacking a Marked enemy,1,0,160,11,103,Inside the Monolith (Tainted Waters)\nGo straight from the flag to find a little hidden path leading to the Chromatic Bourgeon. The Pictos is right behind it.,0
+Weakness Gain,+1 AP on hitting an enemy's weakness once per turn,1,0,160,11,104,"Inside the Monolith (Tainted Cliffs)\nWhen you go past the windmill and head on the main path, you'll end up in an area with a Hexga. Look on the right side to find this Pictos.",0
+Random Defense,Damage taken is randomly multiplied by a value between 50% and 200%,1,0,160,11,105,"Inside the Monolith (Tainted Cliffs)\nTurn around, leave the cave, and head to the right to find a secluded area with a Paint Cage. Need Paint Break to reveal one of its locks.",0
+Empowering Parry,Each successful parry increases damage by 5% until end of the following turn. Taking damage removes this buff.,1,0,160,11,106,"Inside the Monolith (Tainted Hearts)\nWhen the path splits for the first time, head left past a huge rock monster to find a grapple point leading to a Paint Cage.",0
+Greater Defenceless,+15% to defenceless damage amplification,1,0,160,11,107,"Inside the Monolith (Tainted Hearts)\nWhen the path splits for the first time, turn left and then look to the right to find some handholds on the wall leading to a Merchant.",0
+Enfeebling Attack,Base Attack applies powerless for 1 turn,1,0,160,11,108,"Inside the Monolith (Tainted Hearts)\nCross the bridge beyond the Tainted Hearts expedition flag and immediately go left to enter an area with Gargant, a large Nevron. There are handholds on the wall to the right of that foe, and they lead to a merchant that sells a variety of items. The Enfeebling Attack Pictos is on the ground just past the merchant, next to a wrecked train.",0
+Breaking Attack,Base attack can Break,1,0,160,11,109,"Inside the Monolith (Tainted Lumiere)\nWhen you pass the big tree into a new area, immediately turn left and grapple onto the platform on the other side to fight some enemies.",0
+Second Chance,Revive with 100% Health. Once per battle,1,0,160,11,110,Inside the Monolith (Tower Peak)\nDefeat Renoir,0
+Combo Attack II,Base attack has 1 extra hit,1,0,160,11,111,"Monolith Peak (Entrance)\nAfter beating the Paintress, return to the arena in which you fought her to encounter Chromatic Clair Obscur. Beat the Nevron to obtain the Combo Attack II Pictos.",0
+Painted Power,"Damage can exceed 9,999",1,0,160,11,112,Monolith Peak\nDefeat the Paintress.,0
+Shortcut,Immediately play when falling below 30% health. Once per battle,1,0,160,11,113,Lumiere (Harbour)\nFight the Abberation near the first big horse statue.,0
+Energising Powerful,Give 2 AP on applying Powerful,1,0,160,11,114,"Lumiere (Harbour)\nWhen you need to use the magic rope at the end of the initial path, ignore the grapple point to the left and instead head on the path to the right to lead you to the Pictos.",0
+Charging Stun,+5% of a Gradient Charge on hitting a Stunned enemy,1,0,160,11,115,"Lumiere (Shattered Alley)\nFrom the flag, turn around to see the Pictos near the large tree.",0
+Augmented Counter III,75% Increased Counterattack Damage,1,0,160,11,116,Lumiere (Shattered Alley)\nContinue the path until you spot a large creature with a light on its head. Defeat the Chromatic Echassier.,0
+Healing Stun,Recover 5% Health on hitting a Stunned target,1,0,160,11,117,"Lumiere (Opera House)\nFollow the path, use two grapple points, head on the left path, and keep an eye on the right wall to find this one. (You can find a dupe on the opposite side.)",0
+Full Strength,25% increased damage on full Health,1,0,160,11,118,"Lumiere (Lumiere's Gardens)\nBuy from Merchant after fighting him. Turn around and the merchant will be to the left. 53,200 Chroma.",0
+Gradient Fighter,25% Increased damage with Gradient Attacks,1,0,160,11,119,"Lumiere (Lumiere's Gardens)\nWhen you start walking the main path after the flag, turn on the second set of staircases to the left to find a Pictos by some enemies.",0
+Faster Than Strong,"Always play twice in a row, but deal 50% less damage",1,0,160,11,120,Lumiere (Lumiere's Gardens)\nFight Creation at the end of the garden path to get this.,0
+Draining Cleanse,"Consume 1 AP to prevent Status Effects application, if possible.",1,0,160,11,121,"The Reacher (Entrance)\nAfter you grapple and use a magic rope, look right to see the Pictos behind enemies.",0
+Sniper,First Free Aim shot each turn deals 200% increased damage and can Break,1,0,160,11,122,The Reacher (Mountain)\nFight the first group of monsters after the flag.,0
+Charging Counter,+10% of a Gradient Charge on Counterattack.,1,0,160,11,123,"The Reacher (Mountain)\nBefore the second hot air balloon ride, look to the left to find handholds leading to a side area. You'll find the Pictos at the end of it.",0
+Charging Attack,+15% of a Gradient Charge on Base Attack,1,0,160,11,124,"The Reacher (Mountain)\nBefore the second hot air balloon ride, look to the left to find handholds leading to a side area. You'll find the Pictos at the end of it.",0
+Protecting Tint,Healing Tints also apply Shell,1,0,160,11,125,The Reacher (Foggy Area)\nCross the second wooden bridge and then turn right.,0
+Anti-Blight,Immune to Blight,1,0,160,11,126,"The Reacher (Foggy Area)\nHead to the path on the left to find a hot air balloon ride, and speak to the nearby Merchant. 67,350 Chroma.",0
+Exposing Break,Apply Defenceless on Break,1,0,160,11,127,"The Reacher (Foggy Area)\nHead to the path on the left to find a hot air balloon ride, and speak to the nearby Merchant. 53,880 Chroma.",0
+Charging Weakness,15% of a Gradient Charge on hitting a Weakness. Once per turn.,1,0,160,11,128,"The Reacher (Foggy Area)\nHead to the path on the left to find a hot air balloon ride, and speak to the nearby Merchant. 53,880 Chroma.",0
+Tainted,15% Increased damage for each Status Effect on self,1,0,160,11,129,"The Reacher (Foggy Area)\nHead to the path on the left to find a hot air balloon ride, and speak to the nearby Merchant. 49,391 Chroma.",0
+Healing Boon,Heal 15% HP on applying a buff,1,0,160,11,130,The Reacher (Foggy Area)\nHead to the path on the left to find a hot air balloon ride. Use the grappling points afterwards to find a magic rope leading down to a Pictos.,0
+Energising Rush,Give 2 AP on applying Rush,1,0,160,11,131,"Endless Tower\nComplete Stage 2, Trial 3",0
+Charging Critical,+20% Gradient Charge on Critical Hit. Once per turn,1,0,160,11,132,"Endless Tower\nComplete Stage 5, Trial 3",0
+Critical Weakness,25% increased Critical Chance on Weakness,1,0,160,11,133,"Endless Tower\nComplete Stage 6, Trial 3",0
+Rush on Powerful,Apply Rush on applying Powerful,1,0,160,11,134,"Endless Tower\nComplete Stage 9, Trial 3",0
+Greater Powerless,+15% to Powerless damage reduction,1,0,160,11,135,"Endless Tower\nComplete Stage 10, Trial 3",0
+Anti-Burn,Immune to Burn,1,0,160,11,136,"Flying Manor - Central Plaza\nFrom the Flag, run towards the faded boy to find a staircase past him. Take it down to find a magic rope that leads to an elevator. Fight the giant rock monster (Gargant)",0
+Charging Alteration,+10% of a Gradient Charge on applying a buff. Once per turn.,1,0,160,11,137,"Flying Manor - Central Plaza\nFrom the Flag, run towards the faded boy to find a staircase past him. Take it down to find a magic rope that leads to an elevator and a new area. Run down the stairs, head towards the left to find a grapple point. Follow the path and grapple to reach the Pictos.",0
+Energetic Healer,+2 AP when healing an ally,1,0,160,11,138,Flying Manor - Central Plaza\nThe Picto can be found on the ledge to the left after riding the rope up in the lower section of Flying Manor.,0
+Painter,Convert all Physical damage to Void damage,1,0,160,11,139,"Flying Manor - Central Plaza\nFrom the Flag, go towards the grapple point leading to the big locked door. Look to the right to find a large picture frame you can walk on. It'll lead to a new area. You'll find this Picto on one of the upper walkways.",0
+Powerful Revive,Apply Powerful for three turns when Revived,1,0,160,11,140,Flying Manor - Central Plaza\nBeat the Dualliste and then go to the upper area near where you fought him to find a grapple point leading to a Paint Cage containing the Pictos.,0
+Empowering Break,Gain Powerful on Breaking a target,1,0,160,11,141,"Flying Manor - Central Plaza\nTake the elevator right next to the Flag. When you get up, follow the path and hug the left to find a magic rope. Stay on the left and find a grapple that leads to the Pictos behind a monster",0
+Accelerating Shots,20% chance to gain Rush on Free Aim shot,1,0,160,11,142,"Flying Manor - Central Plaza\nTake the elevator right next to the Flag. When you get up, follow the path and then once it splits into three, head on the left path to find a merchant.",0
+Gradient Breaker,50% increased Break damage when using Gradient attacks,1,0,160,11,143,"Flying Manor - Central Plaza\n(1) Take the elevator right next to the Flag. When you get up, follow the path and then once it splits into three, head on the left path to find a merchant. (2) You can find the Gradient Break Pictos in a small cave along one of the paths behind the Grandis NPC at Endless Night Sanctuary.",0
+Break Specialist,"Break damage is increased by 50%, but base damage is reduced by 20%",1,0,160,11,144,"Flying Manor - Central Plaza\nTake the elevator right next to the Flag. When you get up, follow the path and then once it splits into three, head on the left path to find a merchant.",0
+Slowing Break,Apply Slow on Break,1,0,160,11,145,"Flying Manor - Central Plaza\nTake the elevator right next to the Flag. When you get up, follow the path and then once it splits into three, head on the left path to find a merchant.",0
+Energising Shots,20% chance to gain 1 AP on Free Aim shot,1,0,160,11,146,Flying Manor - Central Plaza\nDefeat Goblu as part of the challenge (take the elevator next to the flag). The Pictos will be next to Goblu.,0
+Clea's Life,"On turn start, if no damage taken since last turn, recover 100% health",1,0,160,11,147,Flying Manor - Central Plaza\nDefeat Clea at the end of Flying Manor.,0
+SOS Rush,Apply Rush when falling below 50% Health.,1,0,160,11,148,"Falling Leaves - Resinveil Groove\nFrom Journal 35, turn around and walk along the stone path. Look to the right for the Pictos.",0
+Beneficial Contamination,+2 AP on applying a Status Effect. Once per turn.,1,0,160,11,149,"Falling Leaves - Resinveil Groove\nLeft from the flag, grapple across and follow the path to a Merchant.",0
+Greater Slow,+15% to Slow Speed reduction,1,0,160,11,150,Sky Island - Entrance\nFind a staircase at the end of this small map.,0
+In Medias Res,"+3 Shields on Battle Start, but max health is halved",1,0,160,11,151,Dark Shores - Bloodied Beach\nRun straight past the flag to the end of the area to find this surrounded by enemies.,0
+Energising Revive,+3 AP to all Allies when revived,1,0,160,11,152,Stone Wave Cliffs Cave\nBeat the Chromatic Hexga at the end.,0
+Exhausting Power,50% increased damage if exhausted,1,0,160,11,153,Stone Wave Cliffs Cave\nBeat the Chromatic Hexga at the end. Look to the left of it.,0
+Solidifying,+2 Shields when the character's Health falls below 50%. Once per battle.,1,0,160,11,154,"Sacred River\nBuy from Merchant for 67,350 Chroma.",0
+Critical Stun,100% on Critical Chance on hitting a Stunned target,1,0,160,11,155,"Sacred River\nBuy from Merchant for 53,880 Chroma.",0
+First Offensive,First hit dealt and taken deals 50% more damage.,1,0,160,11,156,Abbest Cave\nBeat Chromatic Abbest,0
+Energising Attack I,+1 AP on base attack,1,0,160,11,157,Painting Workshop\nSolve the Painting Workshop mystery and defeat the Lampmaster,0
+The One,Max Health is reduced to 1,1,0,160,11,158,Sunless Cliffs\nBeat the Mime at the Portal.,0
+Base Shield,+1 Shield if not affected by any Shield on turn start,1,0,160,11,159,The Chosen Path\nDefeat the mirror challenges and enter the double doors up the staircase.,0
+Pro Retreat,Allows Flee to be instantaneous,1,0,160,11,160,Camp\nFind all nine Lost Gestrals for Sastro,0
+Burning Break,Apply 3 burn stacks on Breaking a target,1,0,160,11,161,"Frozen Hearts - Glacial Falls\nIf you're facing the bells near the flag, turn right and hug the wall. Run up the cliff, and then you'll see the Pictos across the way that you can jump to by using a frozen bell.",0
+Burn Affinity,25% increased damage on Burning targets,1,0,160,11,162,"Frozen Hearts - Glacial Falls\nFrom the Flag, look out towards the flaming enemies to see a magic rope. Take it up to find an area with some Chroma. Follow the path up there to find a grappling hook. Use the handholds and then jump to a path on the right to find another grapple point leading to the Pictos.",0
+Death Bomb,"On Death, deal damage to all enemies.",1,0,160,11,163,"Yellow Harvest - Harvester's Hollow\nPass the flag and head to the right of the tall stone statue. There is a short path to the right of the long ramp, and the Pictos is at the end.",0
+Auto Death,Kill self on battle start,1,0,160,11,164,"Yellow Harvest (Harvester's Hollow)\nBuy from nearby Merchant for 5320 Chroma. From the flag, head towards the right to find a slope that leads to an area with blue lamps. You'll find a grapple point.",0
+Teamwork,10% increased damage while all allies are alive,1,0,160,11,165,"Yellow Harvest (Harvester's Hollow)\nFrom the flag, go straight into the large clearing. Stay on the right until you find a large slope that leads to an area with lamps. Use the grapple point at the end to find a Merchant.",0
+Quick Break,Play again after Breaking a target,1,0,160,11,166,Renoir's Drafts - Entrance\nHook a left after passing the flag to find a grapple point.,0
+Aegis Revival,+1 Shield after being revived,1,0,160,11,167,Renoir's Drafts - Entrance\nFollow the main path until you reach the fading man. Walk down the slope on the right once you pass him. Hook a left before entering the round gate to find a slope that leads to a grapple point and a Merchant.,0
+Charging Burn,+20% of a Gradient Charge on applying Burn. Once per turn.,1,0,160,11,168,Renoir's Drafts - Entrance\nFollow the main path until you reach the fading man. Walk down the slope on the right once you pass him. Hook a left before entering the round gate to find a slope that leads to a grapple point and a Merchant. Jump on the bridge behind the Merchant.,0
+Recovery,Recovers 10% Health on turn start,1,0,160,11,169,Red Woods\nDonate Chroma to help Benisseur.,0
+Combo Attack III,Base Attack has 1 extra hit,1,0,160,11,170,Dark Gestral Arena\nComplete the Dark Gestral Arena,0
+Auto Powerful,Apply Powerful for 3 turns on battle start,1,0,160,11,171,Floating Cemetery\nFight the Chalier.,0
+Survivor,Survive fatal damage with 1 Health. Once per battle.,1,0,160,11,172,Monoco's Station\nDeliver the Eternal Ice to the Grandis Trader nearby.,0
+Greater Rush,+25% Rush Speed increase BOM,1,0,160,11,173,"Monoco's Station\nThe Greater Rush Pictos is purchasable from the Grandis merchant in Monoco's Station for 85,750 Chroma after retrieving the Eternal Ice from the Gargant in Frozen Hearts.",0
+Shielding Death,"On death, allies gain 3 Shield points.",1,0,160,11,174,The Crows\nBeat the Chromatic Chapelier at The Crows (shoot all the crows),0
+Powerful Shield,10% Increased damage per Shield Point on self.,1,0,160,11,175,Endless Night Sanctuary\nPurchase from the Merchant.,0
+Powerful Heal,Healing an ally also applies Powerful for 1 turn.,1,0,160,11,176,Endless Night Sanctuary\nPurchase from the Merchant.,0
+Protecting Attack,Gain Shell for 1 turn on Base Attack,1,0,160,11,177,Endless Night Sanctuary\nPurchase from the Merchant.,0
+Charging Mark,+20% of a Gradient Charge on hitting a Marked target. Once per turn,1,0,160,11,178,Endless Night Sanctuary\nPurchase from the Merchant.,0
+Accelerating Tint,Healing Tints also apply Rush,1,0,160,11,179,Endless Night Sanctuary\nPurchase from the Merchant.,0
+Shell On Rush,Apply Shell on applying Rush,1,0,160,11,180,Endless Night Sanctuary\nPurchase from the Merchant.,0
+Anti-Freeze,Immune to Freeze,1,0,160,11,181,Frozen Hearts\nCan be obtained upon destroying the Paint Cage in Glacial Falls past the Manor entrance.,0
+"Critical Break 
+",25% increased Break damage on Critical Hits.,1,0,160,11,182,The Continent\nYou can find the Pictos by destroying a Paint Spike on a beach northeast of The Reacher.,0
+Critical Vulnerability,25% increased Critical Chance on Defenceless enemies.,1,0,160,11,183,The Continent\nYou can find the Pictos surrounded by Nevrons in an abandoned camp northwest of the Floating Cemetary.,0
+Effective Support,+2 AP on using an item.,1,0,160,11,184,The Continent\nYou can find Effective Support Pictos surrounded by Nevrons northeast of Sirene.,0
+Energising Burn,+1 AP on applying Burn. Once per turn.,1,0,160,11,185,Frozen Hearts\nEnergising Burn is obtained as a drop by defeating Chromatic Veilleur found at Frozen Hearts.,0
+Energising Stun,+1 AP on hitting a Stunned target with a Skill.,1,0,160,11,186,Flying Manor\nEnergising Stun is obtained as a reward for solving a Painted Cage puzzle in the Flying Manor area.,0
+Marking Break,Apply Mark on Break.,1,0,160,11,187,Endless Night Sanctuary\nPurchase from the Merchant.,0
+Powerful Mark,Gain Powerful on hitting a Marked enemy.,1,0,160,11,188,Flying Manor\nYou can find the Powerful Mark Pictos being guarded by two Steel Chevalieres on a platform in the Goblu boss area.,0
+Powerful Shots,20% chance to gain Powerful on Free Aim shot.,1,0,160,11,189,Gestral Village\nYou can find the Powerful Shots Pictos by breaking a Paint Spike near the Gestral doctor.,0
+Rejuvenating Revive,Apply Regen for 3 turns when revived.,1,0,160,11,190,Stone Wave Cliffs\nYou can get the Rejuvenating Revive Pictos after breaking a Paint Spike in the Old Farm area.,0
+Shielding Tint,Healing Tints also add 2 Shields.,1,0,160,11,191,The Continent\nThis can be found on the ground under wooden crates near the Bourgeon southeast of Forgotten Battlefield (requires Esquie flight).,0
+Protecting Shots,20% chance to gain Shell on Free Aim shot.,1,0,160,11,192,"Flying Manor\nAfter entering the Flying Manor, go down the first flight of stairs facing the Nevron statue, then turn right and jump off the staircase leading to a cliff.
+Go down the rope and continue walking to the right. You'll find the Pictos sitting on the edge of a broken picture frame.",0
+Gradient Break,,1,0,160,11,193,"Endless Night Sanctuary\nThe Gradient Break Pictos can be found in a tiny alcove in the passage between the two paths past the behind the Grandis Engineer in Endless Night Sanctuary. 
+
+",0
+Fracture Survivor,"Old Lumiere\nFrom the Left Street, make your way down the path through the broken doorway then continue to the second open field. Take the path on the right and drop down inside the large broken pipe, use the Old Key on the gate and pick up the journal",1,0,161,11,1,,0
+Expedition 34,The Crows\nFound to the right of the Entrance,1,0,161,11,2,,0
+Expedition 35,Falling Leaves\nFound next to the bridge leading to the Chromatic Ballet within the Resinveil Grove,1,0,161,11,3,,0
+Expedition 36,White Tree\nFound to the right at the base of the tree upon entering White Tree,1,0,161,11,4,,0
+Expedition 37,"Gestral Beach\nLocated east to The Sunless Cliffs, requieres Esquie's ability to fly",1,0,161,11,5,,0
+Expedition 38,Yellow Harvest\nFound by a few corpses surrounded by lit lamps on a cliffside to the right of the Harverster's Hollow section,1,0,161,11,6,,0
+Expedition 39,"Visages\nIn the Sadness Vale area, after picking up the Energy Tint Shard, head to the other path and climb up the ledge",1,0,161,11,7,,0
+Expedition 40,"The Continent\nExit Sirene and swim toward The Monolith, pick up the Journal in the upper left corner of the isle, next to the Merchant Granasori",1,0,161,11,8,,0
+Expedition 41,"Forgotten Battlefield\nIn the Battlefield section, go to the trenches on the right side of the Fading Woman. On the left side, you can find a small area containing the journal",1,0,161,11,9,,0
+Expedition 42,"Old Lumiere\nFrom the Manor Gardens, head to the upper right corner to find a new path. Follow it and take the rope down, pick up journal at the end of the path",1,0,161,11,10,,0
+Expedition 43,"The Continent\nFound in an abandoned expedition camp, on an island northeast of the Coastal Cave",1,0,161,11,11,,0
+Expedition 44,"Yellow Harvest\nFrom the Harvester's Hollow, continue ahead towards the path on the left. Past the slope on the right, you will find a corpse holding a lit lamp on the left with the Journal",1,0,161,11,12,,0
+Expedition 45,"Crushing Cavern\nAfter defeating the Giant Sapling, head into the tunnel ahead until you reach the fork path. Take the left path and pick up Journal",1,0,161,11,13,,0
+Expedition 46,Sirene's Dress\nFound by some rubble across the arena where you fight the Chromatic Glissando,1,0,161,11,14,,0
+Expedition 47,"The Continent\nFound beside a collapsed structure, near the merchant Carnovi",1,0,161,11,15,,0
+Expedition 48,Stone Quarry\n,1,0,161,11,16,,0
+Expedition 49,"Falling Leaves\nComplete the Fading Spirit Quest to open the gate, continue up the path and make your way up to the cliff to find the journal by a set of broken stairs.",1,0,161,11,17,,0
+Expedition 50,"Stone Wave Cliffs\nFrom the Paintress Shrine, head down the path on the right and cross the bridge. Take the path on the left and pick up the journal",1,0,161,11,18,,0
+Expedition 51,"Frozen Hearts\nFrom the Icebound Train Station, cross the tracks and make your way up the hill. Once you reach the top where you see the end of a train, turn right into a crack in the wall to find journal",1,0,161,11,19,,0
+Expedition 52,Gestral Village\nFound on a narrow path near the Gestral Doctor,1,0,161,11,20,,0
+Expedition 53,The Small Bourgeon\nFound at the end of the path to the left of the Bourgeon,1,0,161,11,21,,0
+Expedition 54,"Stone Wave Cliffs Cave\nFound on the right side of the Arena, where you fight the Chromatic Hexga",1,0,161,11,22,,0
+Expedition 55,"Sirene\nFrom the Dancing Classes, continue down the path and up the stairs to the plaza filled with enemies. To the right, you can find the journal",1,0,161,11,23,,0
+Expedition 56,"Stone Wave Cliffs\nFrom the Entrance, head down the path and through the broken airship, use your grappling hook to reach the other side. Head down the path and head down on the left path. Take out the enemy and pick up the journal at the base of the statue",1,0,161,11,24,,0
+Expedition 57,"Forgotten Battlefield\nIn the Battlefield section, you can find an open area after passing through the Paint Cage. In the middle of the field, you can find the journal",1,0,161,11,25,,0
+Expedition 58,"Old Lumiere\nFound within a cutscene when playing as Lune, Sciel, and Monoco past the Left Street",1,0,161,11,26,,0
+Expedition 59,"Yellow Harvest\nFrom the Yellow Spire Wrecks, head left into a cave to find the journal by the structure in the middle",1,0,161,11,27,,0
+Expedition 60,"Lumiere\nFound if you interact with the ledge on the right outside the opera house. Ask Esquie to bring an item to the surface, and you will obtain the journal",1,0,161,11,28,,0
+Expedition 61,"The Reacher\nFrom the Foggy Area, cross the bridge and go straight ahead to the lit areas on the upper portion of the field. Proceed through the cave to find journal",1,0,161,11,29,,0
+Expedition 62,The Continent\nFound at a camp to the left of the beach behind Gestral Village,1,0,161,11,30,,0
+Expedition 63,Ancient Sanctuary\nFound by a fork in the path in the Sanctuary Maze section near a Paint Cage,1,0,161,11,31,,0
+Expedition 64,"The Continent\nFound on a camp along the path to the left of the entrance to The Meadows, you will need Esquie's swim ability to reach this area",1,0,161,11,32,,0
+Expedition 65,"Monoco's Station\nAfter defeating the Stalact, head into the station past Monoco's Station flag. Cross the tracks at the end of the path and turn left to find the journal",1,0,161,11,33,,0
+Expedition 66,Esquie's Nest\nFound at a camp on the fork of the path after Esquie joins your party,1,0,161,11,34,,0
+Expedition 67,Sirene\nFound by a pile of boxes after being transported past the Crumbling Path flag,1,0,161,11,35,,0
+Expedition 68,"Flying Waters\nGo through the main path in the Coral Cave, you can find the journal lying on the ground at the path with lanterns at the beginning",1,0,161,11,36,,0
+Expedition 69,"Visages\nIn the Joyful Vale section, you can find the journal behind enemies on the left path",1,0,161,11,37,,0
+Expedition 70,"The Monolith\nFrom the Tainted Lumiere, head down to the main square and follow the path behind the statue. Grapple across the next area and continue making your way through the broken streets. At the fork of the road, head straight and go behind the flower stalls on the right. Take the right turn, grapple across through the floating islands, take out the enemies and get behind the building to pick up the journal",1,0,161,11,38,,0
+Expedition 78,"Stone Wave Cliffs\nFrom the Entrance, head down the path and take the top up on the right. Once you reach the top, you can find the journal on the right",1,0,161,11,39,,0
+Expedition 81,Spring Meadows\nPicked up during a cutscene when Lune and Gustave find Jar for the first time,1,0,161,11,40,,0
+Expedition 84,The Fountain\nRequires Esquie's fly ability to reach the location. Can be found on the path to the right of the fountain,1,0,161,11,41,,0
+Julie Search and Rescue,"The Continent\nFound beside a collapsed tent, west of the Forgotten Battlefield. To reach this area, you’ll need to progress the story far enough to Fly",1,0,161,11,42,,0
+Simon,The Abyss\nFound in the middle of the area after defeating Simon,1,0,161,11,43,,0
+Aline,"The Manor\nEnter The Manor from the entrance in the Tainted Battlefield in The Monolith to reach the Garden, the journal can be found by the statue in the center",1,0,161,11,44,,0
+Renoir,"The Manor\nEnter The Manor from the entrance in Old Lumiere, and exit the bathroom to a bedroom. The Journal can be found on the nightstand",1,0,161,11,45,,0
+Unkown 1,"The Manor\nFound inside a bedroom in The Manor, which can be accessed from the Visages",1,0,161,11,46,,0
+Unkown 2,"The Manor\nFound inside a room in The Manor, which can be accessed from The Reacher",1,0,161,11,47,,0
+Unkown 3,"The Manor\nPlace the Manor Family Canvas quest item on the empty frame in The Manor to unlock the Painting Room. There's an empty frame just by the stairs on the east wing of the manor, near the flag",1,0,161,11,48,,0
+Verso,"The Continent\nLocated just by the foot of a destroyed building west to Stone Quarry. Requires Esquie's swim ability and destroy coral reefs to reach it, or his Fly ability",1,0,161,11,49,,0
+Gustave - Baguette,Spring Meadows (Missable),1,0,164,11,1,Defeat the Mime,0
+Gustave - Bun,"Lumiere (Prologue, Missable)",1,0,164,11,2,Obtained by giving a Festival Token to Amandine during the Expedition Festival,0
+Gustave - Charming,The Continent (Missable),1,0,164,11,3,Can be purchased from Jumeliba for 500 Chroma,0
+Gustave - Curly,The Continent (Missable),1,0,164,11,4,Can be purchased from Jumeliba for 500 Chroma,0
+Gustave - Expedition White,"Lumiere (Act III, Missable)",1,0,164,11,5,Choose the Maelle ending,0
+Gustave - Flowers,DLC,1,0,164,11,6,Deluxe Edition DLC,0
+Gustave - Gestral,Gestral Village (Missable),1,0,164,11,7,"Sold by the merchant Delsitra for 1,000 Chroma",0
+Gustave - Gustave,Default,1,0,164,11,8,Default haircut,0
+Gustave - Short,The Continent (Missable),1,0,164,11,9,Can be purchased from Carrabi for 500 Chroma,0
+Gustave - Renoir,Lumiere (Act III),1,0,164,11,10,Defeat Renoir,0
+Lune - Artist,The Continent,1,0,164,11,11,"Can be purchased from Blabary for 3,000 Chroma",0
+Lune - Baguette,Ancient Sanctuary,1,0,164,11,12,Defeat the Mime,0
+Lune - Bald,Sunless Cliffs,1,0,164,11,13,Defeat the Mime as Lune,0
+Lune - Braid,The Continent,1,0,164,11,14,Can be purchased from Appla for 1000 Chroma,0
+Lune - Clea,Endless Tower,1,0,164,11,15,"Rewarded for completing Stage 3, Trial 3",0
+Lune - Double Braid,The Continent,1,0,164,11,16,Can be purchased from Granasori for 3000 Chroma,0
+Lune - Flowers,DLC,1,0,164,11,17,Deluxe Edition DLC,0
+Lune - French Bob,The Continent,1,0,164,11,18,Can be purchased from Strabami for 3000 Chroma,0
+Lune - Gestral,Camp,1,0,164,11,19,Rewarded by Sastro for finding 2 out of 9 Lost Gestrals,0
+Lune - Half Ponytail,The Continent,1,0,164,11,20,Can be purchased from Rederi for 2000 Chroma,0
+Lune - Lune,Default,1,0,164,11,21,Default haircut,0
+Lune - Messy Bun,The Continent,1,0,164,11,22,Can be purchased from Papasso for 3000 Chroma,0
+Lune - Ponytail,The Continent,1,0,164,11,23,Can be purchased from Blackora for 3000 Chroma,0
+Lune - Rebellious White,Endless Tower,1,0,164,11,24,"Rewarded for completing Stage 5, Trial 3",0
+Lune - Short,Frozen Hearts,1,0,164,11,25,Defeat the Mime,0
+Lune - Sirene,Sirene,1,0,164,11,26,Defeat the Mime,0
+Lune - Wavy,Yellow Harvest,1,0,164,11,27,"Can be purchased from the Merchant Pinabby for 1,000 Chroma",0
+Lune - Voluminous,The Continent,1,0,164,11,28,Defeat the two Mimes northwest to Old Lumiere,0
+Maelle - Artist,The Continent,1,0,164,11,29,"Can be purchased from Blabary for 3,000 Chroma",0
+Maelle - Baguette,The Reacher,1,0,164,11,30,Defeat the Mime,0
+Maelle - Bald,Sunless Cliffs,1,0,164,11,31,Defeat the Mime as Maelle,0
+Maelle - Braid,Yellow Harvest,1,0,164,11,32,Defeat the Mime,0
+Maelle - Clea,Flying Manor,1,0,164,11,33,Defeat the Mime,0
+Maelle - Maelle,Default,1,0,164,11,34,Default haircut,0
+Maelle - Double Braid,The Continent,1,0,164,11,35,Can be purchased from Colaro for 2000 Chroma,0
+Maelle - Double Braid White,Endless Tower,1,0,164,11,36,"Rewarded for completing Stage 4, Trial 3",0
+Maelle - Flowers,DLC,1,0,164,11,37,Deluxe Edition DLC,0
+Maelle - French Bob,The Carousel,1,0,164,11,38,Complete Grandis' quest,0
+Maelle - Gestral,Camp,1,0,164,11,39,Rewarded by Sastro for finding 1 out of 9 Lost Gestrals,0
+Maelle - Gestral White (Missable),Dark Gestral Arena,1,0,164,11,40,Complete all three challenges and win against Golgra to acquire this as a reward (don't let her beat you!),0
+Maelle - Messy Bun,The Continent,1,0,164,11,41,Can be purchased from Papasso for 3000 Chroma,0
+Maelle - Painted Me,The Reacher,1,0,164,11,42,Acquired as a drop reward for defeating Alicia,0
+Maelle - Ponytail,Endless Tower,1,0,164,11,43,"Complete all 33 Trials (11 Stages), and speak to the Fading Woman to obtain this haircut",0
+Maelle - Real Maelle,Story,1,0,164,11,44,Start Act III,0
+Maelle - Rebellious,The Manor,1,0,164,11,45,Found in the basement. There is an opening on the ground that you can jump into from the kitchen.,0
+Maelle - Short,Flying Waters,1,0,164,11,46,Defeat the Mime,0
+Maelle - Short White,The Continent,1,0,164,11,47,Can be purchased from Sodasso for 2000 Chroma,0
+Maelle - Vintage,The Continent,1,0,164,11,48,Can be purchased from Geranjo for 1000 Chroma,0
+Maelle - Voluminous,The Monolith,1,0,164,11,49,Defeat the Mime,0
+Sciel - Artist,The Continent,1,0,164,11,50,Can be purchased from Blabary for 3000 Chroma,0
+Sciel - Baguette,Esquie's Nest,1,0,164,11,51,Defeat the Mime,0
+Sciel - Bald,Sunless Cliffs,1,0,164,11,52,Defeat the Mime as Sciel,0
+Sciel - Braid,Old Lumiere,1,0,164,11,53,Defeat the Mime,0
+Sciel - Clea,Endless Tower,1,0,164,11,54,"Rewarded for completing Stage 7, Trial 3",0
+Sciel - Double Braid,The Continent,1,0,164,11,55,Can be purchased from Sodasso for 2000 Chroma,0
+Sciel - Flowers,DLC,1,0,164,11,56,Deluxe Edition DLC,0
+Sciel - French Bob,The Continent,1,0,164,11,57,Can be purchased from Pecha for 3000 Chroma,0
+Sciel - Gestral,Camp,1,0,164,11,58,Rewarded by Sastro for finding 3 out of 9 Lost Gestrals,0
+Sciel - Messy Bun White,Endless Tower,1,0,164,11,59,"Rewarded for completing Stage 6, Trial 3",0
+Sciel - Plunging Bob,The Continent,1,0,164,11,60,Can be purchased from Pecha for 2000 Chroma,0
+Sciel - Ponytail,Stone Wave Cliffs,1,0,164,11,61,"Can be purchased from Jerijeri the Merchant for 1,000 Chroma",0
+Sciel - Rebellious,The Continent,1,0,164,11,62,Can be purchased from Rederi for 2000 Chroma,0
+Sciel - Sciel,Default,1,0,164,11,63,Default haircut,0
+Sciel - Short Curly,The Continent,1,0,164,11,64,Can be purchased from Appla for 1000 Chroma,0
+Sciel - Short,The Continent,1,0,164,11,65,Can be purchased from Papasso for 3000 Chroma,0
+Sciel - Vintage,The Continent,1,0,164,11,66,Can be purchased from Colaro for 2000 Chroma,0
+Sciel - Voluminous,The Continent,1,0,164,11,67,Defeat the two Mimes northwest to Old Lumiere,0
+Verso - Baguette,Visages,1,0,164,11,68,Defeat the Mime,0
+Verso - Bald,Sunless Cliffs,1,0,164,11,69,Defeat the Mime as Verso,0
+Verso - Bun,The Continent,1,0,164,11,70,Can be purchased from Blackora for 3000 Chroma,0
+Verso - Curly,The Continent,1,0,164,11,71,Can be purchased from Sodasso for 2000 Chroma,0
+Verso - Expedition White,Endless Tower,1,0,164,11,72,"Rewarded for completing Stage 9, Trial 3",0
+Verso - Flowers,DLC,1,0,164,11,73,Deluxe Edition DLC,0
+Verso - Gestral,Camp,1,0,164,11,74,Rewarded by Sastro for finding 5 out of 9 Lost Gestrals,0
+Verso - Gustave's,The Continent,1,0,164,11,75,Can be purchased from Papasso for 3000 Chroma,0
+Verso - Renoir,"Lumiere (Act III, Missable)",1,0,164,11,76,Choose the Verso ending,0
+Verso - Samurai,Camp,1,0,164,11,77,"Before reaching Relationship Level 3, Verso will talk to Monoco about cutting his hair. 
+Make sure to choose the following dialogue options:
+""Yes, my hair is impeccable.""
+""Fine!"" When Monoco tells Verso ""You first then.""",0
+Verso - Verso,Default,1,0,164,11,78,Default haircut,0
+Monoco - Bald,Sunless Cliffs,1,0,164,11,79,Defeat the Mime as Monoco,0
+Monoco - Flowers,DLC,1,0,164,11,80,Deluxe Edition DLC,0
+Monoco - Monoco,Default,1,0,164,11,81,Default haircut,0
+Monoco - Pure,The Continent,1,0,164,11,82,Can be purchased from Lucaroparfe for 2000 Chroma,0
+Monoco - Viking,Camp,1,0,164,11,83,"Before reaching Relationship Level 3, Verso will talk to Monoco about cutting his hair. 
+Make sure to choose the following dialogue options:
+""Yes, my hair is impeccable.""
+""Fine!"" When Monoco tells Verso ""You first then.""",0
+Gustave - Baguette,Spring Meadows (Missable),1,0,170,11,1,Defeat the Mime,0
+Gustave - Civilian,"Lumiere (Act III, Missable)",1,0,170,11,2,Choose the Maelle ending,0
+Gustave - Crimson Uniform,"Lumiere (Prologue, Missable)",1,0,170,11,3,"Complete ""A Uniform for Richard's Son"" quest",0
+Gustave - Expedition,Default,1,0,170,11,4,Default outfit,0
+Gustave - Flowers Suit,DLC,1,0,170,11,5,Deluxe Edition DLC,0
+Gustave - Gommage,DLC,1,0,170,11,6,Deluxe Edition DLC,0
+Gustave - Lumiere,The Continent,1,0,170,11,7,"Can be purchased from Carrabi for 1,000 Chroma",0
+Gustave - Obscur,DLC,1,0,170,11,8,Deluxe Edition DLC,0
+Gustave - Pure,Gestral Village (Missable),1,0,170,11,9,Complete Karatom the Gestral's quest,0
+Gustave - Renoir,"Lumiere (Act III, Missable)",1,0,170,11,10,Choose the Verso ending,0
+Gustave - Renoir's Suit,The Monolith,1,0,170,11,11,Defeat Renoir,0
+Gustave - Sakapatate,Gestral Village (Missable),1,0,170,11,12,"Sold by the merchant Delsitra for 1,000 Chroma",0
+Gustave - Swimsuit,Gestral Beach,1,0,170,11,13,Finish the platforming challenge and speak to the young Gestral to acquire this as a reward,0
+Lune - Baguette,Ancient Sanctuary,1,0,170,11,14,Defeat the Mime,0
+Lune - Civilian,"Lumiere (Act III, Missable)",1,0,170,11,15,Choose the Maelle ending,0
+Lune - Clea,Flying Manor (Missable),1,0,170,11,16,"After defeating Clea, talk to the Young Boy in the Central Plaza and choose Lune",0
+Lune - Danseuse,Frozen Hearts,1,0,170,11,17,Complete Danseuse Teacher's quest,0
+Lune - Expedition,Default,1,0,170,11,18,Default outfit,0
+Lune - Flowers Suit,DLC,1,0,170,11,19,Deluxe Edition DLC,0
+Lune - Gommage,DLC,1,0,170,11,20,Deluxe Edition DLC,0
+Lune - Pure,Monoco's Station,1,0,170,11,21,Speak to the Grandis Fashionist as Lune and challenge it to a battle of eloquence,0
+Lune - Sakapatate,Gestral Village,1,0,170,11,22,"Complete the ""Help Alexaundro"" quest",0
+Lune - Sirene,Sirene,1,0,170,11,23,Defeat the Glissando,0
+Lune - Skirt,The Continent,1,0,170,11,24,Can be purchased from Geranjo for 1000 Chroma,0
+Lune - Swimsuit 1,Gestral Beach,1,0,170,11,25,"Finish the platforming challenge. After receiving the first swimsuit reward for Gustave, speak to the 
+young Gestral to ask for another swimsuit and aswer his question",0
+Lune - Swimsuit 2,Gestral Beach,1,0,170,11,26,"Win against the ""Normal One"" difficulty in the beach raft volley mini-game",0
+Maelle - Alicia,Story,1,0,170,11,27,Obtained in Act III,0
+Maelle - Baguette,The Reacher,1,0,170,11,28,Defeat the Mime,0
+Maelle - Civilian,The Continent,1,0,170,11,29,Sold by the gestral merchant Geranjo for 1000 Chroma,0
+Maelle - Clair,DLC,1,0,170,11,30,Deluxe Edition DLC,0
+Maelle - Clea,Flying Manor (Missable),1,0,170,11,31,"After defeating Clea, talk to the Young Boy in the Central Plaza and choose Maelle",0
+Maelle - Expedition,Default,1,0,170,11,32,Default outfit,0
+Maelle - Flowers Suit,DLC,1,0,170,11,33,Deluxe Edition DLC,0
+Maelle - Gommage,DLC,1,0,170,11,34,Deluxe Edition DLC,0
+Maelle - Lumiere,The Continent,1,0,170,11,35,"Can be purchased from Carrabi for 1,000 Chroma",0
+Maelle - Obscur,Forgotten Battlefield,1,0,170,11,36,"Can be purchased from Kasumi for 5,000 Chroma after winning against him in a duel",0
+Maelle - Pure,Monoco's Station,1,0,170,11,37,Speak to the Grandis Fashionist as Maelle and challenge it to a battle of eloquence,0
+Maelle - Real Maelle,The Manor,1,0,170,11,38,"Place the Manor Family Canvas quest item on the empty frame in The Manor to unlock the Painting 
+Room. There's an empty frame just by the stairs on the east wing of the manor, near the flag",0
+Maelle - Sakapatate,Gestral Village,1,0,170,11,39,"Complete the ""Ono-Puncho Challenge"" quest",0
+Maelle - Skirt,The Manor,1,0,170,11,40,"From the Tide Caverns Expedition Flag, get across to the next cliff and follow the lanterns. Take the 
+rope down and head to the right side of the cave past the Rocher Boss. Take the rope down and 
+defeat the Gold Chevaliere. Enter the doors ahead to enter The Manor and open the wardrobe",0
+Maelle - Swimsuit,Gestral Beach,1,0,170,11,41,Acquired as a reward from the Grandis for completing the wall climbing challenge,0
+Sciel - Baguette,Esquie's Nest,1,0,170,11,42,Defeat the Mime,0
+Sciel - Civilian,"Lumiere (Act III, Missable)",1,0,170,11,43,Choose the Maelle ending,0
+Sciel - Clea,Flying Manor (Missable),1,0,170,11,44,"After defeating Clea, talk to the Young Boy in the Central Plaza and choose Sciel",0
+Sciel - Danseuse,Frozen Hearts,1,0,170,11,45,"Sold by the Gestral Merchant Verogo for 10,000 Chroma",0
+Sciel - Expedition,Default,1,0,170,11,46,Default outfit,0
+Sciel - Flowers Suit,DLC,1,0,170,11,47,Deluxe Edition DLC,0
+Sciel - Gommage,DLC,1,0,170,11,48,Deluxe Edition DLC,0
+Sciel - Pure,Monoco's Station,1,0,170,11,49,Speak to the Grandis Fashionist as Lune and challenge it to a battle of eloquence,0
+Sciel - Sakapatate,Gestral Village,1,0,170,11,50,Can be purchased from Alexcyclo for 1000 Chroma,0
+Sciel - Sirene,The Continent,1,0,170,11,51,Can be purchased from Pearo for 5000 Chroma,0
+Sciel - Skirt,The Continent,1,0,170,11,52,Can be purchased from Carnovi for 5000 Chroma,0
+Sciel - Swimsuit 1,Camp,1,0,170,11,53,Reach relationship level 6 with Sciel,0
+Sciel - Swimsuit 2,Gestral Beach,1,0,170,11,54,"Win against the ""The Strongest"" difficulty in the beach raft volley mini-game",0
+Verso - Baguette,Visages,1,0,170,11,55,Defeat the Mime,0
+Verso - Civilian,The Manor,1,0,170,11,56,"Entered from an entrance on an island south of Blades' Graveyard. Can be found inside a hidden 
+room that can be revealed by interacting with a set of books on a shelf in front of the spiral stairs",0
+Verso - Clair,Endless Tower,1,0,170,11,57,"Rewarded for completing Stage 11, Trial 3",0
+Verso - Expedition,Camp,1,0,170,11,58,Progress through Act II to get the outfit,0
+Verso - Flowers Suit,DLC,1,0,170,11,59,Deluxe Edition DLC,0
+Verso - Gommage,DLC,1,0,170,11,60,Deluxe Edition DLC,0
+Verso - Obscur,DLC,1,0,170,11,61,Deluxe Edition DLC,0
+Verso - Perelin,Frozen Hearts,1,0,170,11,62,Sold by the Gestral Merchant Verogo for 20000 Chroma,0
+Verso - Pure,The Continent,1,0,170,11,63,Can be purchased from Granasori for 10000 Chroma,0
+Verso - Renoir,"Lumiere (Act III, Missable)",1,0,170,11,64,Choose the Verso ending,0
+Verso - Renoir's Suit,The Monolith,1,0,170,11,65,Defeat Renoir,0
+Verso - Sakapatate,Gestral Village,1,0,170,11,66,Sold by the merchant Delsitra for 1000 Chroma,0
+Verso - Simple,The Continent,1,0,170,11,67,Can be purchased from Rubiju for 5000 Chroma,0
+Verso - Swimsuit 1,Camp,1,0,170,11,68,Reach relationship level 6 with Sciel,0
+Verso - Swimsuit 2,Gestral Beach,1,0,170,11,69,Reach Gold Medal in the obstacle race course to obtain this outfit,0
+Verso - Verso,Default,1,0,170,11,70,Default outfit,0
+Monoco - Civilian,Endless Night Sanctuary,1,0,170,11,71,Sold by the Gestral Merchant Anthonypo for 10000 Chroma,0
+Verso - Lumiere,Flying Casino,1,0,170,11,72,Can be obtained when speaking to the Gestral inside the casino as Monoco,0
+Verso - Expedition,Default,1,0,170,11,73,Default outfit,0
+Verso - Flowers Suit,DLC,1,0,170,11,74,Deluxe Edition DLC,0
+Verso - Gommage,DLC,1,0,170,11,75,Deluxe Edition DLC,0
+Verso - Pure,The Continent,1,0,170,11,76,Can be purchased from Lucaroparfe for 10000 Chroma,0
+Verso - Swimsuit,Gestral Beach,1,0,170,11,77,"Rewarded for completing the ""Only-up"" climbing challenge in the Gestral Beach",0
+Lost Gestral,The Continent,1,0,168,11,1,In front of Esquie's Nest,0
+Lost Gestral,The Continent,1,0,168,11,2,"As you approach the entrance to the Stone Wave Cliffs, they will see a path to their right that leads to a Bourgeon. There is a Lost Gestral in an alcove just beyond that enemy.",0
+Lost Gestral,The Continent,1,0,168,11,3,"There is a Lost Gestral just southeast of Monoco's Station, in the northeast of the area",0
+Lost Gestral,The Continent,1,0,168,11,4,"After unlocking the ability to swim, this Lost gestral can be found on the same island as White Tree, west of Yellow Harvest. The Gestral is on the south side of the island",0
+Lost Gestral,The Continent,1,0,168,11,5,"After unlocking the ability to swim through coral reefs, you can find this Lost Gestral on the beach above Coastal Cave",0
+Lost Gestral,The Continent,1,0,168,11,6,"There is a red island northwest of Old Lumiere. The gestal is hidden in the corner next to two Mimes. Swim is required for this one, but in order to reach this area of the map that should already be unlocked",0
+Lost Gestral,The Continent,1,0,168,11,7,"After unlocking the ability to Fly, head towards the endless tower. There is a single rock platform high in the air by the tower, and a Lost Gestral stands upon it.",0
+Lost Gestral,The Continent,1,0,168,11,8,"After unlocking the ability to Fly, head toward the left side of Visages or northeast of the Reacher. Esquie can land on some land in that area and the Lost Gestral is standing near its south end",0
+Lost Gestral,The Continent,1,0,168,11,9,"After unlocking the ability to Fly, this Lost Gestral can be found in the red area southwest of Sirene, near the portal to the Endless Night Sanctuary",0
+Alicia,The Manor,1,0,171,11,1,"Enter the Manor door through the Falling Leaves location to transport yourself to Alicia's study. The Manor door can be found in the lower area of the Falling Leaves, in the cavern where the Lady of Sap is",0
+Alicia's Birthday Party,Boat Graveyard,1,0,171,11,1,Requires Esquie to acquire a new ability that can destroy the coral reefs,0
+Aline,White Sands,1,0,171,11,1,"Found at the dead end of this location, next to a rowboat. Requires Esquie's fly ability to reach the location",0
+Aline's Glasshouse,Lost Woods,1,0,171,11,1,Clear out the Yellow Harvest location to reach the other exit where you can find the entrance to the Lost Woods.,0
+Children of Lumiere,The Continent,1,0,171,11,1,Can be purchased from Citrelo for 1000 Chroma. Requires Esquie's fly ability to reach the location,0
+Clea,Endless Tower,1,0,171,11,1,Complete all 11 Stages which is a total of 33 challenges. Requires Esquie's Fly ability to reach the entrance of the location,0
+Clea! Don't Pull Your Sister's Hair!,The Manor,1,0,171,11,1,The entrance for this room is located in Frozen Hearts,0
+Endless Light,Renoir's Drafts,1,0,171,11,1,"Requires Esquie's swim underwater ability to reach the location. From the Entrance Expedition Flag, head down the path and take the path directly to the left of the slope you came from. Grapple to the building, head down the path and pick up the Music Record on the right side of the field",0
+Forlorn,The Manor,1,0,171,11,1,"Requires Esquie's fly ability to reach the entrance from The Continent. It is east to The Meadows, before the Chromatic Benisseur",0
+Goblu,The Continent,1,0,171,11,1,Purchased from the Gestral Merchant Blabary for 1000 Chroma,0
+Gustave,Stone Wave Cliffs,1,0,171,11,1,Return to the area where you fought the main boss and where the cutscene took place. You'll find it in the ground by the edge of the cliff,0
+Honeymoon in Lumiere,White Tree,1,0,171,11,1,Progress the story to acquire the swim ability for Esquie and to reach the location,0
+L'Amour D'Une Mère,The Manor,1,0,171,11,1,"Enter the Manor through The Monolith entrance from the Tainted Battledfields, it can be found to the left upon entering",0
+Le Grand Cafe de Lumiere,The Carousel,1,0,171,11,1,"As you approach the Carousel from the Expedition flag, take a path to the left. The record is at the end",0
+Lettre à Maelle (Missable),Camp,1,0,171,11,1,"Progress the story in Act II. After defeating an axon, in the Camp. Choose ""Check up on the others"". You'll acquire this record after the cutscene",0
+Lights of the Past,Ancient Gestral Village,1,0,171,11,1,Requires Esquie to destroy the rock obstacles blocking the path to the location,0
+Linen and Cotton,The Continent,1,0,171,11,1,Can be purchased from Rubiju for 1000 Chroma,0
+Lost Voice,The Continent,1,0,171,11,1,Can be purchased from Strabami for 5000 Chroma,0
+Lumiere,"Lumiere (Missable)
+The Continent",1,0,171,11,1,"Acquired as a drop by defeating the Mime enemy located in Lumiere during the Prologue section of the game.
+Or, if you missed it, buy it from the merchant near the entrance to the Isle of the Eyes.",0
+Lune,Camp,1,0,171,11,1,Reach Relationship Level 6 with Lune and complete her side quest,0
+Monoco,Camp,1,0,171,11,1,Reach Relationship Level 6 with Monoco and complete his side quest,0
+Nocturne Pour Lumiere,Sinister Caves,1,0,171,11,1,"Found next to the remains of an expedition. Climb to the top section of the cave, and then go east to find an opening on the ground that you can jump to drop onto a platform where the dead expeditioner and the music record is",0
+Nocturne Pour Un Masque De Tristesse,The Manor,1,0,171,11,1,"Trigger the four switches in the dining room, and then investigate the fireplace to find this music record",0
+Our Drafts Collide,Camp,1,0,171,11,1,Automatically unlocked and added to the list of music records upon defeating the final boss of the main campaign in Act III,0
+Our Painted Family,The Meadows,1,0,171,11,1,Progress the story to acquire the swim ability for Esquie and to reach the location,0
+Renoir,The Manor,1,0,171,11,1,"Enter The Manor from Old Lumiere, and pick up the record on the sink directly to the right upon entering",0
+Reverence,Blades' Graveyard,1,0,171,11,1,Progress the story to acquire the swim ability for Esquie and to reach the location,0
+Rêveries Dans Paris,Flying Casino,1,0,171,11,1,Can be found on the right side behind the casino,0
+Robe de Jour,The Continent,1,0,171,11,1,Can be purchased from Rederi for 1000 Chroma,0
+Sciel,Camp,1,0,171,11,1,Reach Relationship Level 6 with Sciel. Progress the story around Act III and choose to spend time with her back at camp,0
+Un 33 Decembre a Lumiere,Twilight Quarry,1,0,171,11,1,Requires Esquie to destroy the rock obstacles blocking the path to the location,0
+Until Next Life,Falling Leaves,1,0,171,11,1,Defeat the Scavenger boss and return to the Young Boy. Speak to him to acquire this record,0
+Verso,The Manor,1,0,171,11,1,"Access The Manor through the door inside a cavern in the Anger Vale section of Visages. In the room, the record is besides the baby grand piano",0
+Ancient Sanctuary,"Near the expedition flag at the entrance, chase the Petank across the log bridge to the glowing plate on the other side of the stream",1,0,169,11,1,,0
+Esquie's Nest,"From the entrance, go through the narrow tunnel and drop down from the left side of the bridge, approach from the left so the Petank runs through the cave on the right, the glowing plate is between two large rocks at the end",1,0,169,11,2,,0
+Stone Wave Cliffs,"At the Old Farm checkpoint, look for the Petank beneath the first cabin on the right, approach from behind and guide it through the gates into a narrow alley where the glowing plate is located",1,0,169,11,3,,0
+Endless Night Sanctuary,"From the Night Totem flag, head toward the exit past the Ultimate Sakapatate, instead of leaving, keep to the left to find a tunnel leading to a new area, follow the path to the Petank and guide it to the glowing plate",1,0,169,11,4,,0
+Frozen Hearts,"Located to the left of an abandoned building next to a piano, before the expedition flag at Frozen Heart, chase the Petank northward until it reaches the glowing plate",1,0,169,11,5,,0
+Forgotten Battlefield,"From the Battlefield flag, move through the main area until you find the purple Petank, approach it from the right so it flees to its left, then circle around and approach from the 3 o’clock direction (as if coming from the right side of the map) to push it toward the far end of the area. Finally, approach from its left to guide it directly onto the glowing plate",1,0,169,11,6,,0
+The Reacher,"In the same area with one of the Mansion’s doors, descend the spiral ramp to a lower floor, chase the Petank toward the cliff’s edge, clearing out the Nevrons along the way",1,0,169,11,7,,0
+Isle of Eyes,"Climb the stairs and go under a mannequin with an eye on its chest, jump from the right side of the platform to drop into the area with the Petank. Guide it around the stone pillars to the glowing plate next to another mannequin",1,0,169,11,8,,0
+Sirene,"After using a floating disc to reach a room with a large statue, enter the room behind the statue to find the red Petank. Approach from the left to make it run into the statue room, then into the room on the right where it can be cornered",1,0,169,11,9,,0
+Sirene,"Located to the left of the Glissando boss area. Look among the floating rubble of one of the broken columns for handholds. After crossing, drop a light rope to reach the lower level with the Petank. Chase it until it stops at the base of the stairs, then guide it onto the glowing plate",1,0,169,11,10,,0
+The Monolith,"From the Tainted Cliffs checkpoint, ascend the spiral staircase. Continue along the path until you reach a group of Cultists. The glowing green plate is located next to them. The Petank can be found in the open area beyond the Cultists",1,0,169,11,11,,0
+The Continent,"A Chromatic Petank can be found on the overworld. To find it, head east from the central map area and look for a glowing chromatic aura in the distance. The Petank will appear with a colorful, radiant glow, making it easy to spot. To capture it, approach carefully without startling it. Follow the Petank as it moves through the area, and eventually, it will stop at a glowing circle",1,0,169,11,12,,0
+Flying Manor,"In the path to the Eveques bossfight, in the back corner, there should be a canvas near a ramp, the Petank should be visible from there",1,0,169,11,13,,0
+Gustave/Verso - Abysseram,"The Continent, Flying Manor",1,0,166,11,1,,0
+Gustave/Verso - Baguette,"Lumiere (Prologue, ng+)",1,0,166,11,2,,0
+Gustave/Verso - Blodam,The Continent,1,0,166,11,3,,0
+Gustave/Verso - Chevalam,Crimson Forest,1,0,166,11,4,,0
+Gustave/Verso - Confuso,Visages,1,0,166,11,5,,0
+Gustave/Verso - Contorso,The Chosen Path,1,0,166,11,6,,0
+Gustave/Verso - Corpeso,Dark Shores,1,0,166,11,7,,0
+Gustave/Verso - Cruleram,"Flying Waters, Coastal Cave, Flying Manor, Endless Night Sanctuary",1,0,166,11,8,,0
+Gustave/Verso - Cultam,Monoco's Station,1,0,166,11,9,,0
+Gustave/Verso - Danseso,Old Lumiere,1,0,166,11,10,,0
+Gustave/Verso - Delaram,Stone Wave Cliffs,1,0,166,11,11,,0
+Gustave/Verso - Demonam,Gestral Village,1,0,166,11,12,,0
+Gustave/Verso - Dreameso,The Monolith,1,0,166,11,13,,0
+Gustave/Verso - Dualiso,"Forgotten Battlefield, Flying Manor",1,0,166,11,14,,0
+Gustave/Verso - Gaulteram,"The Continent, Yellow Harvest, Lumiere (Act III)",1,0,166,11,15,,0
+Gustave/Verso - Gesam,Flying Manor,1,0,166,11,16,,0
+Gustave/Verso - Glaceso,The Continent,1,0,166,11,17,,0
+Gustave/Verso - Lanceram,"Spring Meadows, Coastal Cave, Flying Manor",1,0,166,11,18,,0
+Gustave/Verso - Liteso,Lumiere (Act III),1,0,166,11,19,,0
+Gustave/Verso - Noahram,Default,1,0,166,11,20,,0
+Gustave/Verso - Nosaram,Renoir's Drafts,1,0,166,11,21,,0
+Gustave/Verso - Sakaram,"Ancient Sanctuary, Gestral Village, Dark Gestral Arena",1,0,166,11,22,,0
+Gustave/Verso - Seeram,Coastal Cave,1,0,166,11,23,,0
+Gustave/Verso - Simoso,The Abyss,1,0,166,11,24,,0
+Gustave/Verso - Sireso,Sirene,1,0,166,11,25,,0
+Gustave/Verso - Tireso,The Reacher,1,0,166,11,26,,0
+Gustave/Verso - Verleso,Default,1,0,166,11,27,,0
+Lune - Angerim,The Continent,1,0,166,11,28,,0
+Lune - Baguette,"Lumiere (Prologue, ng+)",1,0,166,11,29,,0
+Lune - Benisim,"Forgotten Battlefield, The Continent",1,0,166,11,30,,0
+Lune - Betelim,Gestral Village,1,0,166,11,31,,0
+Lune - Braselim,The Monolith,1,0,166,11,32,,0
+Lune - Chapelim,Visages,1,0,166,11,33,,0
+Lune - Choralim,Sirene's Dress,1,0,166,11,34,,0
+Lune - Colim,The Continent,1,0,166,11,35,,0
+Lune - Coralim,Stone Wave Cliffs,1,0,166,11,36,,0
+Lune - Deminerim,"Flying Waters, Coastal Cave",1,0,166,11,37,,0
+Lune - Elerim,"Sinister Cave, Flying Manor",1,0,166,11,38,,0
+Lune - Kralim,"The Continent, Yellow Harvest",1,0,166,11,39,,0
+Lune - Lighterim,"Spring Meadows, Coastal Cave, Flying Manor",1,0,166,11,40,,0
+Lune - Lithelim,The Monolith,1,0,166,11,41,,0
+Lune - Lunerim,Default,1,0,166,11,42,,0
+Lune - Painerim,Renoir's Drafts,1,0,166,11,43,,0
+Lune - Potierim,"Lumiere (Act III), The Continent",1,0,166,11,44,,0
+Lune - Redalim,Old Lumiere,1,0,166,11,45,,0
+Lune - Saperim,"The Continent, Flying Manor",1,0,166,11,46,,0
+Lune - Scaverim,Falling Leaves,1,0,166,11,47,,0
+Lune - Snowim,"Frozen Hearts, Flying Manor",1,0,166,11,48,,0
+Lune - Trebuchim,"Ancient Sanctuary, Gestral Village, Dark Gestral Arena",1,0,166,11,49,,0
+Lune - Troubadim,"Flying Waters, Flying Manor, Forgotten Battlefield",1,0,166,11,50,,0
+Maelle - Baguette,"Lumiere (Prologue, ng+)",1,0,166,11,51,,0
+Maelle - Barrier Breaker,Camp,1,0,166,11,52,,0
+Maelle - Battlum,"Old Lumiere, Flying Manor",1,0,166,11,53,,0
+Maelle - Brulerum,"Flying Waters, Coastal Cave",1,0,166,11,54,,0
+Maelle - Chalium,Sinister Cave,1,0,166,11,55,,0
+Maelle - Chantenum,Sirene,1,0,166,11,56,,0
+Maelle - Clierum,Visages,1,0,166,11,57,,0
+Maelle - Coldum,Monoco's Station,1,0,166,11,58,,0
+Maelle - Duenum,Stone Wave Cliffs,1,0,166,11,59,,0
+Maelle - Facesum,Isle of the Eyes,1,0,166,11,60,,0
+Maelle - Glaisum,Falling Leaves,1,0,166,11,61,,0
+Maelle - Jarum,The Continent,1,0,166,11,62,,0
+Maelle - Lithum,The Reacher,1,0,166,11,63,,0
+Maelle - Maellum,Default,1,0,166,11,64,,0
+Maelle - Medalum,Gestral Village,1,0,166,11,65,,0
+Maelle - Melarum,Old Lumiere,1,0,166,11,66,,0
+Maelle - Plenum,Yellow Harvest,1,0,166,11,67,,0
+Maelle - Seashellum,Flying Manor,1,0,166,11,68,,0
+Maelle - Sekarum,Gestral Village,1,0,166,11,69,,0
+Maelle - Stalum,"Frozen Hearts, The Continent",1,0,166,11,70,,0
+Maelle - Tissenum,Sirene,1,0,166,11,71,,0
+Maelle - Veremum,The Monolith,1,0,166,11,72,,0
+Maelle - Volesterum,Lumiere (Act III),1,0,166,11,73,,0
+Maelle - Yeverum,Renoir's Drafts,1,0,166,11,74,,0
+Sciel - Algueron,Old Lumiere,1,0,166,11,75,,0
+Sciel - Baguette,"Lumiere (Prologue, ng+)",1,0,166,11,76,,0
+Sciel - Blizzon,Falling Leaves,1,0,166,11,77,,0
+Sciel - Bourgelon,"The Monolith, Coastal Cave",1,0,166,11,78,,0
+Sciel - Charnon,Renoir's Drafts,1,0,166,11,79,,0
+Sciel - Chation,"Stone Wave Cliffs, Flying Manor, The Continent, The Monolith",1,0,166,11,80,,0
+Sciel - Corderon,Sinister Cave,1,0,166,11,81,,0
+Sciel - Direton,Falling Leaves,1,0,166,11,82,,0
+Sciel - Garganon,The Monolith,1,0,166,11,83,,0
+Sciel - Gobluson,"The Continent, Coastal Cave",1,0,166,11,84,,0
+Sciel - Guleson,Endless Night Sanctuary,1,0,166,11,85,,0
+Sciel - Hevasson,Gestral Village,1,0,166,11,86,,0
+Sciel - Litheson,Lumiere (Act III),1,0,166,11,87,,0
+Sciel - Lusteson,Forgotten Battlefield,1,0,166,11,88,,0
+Sciel - Martenon,Flying Manor,1,0,166,11,89,,0
+Sciel - Minason,The Crows,1,0,166,11,90,,0
+Sciel - Moisson,The Continent,1,0,166,11,91,,0
+Sciel - Ramasson,Flying Manor,1,0,166,11,92,,0
+Sciel - Rangeson,Stone Wave Cliffs,1,0,166,11,93,,0
+Sciel - Sadon,"Visages, Lumiere (Act III)",1,0,166,11,94,,0
+Sciel - Scieleson,Default,1,0,166,11,95,,0
+Sciel - Tisseron,Sirene,1,0,166,11,96,,0
+Monoco - Baguette,"Lumiere (Prologue, ng+)",1,0,166,11,97,,0
+Monoco - Ballaro,"The Continent, Lumiere (Act III), Sirene's Dress",1,0,166,11,98,,0
+Monoco - Boucharo,Visages,1,0,166,11,99,,0
+Monoco - Brumaro,The Continent,1,0,166,11,100,,0
+Monoco - Chromaro,Renoir's Drafts,1,0,166,11,101,,0
+Monoco - Fragaro,The Monolith,1,0,166,11,102,,0
+Monoco - Grandaro,Monoco's Station,1,0,166,11,103,,0
+Monoco - Joyaro,"Flying Manor, Endless Night Sanctuary",1,0,166,11,104,,0
+Monoco - Monocaro,Default,1,0,166,11,105,,0
+Monoco - Nusaro,Old Lumiere,1,0,166,11,106,,0
+Monoco - Sidaro,"Gestral Village, Flying Manor",1,0,166,11,107,,0
+Monoco - Urnaro,Sky Island,1,0,166,11,108,,0

@@ -1,21 +1,18 @@
-﻿Name,GameID,ListOrder,RecordOrderPreference,Hidden
-Flower: Bellbutton,4,51,completed-order-name,0
-Flower: Dandelily,4,52,completed-order-name,0
-Flower: Penstemum,4,53,completed-order-name,0
-Flower: Tulias,4,54,completed-order-name,0
-Flower: Hibiscus,4,55,completed-order-name,0
-Flower: Ghostgleam,4,56,completed-order-name,0
-Flower: Thistle,4,57,completed-order-name,0
-Flower: Heavy Nettle,4,58,completed-order-name,0
-Flower: Anemone,4,59,completed-order-name,0
-Flower: Dreampuff (AA only),4,60,completed-order-name,1
-Flower: Frostfeather (AA only),4,61,completed-order-name,1
-Flower: Blazebulb (AA only),4,62,completed-order-name,1
-Flower: Marigold,4,63,completed-order-name,0
-Flower: Eggwort,4,64,completed-order-name,0
-Flower: Petunia,4,65,completed-order-name,0
-Flower: Bowblossom,4,66,completed-order-name,0
-Flower: Poinsettia,4,67,completed-order-name,0
-Flower: Glowbal,4,68,completed-order-name,0
-Flower: Rose,4,69,completed-order-name,0
-Flower: Happadil,4,70,completed-order-name,0
+﻿ID,Name,GameID,ListOrder,RecordOrderPreference,Hidden
+155,Achievements,11,1,completed-order-name,0
+156,Side Quests,4,2,completed-order-name,0
+157,Nevron Quests,4,3,completed-order-name,0
+158,Mimes,4,4,completed-order-name,0
+159,Optional Bosses,4,5,completed-order-name,0
+160,Pictos,4,6,completed-order-name,0
+161,Expedition Journals,4,7,completed-order-name,0
+163,Tints,4,9,completed-order-name,0
+164,Haircuts,4,10,completed-order-name,0
+166,Weapons,4,12,completed-order-name,0
+168,Lost Gestrals,4,14,completed-order-name,0
+169,Petanks,4,15,completed-order-name,0
+170,Outfits,,,,
+171,Music,,,,
+,,,,,
+,Paint Cages,,,,
+,Monoco Skills,,,,
