@@ -65,6 +65,7 @@ The `game.html` file creates a landing page for the game. It then calls `script_
 -[ ] Optimize how records/sections are auto-numbered when re-ordering
 -[ ] Change New Record/Section pages to modals?
 -[ ] Auto-fill new Record/Section form with 0 completed, 1 available, and order set to 1
+-[ ] Edit/Add records/sections need to support Section Groups]
 
 ## Adding a new Route
 1. Create the new HTML file in the root directory
