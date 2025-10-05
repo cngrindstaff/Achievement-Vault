@@ -33,7 +33,8 @@ $(document).ready(async function () {
     linkContainerDiv.append('<div class="link-icon"><a href="' + linkToHomePage + '" class="link-icon-text"><i class="fa fa-solid fa-house fa-lg fa-border" ></i></a></div>');
     linkContainerDiv.append('<div class="link-icon"><a href="' + linkToGamePage + '" class="link-icon-text" title="Return to Game Page"><i class="fa fa-arrow-left fa-lg fa-border" ></i></a></div>');
 
-    mainContainer.append('<h1>' + htmlTitle + '</h1>');
+    mainContainer.append('<h1>' + gameNameFriendly + '</h1>');
+    mainContainer.append('<h2>Sections</h2>');
 
     mainContainer.append('<div id="grid-manage-sections-container"></div>');
     mainContainer.append('<button id="save-button" class="save-button">Save Order</button>');

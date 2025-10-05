@@ -21,7 +21,7 @@ let sectionGroupFriendlyName = null;
 $(document).ready(async function () {
     var gameId = utils.getQueryParam('gameId');
     var sectionGroupId = utils.getQueryParam('sectionGroupId');
-
+if (debugLogging) console.log('sectionGroupId: ' + sectionGroupId);
     // Fetch game data first
     const gameData = await dbUtils.getGameData(gameId);
     //console.log('gameData:', gameData);
@@ -30,6 +30,7 @@ $(document).ready(async function () {
     linkToGamePage = '/game?id=' + gameId;
 
     const sectionGroupData = await dbUtils.getSectionGroupById(sectionGroupId);
+    if (debugLogging) console.log('sectionGroupData:', sectionGroupData);
     sectionGroupName = sectionGroupData.Name;
     sectionGroupFriendlyName = sectionGroupData.FriendlyName;
     

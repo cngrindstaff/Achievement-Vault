@@ -513,6 +513,7 @@ export async function getSectionsBySectionGroupId(sectionGroupId, hiddenFilter) 
 
     try {
         //console.log('made it here loadSectionsByGameId');
+        if(debugLogging) console.log('getSectionsBySectionGroupId sectionGroupId: ' + sectionGroupId);
         const res = await fetch(`/api/db/sections/sectionGroupId/${sectionGroupId}/${hiddenFilter}`);
         const data = await res.json();
         //console.log('Section data:', data);

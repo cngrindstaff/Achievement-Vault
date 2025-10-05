@@ -33,8 +33,9 @@ $(document).ready(async function () {
     //.append() puts data inside an element at last index and .prepend() puts the prepending elem at first index.
     const mainContainer = $('#container');
 
-    mainContainer.prepend('<h1>' + htmlTitle + '</h1>');
-
+    mainContainer.prepend('<h2>Tables</h2>');
+    mainContainer.prepend('<h1>' + gameNameFriendly + '</h1>');
+    
     mainContainer.prepend(`<div class="link-container"> </div>`);
 
     const linkContainerDiv = $('.link-container');

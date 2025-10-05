@@ -9,7 +9,7 @@ let htmlTitle = null;
 let linkToGamePage = null;
 const linkToHomePage = './';
 
-var debugLogging = true;
+var debugLogging = false;
 
 $(document).ready(async function () {
     var passed_gameId = utils.getQueryParam('gameId');
