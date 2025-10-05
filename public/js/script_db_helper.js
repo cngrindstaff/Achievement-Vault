@@ -49,7 +49,7 @@ export async function getSectionsByGameId(gameId, hiddenFilter) {
         
         return data;
     } catch (err) {
-        console.error("Error fetching game data:", err);
+        console.error("Error getSectionsByGameId: ", err);
     }
 }
 //************************************ GET SECTION BY SECTION ID ************************************//
@@ -447,6 +447,42 @@ export async function deleteGameRecord(recordId) {
     } catch (err) {
         console.error("Error deleting record:", err);
         return false;
+    }
+}
+
+//************************************ GET ALL SECTIONGROUPS FOR A GAME BY GAME ID ************************************//
+export async function getSectionGroupsByGameId(gameId, hiddenFilter) {
+    if (!gameId) {
+        alert("Missing game ID in URL.");
+        return;
+    }
+
+    try {
+        //console.log('made it here getSectionGroupsByGameId');
+        const res = await fetch(`/api/db/sectionGroups/${gameId}/${hiddenFilter}`);
+        const data = await res.json();
+        //console.log('SectionGroup data:', data);
+        return data;
+    } catch (err) {
+        console.error("Error fetching SectionGroup data:", err);
+    }
+}
+
+//************************************ GET ALL SECTIONS FOR A GAME BY SECTION GROUP ID ************************************//
+export async function getSectionsBySectionGroupId(sectionGroupId, hiddenFilter) {
+    if (!sectionGroupId) {
+        alert("Missing sectionGroupId in URL.");
+        return;
+    }
+
+    try {
+        //console.log('made it here loadSectionsByGameId');
+        const res = await fetch(`/api/db/sections/${sectionGroupId}/${hiddenFilter}`);
+        const data = await res.json();
+        //console.log('Section data:', data);
+        return data;
+    } catch (err) {
+        console.error("Error getSectionsBySectionGroupId: ", err);
     }
 }
 

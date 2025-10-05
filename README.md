@@ -65,3 +65,16 @@ The `game.html` file creates a landing page for the game. It then calls `script_
 -[ ] Optimize how records/sections are auto-numbered when re-ordering
 -[ ] Change New Record/Section pages to modals?
 -[ ] Auto-fill new Record/Section form with 0 completed, 1 available, and order set to 1
+
+## Adding a new Route
+1. Create the new HTML file in the root directory
+2. Create the new JS file and put it in js/script_(page).js
+3. Add the path in server.js
+
+## Pages
+1. index.html - Home page, lists all games
+2. game.html - Game landing page, links to checklist and tables
+3. checklist.html - Main checklist page
+4. table.html - Additional tables page
+5. manage_sectionRecords.html - Page to add a new record
+6. manage_sections.html - Page to add a new section

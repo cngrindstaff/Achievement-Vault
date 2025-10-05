@@ -428,6 +428,88 @@ router.get('/db/tableRecords/:tableId', async (req, res) => {
 //#endregion 
 
 
+
+//************************************ GET ALL SECTIONGROUPS FOR A GAME BY GAME ID ************************************//
+router.get('/db/sectionGroups/:gameId/:hiddenFilter', async (req, res) => {
+    //console.log('made it here sectionGroups/gameid');
+    const gameId = req.params.gameId;
+    let hiddenFilter = req.params.hiddenFilter;
+
+    // Convert string 'true'/'false' to boolean 1/0
+    if (hiddenFilter === 'true') {
+        hiddenFilter = 1;
+    } else if (hiddenFilter === 'false') {
+        hiddenFilter = 0;
+    } else {
+        hiddenFilter = null; // Let SQL default it if invalid or missing
+    }
+
+    //console.log('gameId: ' + gameId + ' hiddenFilter: ' + hiddenFilter);
+    try {
+        const [rows] = await db.query('CALL GetSectionGroupsByGameID(?, ?)', [gameId, hiddenFilter]);
+        const result = rows[0];
+
+        if (result.length === 0) {
+            return res.status(404).json({ error: 'Game not found' });
+        }
+
+        res.json(result);
+    } catch (err) {
+        console.error(`Error fetching sectionGroups  with game ID ${gameId}:`, err);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
+//************************************ GET ALL SECTIONS FOR A GAME BY SECTION GROUP ID ************************************//
+router.get('/db/sections/:sectionGroupId/:hiddenFilter', async (req, res) => {
+    //console.log('made it here sectionGroups/gameid');
+    const gameId = req.params.gameId;
+    let hiddenFilter = req.params.hiddenFilter;
+
+    // Convert string 'true'/'false' to boolean 1/0
+    if (hiddenFilter === 'true') {
+        hiddenFilter = 1;
+    } else if (hiddenFilter === 'false') {
+        hiddenFilter = 0;
+    } else {
+        hiddenFilter = null; // Let SQL default it if invalid or missing
+    }
+
+    //console.log('gameId: ' + gameId + ' hiddenFilter: ' + hiddenFilter);
+    try {
+        const [rows] = await db.query('CALL GetGameSectionsBySectionGroupID(?, ?)', [gameId, hiddenFilter]);
+        const result = rows[0];
+
+        if (result.length === 0) {
+            return res.status(404).json({ error: 'Game not found' });
+        }
+
+        res.json(result);
+    } catch (err) {
+        console.error(`Error fetching sections  with game ID ${gameId}:`, err);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
+
+
 //************************************  ************************************//
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 export default router;
