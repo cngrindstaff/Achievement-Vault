@@ -639,3 +639,33 @@ GRANT EXECUTE ON PROCEDURE achievement_vault.GetGameSectionsBySectionGroupID TO 
 
 ************************************************
 
+DELIMITER $$
+
+CREATE PROCEDURE GetGameByIdV2(IN p_GameId INT)
+BEGIN
+    -- Select the game details with counts from related tables
+    SELECT 
+        g.*,
+        (
+            SELECT COUNT(*) 
+            FROM GameTables gt 
+            WHERE gt.GameID = g.ID
+        ) AS GameTableCount,
+        (
+            SELECT COUNT(*) 
+            FROM SectionGroups sg 
+            WHERE sg.GameID = g.ID
+        ) AS SectionGroupCount
+    FROM Games g
+    WHERE g.ID = p_GameId;
+END$$
+
+DELIMITER ;
+
+
+************************************************
+
+
+GRANT EXECUTE ON achievement_vault.* TO 'achievement_vault_user'@'%';
+FLUSH PRIVILEGES;
+SHOW GRANTS FOR 'achievement_vault_user'@'%';

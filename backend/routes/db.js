@@ -22,7 +22,6 @@ router.get('/db/games/all', async (req, res) => {
 
 //************************************ GET GAME BY ID ************************************//
 router.get('/db/games/:gameId', async (req, res) => {
-    //console.log('made it here2');
     const gameId = req.params.gameId;
     //console.log('gameId: ' + gameId);
     try {
@@ -39,6 +38,26 @@ router.get('/db/games/:gameId', async (req, res) => {
         res.status(500).json({ error: 'Internal server error' });
     }
 });
+
+//************************************ GET GAME BY ID V2 - includes # of tables, sectionGroups ************************************//
+router.get('/db/games/v2/:gameId', async (req, res) => {
+    const gameId = req.params.gameId;
+    //console.log('gameId: ' + gameId);
+    try {
+        const [rows] = await db.query('CALL GetGameByIdV2(?)', [gameId]);
+        const result = rows[0];
+
+        if (result.length === 0) {
+            return res.status(404).json({ error: 'Game not found' });
+        }
+
+        res.json(result[0]);
+    } catch (err) {
+        console.error(`Error fetching game V2 with ID ${gameId}:`, err);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
 
 //#endregion 
 
@@ -427,8 +446,6 @@ router.get('/db/tableRecords/:tableId', async (req, res) => {
 
 //#endregion 
 
-
-
 //************************************ GET ALL SECTIONGROUPS FOR A GAME BY GAME ID ************************************//
 router.get('/db/sectionGroups/:gameId/:hiddenFilter', async (req, res) => {
     //console.log('made it here sectionGroups/gameid');
@@ -460,10 +477,30 @@ router.get('/db/sectionGroups/:gameId/:hiddenFilter', async (req, res) => {
     }
 });
 
+
+//************************************ GET  SECTIONGROUPS SECTIONGROUP ID ************************************//
+router.get('/db/sectionGroup/:sectionGroupId', async (req, res) => {
+    const sectionGroupId = req.params.sectionGroupId;
+    //console.log('gameId: ' + gameId);
+    try {
+        const [rows] = await db.query('CALL GetSectionGroupById(?)', [sectionGroupId]);
+        const result = rows[0];
+
+        if (result.length === 0) {
+            return res.status(404).json({ error: 'Section Group not found' });
+        }
+
+        res.json(result[0]);
+    } catch (err) {
+        console.error(`Error fetching sectionGroup with ID ${sectionGroupId}:`, err);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
 //************************************ GET ALL SECTIONS FOR A GAME BY SECTION GROUP ID ************************************//
-router.get('/db/sections/:sectionGroupId/:hiddenFilter', async (req, res) => {
-    //console.log('made it here sectionGroups/gameid');
-    const gameId = req.params.gameId;
+router.get('/db/sections/sectionGroupId/:sectionGroupId/:hiddenFilter', async (req, res) => {
+    console.log('made it here sectionGroups/sectionGroupId');
+    const sectionGroupId = req.params.sectionGroupId;
     let hiddenFilter = req.params.hiddenFilter;
 
     // Convert string 'true'/'false' to boolean 1/0
@@ -477,7 +514,7 @@ router.get('/db/sections/:sectionGroupId/:hiddenFilter', async (req, res) => {
 
     //console.log('gameId: ' + gameId + ' hiddenFilter: ' + hiddenFilter);
     try {
-        const [rows] = await db.query('CALL GetGameSectionsBySectionGroupID(?, ?)', [gameId, hiddenFilter]);
+        const [rows] = await db.query('CALL GetGameSectionsBySectionGroupID(?, ?)', [sectionGroupId, hiddenFilter]);
         const result = rows[0];
 
         if (result.length === 0) {

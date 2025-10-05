@@ -1,5 +1,6 @@
 import * as utils from './script_utilities.js';
 import * as dbUtils from './script_db_helper.js';
+import {getSectionGroupsByGameId} from "./script_db_helper.js";
 
 const sendGridUrl = '/api/send-email';
 const googleSheetsAppendUrl = '/api/google-sheets-append';
@@ -13,19 +14,25 @@ let gameNameFriendly = null;
 let gameName = null;
 let hasDataTables = false;
 let linkToGamePage = null;
+let sectionGroupId = null;
+let sectionGroupName = null;
+let sectionGroupFriendlyName = null;
 
 $(document).ready(async function () {
-    var passed_gameId = utils.getQueryParam('id');
+    var gameId = utils.getQueryParam('gameId');
+    var sectionGroupId = utils.getQueryParam('sectionGroupId');
 
     // Fetch game data first
-    const gameData = await dbUtils.getGameData(passed_gameId);
+    const gameData = await dbUtils.getGameData(gameId);
     //console.log('gameData:', gameData);
-    gameId = gameData.ID;
     gameName = gameData.Name;
     gameNameFriendly = gameData.FriendlyName;
-    hasDataTables = gameData.HasDataTables;
     linkToGamePage = '/game?id=' + gameId;
 
+    const sectionGroupData = await dbUtils.getSectionGroupById(sectionGroupId);
+    sectionGroupName = sectionGroupData.Name;
+    sectionGroupFriendlyName = sectionGroupData.FriendlyName;
+    
     //set the title field that's in the head using the variable from the game's HTML
     const titleElement = document.querySelector('title');
     titleElement.textContent = gameNameFriendly + ' 100% Completion Checklist';
@@ -38,7 +45,10 @@ $(document).ready(async function () {
     linkContainerDiv.append('<div class="link-icon"><a href="' + linkToHomePage + '" class="link-icon-text"><i class="fa fa-solid fa-house fa-lg fa-border" ></i></a></div>');
     linkContainerDiv.append('<div class="link-icon"><a href="' + linkToGamePage + '" class="link-icon-text" title="Return to Game Page"><i class="fa fa-arrow-left fa-lg fa-border" ></i></a></div>');
 
-    mainContainer.append('<h1>' + gameNameFriendly + ' 100% Completion Checklist</h1>');
+    mainContainer.append('<h1>' + gameNameFriendly + '</h1>');
+    mainContainer.append('<h2>100% Completion Checklist</h2>');
+    mainContainer.append('<h3>Section: ' + sectionGroupFriendlyName + '</h3>');
+
     mainContainer.append('<p id="total-completion">Total Completion: 0%</p>');
 
     mainContainer.append('<div id="grid-checklist-container"></div>');
@@ -59,7 +69,7 @@ $(document).ready(async function () {
 
 
     // Fetch sections for that game
-    const sections = await dbUtils.getSectionsByGameId(passed_gameId, false);
+    const sections = await dbUtils.getSectionsBySectionGroupId(sectionGroupId, false);
 
     await processData(sections);
     updateAllSectionsCompletion(); // Update section percentages

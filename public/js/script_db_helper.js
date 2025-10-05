@@ -27,6 +27,25 @@ export async function getGameData(passed_gameId) {
     //document.querySelector('.game-name').textContent = passed_gameNameFriendly;
 }
 
+//************************************ GET GAME BY ID V2 - includes # of tables, sectionGroups ************************************//
+export async function getGameDataV2(passed_gameId) {
+    if (!passed_gameId) {
+        alert("Missing game ID in URL.");
+        return;
+    }
+
+    try {
+        const res = await fetch(`/api/db/games/v2/${passed_gameId}`);
+        const data = await res.json();
+        //console.log('Game data:', data);
+        return data;
+    } catch (err) {
+        console.error("Error fetching game data:", err);
+    }
+
+    //document.querySelector('.game-name').textContent = passed_gameNameFriendly;
+}
+
 //************************************ GET ALL SECTIONS FOR A GAME BY GAME ID ************************************//
 export async function getSectionsByGameId(gameId, hiddenFilter) {
     if (!gameId) {
@@ -450,6 +469,23 @@ export async function deleteGameRecord(recordId) {
     }
 }
 
+//************************************ GET SECTIONGROUP BY SECTIONGROUP ID  ************************************//
+export async function getSectionGroupById(sectionGroupId) {
+    if (!sectionGroupId) {
+        alert("Missing sectionGroupId in URL.");
+        return;
+    }
+
+    try {
+        //console.log('made it here getSectionGroupsByGameId');
+        const res = await fetch(`/api/db/sectionGroup/${sectionGroupId}`);
+        const data = await res.json();
+        //console.log('SectionGroup data:', data);
+        return data;
+    } catch (err) {
+        console.error("Error fetching SectionGroup data:", err);
+    }
+}
 //************************************ GET ALL SECTIONGROUPS FOR A GAME BY GAME ID ************************************//
 export async function getSectionGroupsByGameId(gameId, hiddenFilter) {
     if (!gameId) {
@@ -477,7 +513,7 @@ export async function getSectionsBySectionGroupId(sectionGroupId, hiddenFilter) 
 
     try {
         //console.log('made it here loadSectionsByGameId');
-        const res = await fetch(`/api/db/sections/${sectionGroupId}/${hiddenFilter}`);
+        const res = await fetch(`/api/db/sections/sectionGroupId/${sectionGroupId}/${hiddenFilter}`);
         const data = await res.json();
         //console.log('Section data:', data);
         return data;

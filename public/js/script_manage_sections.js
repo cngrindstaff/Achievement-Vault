@@ -16,7 +16,6 @@ $(document).ready(async function () {
     var passed_gameId = utils.getQueryParam('gameId');
 
     // Fetch game data first
-
     const gameData = await dbUtils.getGameData(passed_gameId);
     //if(debugLogging) console.log('gameData:', gameData);
     gameId = gameData.ID;

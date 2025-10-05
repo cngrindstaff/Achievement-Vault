@@ -37,11 +37,12 @@ body {
   width: 100%;
 }
 
-h1 {
+h1, h2, h3 {
   color: #104042;
   text-align: center;
   margin-bottom: 20px;
 }
+
 
 .section-header, .game-list-item, .game-section-item {
   /*	background-color: $teal_bck_color-2;
