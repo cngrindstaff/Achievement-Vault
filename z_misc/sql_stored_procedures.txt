@@ -488,3 +488,184 @@ GRANT EXECUTE ON PROCEDURE achievement_vault.GetGameRecordByRecordID TO 'achieve
 
 
 ************************************************
+
+
+DELIMITER $$
+
+CREATE PROCEDURE "GetSectionGroupsByGameID"(IN inputGameID INT, IN includeHiddenSectionGroups bool)
+BEGIN
+    -- Default to TRUE if NULL is passed
+    IF includeHiddenSectionGroups IS NULL THEN
+        SET includeHiddenSectionGroups = TRUE;
+    END IF;
+    
+    SELECT * FROM SectionGroups
+    WHERE GameID = inputGameID
+    AND Hidden = includeHiddenSectionGroups
+    ORDER BY ListOrder ASC, ID ASC;
+END $$
+
+DELIMITER ;
+
+GRANT EXECUTE ON PROCEDURE achievement_vault.GetSectionGroupsByGameID TO 'achievement_vault_user'@'%';
+
+************************************************
+
+
+DELIMITER $$
+CREATE DEFINER="doadmin"@"%" PROCEDURE "GetSectionGroupById"(IN sectionGroupId INT)
+BEGIN
+    SELECT * FROM SectionGroups
+    WHERE ID = sectionGroupId;
+END$$
+DELIMITER ;
+
+GRANT EXECUTE ON PROCEDURE achievement_vault.GetSectionGroupById TO 'achievement_vault_user'@'%';
+
+************************************************
+
+DELIMITER //
+
+CREATE PROCEDURE InsertSectionGroup(
+    IN sectionGroupName VARCHAR(100),
+    IN sectionGroupFriendlyName VARCHAR(100),
+    IN gameId INT,
+    IN listOrder INT,
+    IN hidden TINYINT
+)
+BEGIN
+    INSERT INTO SectionGroups
+    (Name, FriendlyName, GameID, ListOrder, Hidden, DateCreated)
+    VALUES
+    (sectionGroupName, sectionGroupFriendlyName, gameId, listOrder, hidden, utc_timestamp());
+END //
+
+DELIMITER ;
+
+
+GRANT EXECUTE ON PROCEDURE achievement_vault.InsertSectionGroup TO 'achievement_vault_user'@'%';
+
+************************************************
+
+The COALESCE function returns the first non-null value. This ensures that only non-null input parameters update the fields, leaving existing values unchanged if the input is NULL.
+
+DELIMITER //
+
+CREATE PROCEDURE UpdateSectionGroup(
+    IN sectionGroupId INT,
+    IN gameId INT,
+    IN sectionGroupName VARCHAR(255),
+    IN sectionGroupFriendlyName VARCHAR(255),
+    IN listOrder INT,
+    IN hidden TINYINT
+)
+BEGIN
+    UPDATE GameSections
+    SET 
+        Name = COALESCE(sectionGroupName, Name),
+        ListOrder = COALESCE(listOrder, ListOrder),
+        Hidden = COALESCE(hidden, Hidden)
+    WHERE 
+        ID = sectionGroupId AND GameID = gameId;
+END //
+
+DELIMITER ;
+
+
+GRANT EXECUTE ON PROCEDURE achievement_vault.UpdateSectionGroup TO 'achievement_vault_user'@'%';
+
+************************************************
+
+
+DELIMITER //
+
+CREATE PROCEDURE UpdateSectionGroupsListOrder(
+    IN sectionGroupUpdates JSON,
+    OUT rowsUpdated INT
+)
+BEGIN
+    DECLARE i INT DEFAULT 0;
+    DECLARE n INT DEFAULT JSON_LENGTH(sectionGroupUpdates);
+    DECLARE sectionGroupId INT;
+    DECLARE listOrder INT;
+    DECLARE totalRowsUpdated INT DEFAULT 0;
+
+    WHILE i < n DO
+        -- Extract the ID and ListOrder for this section
+        SET sectionGroupId = JSON_UNQUOTE(JSON_EXTRACT(sectionGroupUpdates, CONCAT('$[', i, '].ID')));
+        SET listOrder = JSON_UNQUOTE(JSON_EXTRACT(sectionGroupUpdates, CONCAT('$[', i, '].ListOrder')));
+
+        -- Update the row and count the affected rows
+        UPDATE SectionGroups
+        SET ListOrder = listOrder
+        WHERE ID = sectionGroupId;
+
+        SET totalRowsUpdated = totalRowsUpdated + ROW_COUNT();
+
+        SET i = i + 1;
+    END WHILE;
+
+    -- Return the total rows updated
+    SET rowsUpdated = totalRowsUpdated;
+END //
+
+DELIMITER ;
+
+GRANT EXECUTE ON PROCEDURE achievement_vault.UpdateSectionGroupsListOrder TO 'achievement_vault_user'@'%';
+
+
+************************************************
+
+DELIMITER $$
+
+CREATE PROCEDURE "GetGameSectionsBySectionGroupID"(IN inputSectionGroupID INT, IN includeHiddenSections bool)
+BEGIN
+    -- Default to TRUE if NULL is passed
+    IF includeHiddenSections IS NULL THEN
+        SET includeHiddenSections = TRUE;
+    END IF;
+    
+    SELECT * FROM GameSections
+    WHERE SectionGroupId = inputSectionGroupID
+    AND Hidden = includeHiddenSections
+    ORDER BY ListOrder ASC, ID ASC;
+END $$
+
+DELIMITER ;
+
+GRANT EXECUTE ON PROCEDURE achievement_vault.GetGameSectionsBySectionGroupID TO 'achievement_vault_user'@'%';
+
+
+
+************************************************
+
+DELIMITER $$
+
+CREATE PROCEDURE GetGameByIdV2(IN p_GameId INT)
+BEGIN
+    -- Select the game details with counts from related tables
+    SELECT 
+        g.*,
+        (
+            SELECT COUNT(*) 
+            FROM GameTables gt 
+            WHERE gt.GameID = g.ID
+        ) AS GameTableCount,
+        (
+            SELECT COUNT(*) 
+            FROM SectionGroups sg 
+            WHERE sg.GameID = g.ID
+        ) AS SectionGroupCount
+    FROM Games g
+    WHERE g.ID = p_GameId;
+END$$
+
+DELIMITER ;
+
+
+************************************************
+
+
+GRANT EXECUTE ON achievement_vault.* TO 'achievement_vault_user'@'%';
+FLUSH PRIVILEGES;
+SHOW GRANTS FOR 'achievement_vault_user'@'%';

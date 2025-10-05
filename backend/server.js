@@ -39,6 +39,9 @@ app.get('/index', (req, res) => {
 app.get('/checklist', (req, res) => {
     res.sendFile(path.join(__dirname, '../public/checklist.html'));
 });
+app.get('/checklistGroups', (req, res) => {
+    res.sendFile(path.join(__dirname, '../public/checklistGroups.html'));
+});
 app.get('/table', (req, res) => {
     res.sendFile(path.join(__dirname, '../public/table.html'));
 });

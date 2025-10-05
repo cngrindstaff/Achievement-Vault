@@ -7,3 +7,4 @@ credentials.json
 
 .env.old
 env
+.env-old2
