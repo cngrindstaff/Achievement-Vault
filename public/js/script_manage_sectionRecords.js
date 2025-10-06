@@ -61,8 +61,8 @@ $(document).ready(async function () {
                 <form id="new-record-form" class="add-record-container">
                     <label class="add-record">Name:<input type="text" id="recordName" class="add-record" required></label>
                     <label class="add-record">Description:<textarea id="description" class="add-record" rows="3"></textarea></label>
-                    <label class="add-record">Number of Checkboxes:<input type="number" id="numberOfCheckboxes" class="add-record" min="0" required></label>
-                    <label class="add-record">Number Already Completed:<input type="number" id="numberAlreadyCompleted" class="add-record" min="0" required></label>
+                    <label class="add-record">Number of Checkboxes:<input type="number" id="numberOfCheckboxes" class="add-record" min="0" value="1" required></label>
+                    <label class="add-record">Number Already Completed:<input type="number" id="numberAlreadyCompleted" class="add-record" min="0" value="0" required></label>
                     <label class="add-record">List Order:<input type="number" id="listOrder" class="add-record" min="0" required></label>
                     <label class="add-record">Long Description:<textarea id="longDescription" class="add-record" rows="5"></textarea></label>
                     <label class="modern-checkbox add-record">
