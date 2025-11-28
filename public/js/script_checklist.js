@@ -191,7 +191,7 @@ async function processData(sections) {
 }*/
 
 
-async function sendDataToSheets(gameName, sectionName, itemName, action, checkboxNumberClicked) {
+/*async function sendDataToSheets(gameName, sectionName, itemName, action, checkboxNumberClicked) {
     const dateTimeNowUtc = new Date().toISOString()
     const data = [dateTimeNowUtc, gameName, sectionName, itemName, action, checkboxNumberClicked]; 
 
@@ -205,7 +205,7 @@ async function sendDataToSheets(gameName, sectionName, itemName, action, checkbo
 
     const sheetsResponse = await response.json();
     if (debugLogging) console.log(sheetsResponse);
-}
+}*/
 
 function createStorageItemName(gameName, sectionNameClean, itemNameClean, i) {
     var storageItemName = `${gameName}--checkbox--${sectionNameClean}--${itemNameClean}--${i}`;
@@ -320,12 +320,12 @@ function updateCompletion() {
             
         }
         dbUtils.updateRecordCompletion(recordId, numberAlreadyCompleted);
-        if(numberOfCheckboxes > 1) {
+/*        if(numberOfCheckboxes > 1) {
             sendDataToSheets(gameNameFriendly, sectionTitle, checkboxItemName, action, checkboxNumberClicked);
         }
         else {
             sendDataToSheets(gameNameFriendly, sectionTitle, checkboxItemName, action, null);
-        }
+        }*/
     }
 
     updateSectionCompletion(sectionIndex);
@@ -387,26 +387,6 @@ function updateTotalCompletion() {
         $('#total-completion').text(`Total Completion: 0.00%`);
     }
 }
-
-//Local Storage might have updated checkboxes. Initialize them on top of what was in Excel.
-function initializeCheckboxesFromLocalStorage() {
-    $('input[type="checkbox"]').each(function() {
-        //const sectionIndex = $(this).data('section');
-        //const itemIndex = $(this).data('item');
-        const checkboxNum = $(this).data('num-checkbox-clicked');
-        const sectionTitleClean = $(this).data('section-title-clean');
-        const itemNameClean = $(this).data('item-name-clean');
-
-        //const storageItemName = `${gameName}-checkbox-${sectionIndex}-${itemIndex}-${checkboxNum}`;
-        //var storageItemName = createStorageItemName(gameName, sectionIndex, itemIndex, checkboxNum);
-        var storageItemName = createStorageItemName(gameId, sectionTitleClean, itemNameClean, checkboxNum);
-
-        if (localStorage.getItem(storageItemName) === 'checked') {
-            $(this).prop('checked', true);
-        }
-    });
-}
-
 
 function updateAllSectionsCompletion() {
     $('span.section-header-text').each(function() {

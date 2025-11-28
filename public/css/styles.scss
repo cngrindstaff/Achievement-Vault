@@ -123,6 +123,14 @@ h1 {
 	gap: 15px;
 }
 
+.grid-item-1-row:hover,
+.grid-item-2-row:hover {
+	background-color: $teal_bck_color-3;
+	color: $teal_font_dark;
+	transition: background-color 0.2s ease-in-out;
+	cursor: pointer;
+	
+}
 /*.grid-checkbox-container {
 	display: flex;
 	align-items: center;
