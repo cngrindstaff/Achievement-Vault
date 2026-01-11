@@ -72,7 +72,7 @@ export async function getSectionsByGameId(gameId, hiddenFilter) {
     }
 
     try {
-        console.log('made it here loadSectionsByGameId');
+        //console.log('made it here loadSectionsByGameId');
         const res = await fetch(`/api/db/sections/${gameId}/${hiddenFilter}`);
         if (!res || !res.ok) {
             console.log('No response or response not ok:', res);
@@ -96,7 +96,7 @@ export async function getSectionsByGameId(gameId, hiddenFilter) {
         
         //need to just separate these out by groups 
         
-        console.log('Section data:', data);
+        //console.log('Section data:', data);
         /*        return {
                     gameId: data.ID,
                     gameNameFriendly: data.FriendlyName || passed_gameName || passed_gameId,

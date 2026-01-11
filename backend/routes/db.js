@@ -499,7 +499,7 @@ router.get('/db/sectionGroup/:sectionGroupId', async (req, res) => {
 
 //************************************ GET ALL SECTIONS FOR A GAME BY SECTION GROUP ID ************************************//
 router.get('/db/sections/sectionGroupId/:sectionGroupId/:hiddenFilter', async (req, res) => {
-    console.log('made it here sectionGroups/sectionGroupId');
+    //console.log('made it here sectionGroups/sectionGroupId');
     const sectionGroupId = req.params.sectionGroupId;
     let hiddenFilter = req.params.hiddenFilter;
 
