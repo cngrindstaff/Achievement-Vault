@@ -711,3 +711,39 @@ tr:nth-child(odd) {
     }
 }
 /*************************************** END MODAL STYLES *******************************/
+
+
+.filter-input {
+	width: 33%;
+	min-width: 180px;
+	max-width: 300px;
+	margin-bottom: 12px;
+	padding: 8px 12px;
+	font-size: 16px;
+	border-radius: 5px;
+	border: 1px solid $teal_font_dark;
+	box-sizing: border-box;
+	align-self: flex-end;
+	background-color: $teal_bck_color_1;
+	color: $teal_font_dark;
+}
+
+//Change background color of the input when it's selected
+.filter-input::placeholder { color: $teal_font_dark; opacity: 0.7; }
+.filter-input::-webkit-input-placeholder { color: $teal_font_dark; opacity: 0.7; }
+.filter-input:-ms-input-placeholder { color: $teal_font_dark; opacity: 0.7; }
+.filter-input::-ms-input-placeholder { color: $teal_font_dark; opacity: 0.7; }
+
+//default focus has a white outline. Gross. Remove that, add a custom one
+.filter-input:focus {
+	outline: none;
+	box-shadow: 0 0 0 2px $teal_bck_color_3; /* Optional: custom focus style */
+	border-color: $teal_bck_color_3;          /* Optional: highlight border */
+}
+
+mark { //this is what highlights the search terms
+	background-color: #ffe066;
+	color: $teal_font_dark;
+	padding: 0 2px;
+	border-radius: 2px;
+} 

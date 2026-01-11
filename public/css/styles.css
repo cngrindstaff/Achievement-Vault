@@ -668,6 +668,46 @@ tr:nth-child(odd) {
 }
 
 /*************************************** END MODAL STYLES *******************************/
+.filter-input {
+  width: 33%;
+  min-width: 180px;
+  max-width: 300px;
+  margin-bottom: 12px;
+  padding: 8px 12px;
+  font-size: 16px;
+  border-radius: 5px;
+  border: 1px solid #104042;
+  box-sizing: border-box;
+  align-self: flex-end;
+  background-color: #9CE4E8;
+  color: #104042;
+}
+
+.filter-input::placeholder {
+  color: #104042;
+  opacity: 0.7;
+}
+
+.filter-input::-webkit-input-placeholder {
+  color: #104042;
+  opacity: 0.7;
+}
+
+.filter-input:-ms-input-placeholder {
+  color: #104042;
+  opacity: 0.7;
+}
+
+.filter-input::-ms-input-placeholder {
+  color: #104042;
+  opacity: 0.7;
+}
+
+.filter-input:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px #2FBFC6; /* Optional: custom focus style */
+  border-color: #2FBFC6; /* Optional: highlight border */
+}
 
 mark {
   background-color: #ffe066;
