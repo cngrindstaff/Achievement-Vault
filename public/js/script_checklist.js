@@ -41,7 +41,7 @@ if (debugLogging) console.log('sectionGroupId: ' + sectionGroupId);
     //.append() puts data inside an element at last index and .prepend() puts the prepending elem at first index.
     const mainContainer = $('#container');
 
-    mainContainer.append(`<div class="link-container"> </div>`);
+    mainContainer.append('<div class="link-container"> </div>');
     const linkContainerDiv = $('.link-container');
     linkContainerDiv.append('<div class="link-icon"><a href="' + linkToHomePage + '" class="link-icon-text"><i class="fa fa-solid fa-house fa-lg fa-border" ></i></a></div>');
     linkContainerDiv.append('<div class="link-icon"><a href="' + linkToGamePage + '" class="link-icon-text" title="Return to Game Page"><i class="fa fa-arrow-left fa-lg fa-border" ></i></a></div>');
@@ -51,7 +51,7 @@ if (debugLogging) console.log('sectionGroupId: ' + sectionGroupId);
     mainContainer.append('<h3>Section: ' + sectionGroupFriendlyName + '</h3>');
 
     mainContainer.append('<p id="total-completion">Total Completion: 0%</p>');
-
+    mainContainer.append('<div style="display: flex; justify-content: flex-end; width: 100%;"><input id="filter-input" type="text" placeholder="Filter by name or description..." class="filter-input" style="width:33%;"></div>');
     mainContainer.append('<div id="grid-checklist-container"></div>');
     
 
@@ -86,6 +86,109 @@ if (debugLogging) console.log('sectionGroupId: ' + sectionGroupId);
     //It needs to be inside the document ready function, so it's only called once. And it needs to happen after generateChecklist() is defined, but before any 
     //checkboxes are clicked.
     $('#grid-checklist-container').on('change', 'input[type="checkbox"]', updateCompletion);
+
+    // --- FILTER AND EXPAND LOGIC ---
+    $('#container').on('input', '#filter-input', async function() {
+        const filterValue = $(this).val().toLowerCase();
+        // Re-fetch sections and records
+        const sections = await dbUtils.getSectionsBySectionGroupId(sectionGroupId, false);
+        const recordsPromises = sections.map(section =>
+            dbUtils.getRecordsBySectionIdV2(section.ID, section.RecordOrderPreference || null, false)
+                .catch(() => [])
+        );
+        const allRecordsBySection = await Promise.all(recordsPromises);
+
+        // Filter records by name/description
+        const filteredSections = [];
+        const filteredRecordsBySection = [];
+        sections.forEach((section, sectionIndex) => {
+            const records = allRecordsBySection[sectionIndex] || [];
+            const filteredRecords = !filterValue ? records : records.filter(record => {
+                return (record.Name && record.Name.toLowerCase().includes(filterValue)) ||
+                       (record.Description && record.Description.toLowerCase().includes(filterValue));
+            });
+            if (filteredRecords.length > 0) {
+                filteredSections.push(section);
+                filteredRecordsBySection.push(filteredRecords);
+            }
+        });
+        renderFilteredChecklist(filteredSections, filteredRecordsBySection, filterValue);
+        updateAllSectionsCompletion();
+        updateTotalCompletion();
+    });
+
+    async function renderFilteredChecklist(sections, allRecordsBySection, filterValue) {
+        const gridContainer = $('#grid-checklist-container');
+        gridContainer.empty();
+        const sectionFragments = [];
+        sections.forEach((section, sectionIndex) => {
+            const sectionId = section.ID;
+            const sectionTitle = section.Name;
+            const sectionTitleClean = utils.createSlug(sectionTitle);
+            const sectionHeader = $(`
+                <div class="section-header" data-section="${sectionIndex}">
+                    <span class="section-header-text" data-section="${sectionIndex}" data-section-title="${sectionTitle}" data-section-title-clean="${sectionTitleClean}">
+                        ${sectionTitle} (0%)
+                    </span>
+                    <span class="section-header-icon">
+                        <i class="fas fa-chevron-up"></i>
+                    </span>
+                </div>
+            `);
+            // Section body is visible for filtered
+            const sectionBody = $(`<div class="section" data-section="${sectionIndex}" style="display: block;"></div>`);
+            const records = allRecordsBySection[sectionIndex] || [];
+            if (records.length === 0) {
+                sectionBody.append(`<div class="no-records">No checklist items found for this section.</div>`);
+            } else {
+                records.forEach((record, recordIndex) => {
+                    const recordName = record.Name;
+                    const recordId = record.ID;
+                    const recordDescription = record.Description;
+                    const totalCheckboxes = record.NumberOfCheckboxes || 0;
+                    const completedCheckboxes = record.NumberAlreadyCompleted || 0;
+                    const recordNameClean = utils.createSlug(recordName);
+                    const checkboxesHTML = generateCheckboxes(
+                        sectionIndex,
+                        recordIndex,
+                        totalCheckboxes,
+                        completedCheckboxes,
+                        sectionTitleClean,
+                        recordNameClean,
+                        recordId
+                    );
+                    // Highlight match
+                    let labelHTML = recordName;
+                    let descHTML = recordDescription ? recordDescription : '';
+                    if (filterValue) {
+                        const re = new RegExp(`(${filterValue.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&')})`, 'gi');
+                        labelHTML = recordName.replace(re, '<mark>$1</mark>');
+                        if (descHTML) descHTML = descHTML.replace(re, '<mark>$1</mark>');
+                    }
+                    const recordHTML = `
+                        <div class="grid-item-${recordDescription ? '2' : '1'}-row">
+                            <div class="column1">
+                                <div class="label">${labelHTML}</div>
+                                ${descHTML ? `<div class="description">${descHTML}</div>` : ''}
+                            </div>
+                            <div class="column2">
+                                ${checkboxesHTML}
+                            </div>
+                        </div>
+                    `;
+                    sectionBody.append(recordHTML);
+                });
+            }
+            sectionHeader.on('click', function () {
+                $(this).next('.section').toggle();
+                // Toggle icon
+                const icon = $(this).find('i');
+                icon.toggleClass('fa-chevron-down fa-chevron-up');
+            });
+            sectionFragments.push(sectionHeader, sectionBody);
+        });
+        gridContainer.append(sectionFragments);
+    }
 
 });
 

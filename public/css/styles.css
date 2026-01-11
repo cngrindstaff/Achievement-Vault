@@ -669,4 +669,11 @@ tr:nth-child(odd) {
 
 /*************************************** END MODAL STYLES *******************************/
 
+mark {
+  background-color: #ffe066;
+  color: #104042;
+  padding: 0 2px;
+  border-radius: 2px;
+}
+
 /*# sourceMappingURL=styles.css.map */
