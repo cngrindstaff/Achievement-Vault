@@ -79,3 +79,10 @@ ADD COLUMN DateLastUpdated DATETIME(3) DEFAULT CURRENT_TIMESTAMP(3) ON UPDATE CU
 UPDATE GameRecords
 SET Name = CONCAT('Wheatflower - ', Name)
 where sectionid=192;
+
+update GameRecords
+set name=Replace(Name, 'Costal Furniture - ', '')
+where sectionId=223
+
+
+
