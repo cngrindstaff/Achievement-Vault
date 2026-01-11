@@ -112,3 +112,6 @@ ADD COLUMN `DateLastUpdated` DATETIME(3) NULL DEFAULT CURRENT_TIMESTAMP(3) AFTER
 ALTER TABLE `achievement_vault`.`SectionGroups` 
 ADD COLUMN `Hidden` TINYINT(1) NOT NULL DEFAULT '0' AFTER `DateLastUpdated`;
 
+
+ALTER TABLE GameSections
+ADD COLUMN Description varchar(250);
