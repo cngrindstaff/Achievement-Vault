@@ -1,4 +1,4 @@
-﻿import {getQueryParam} from "./script_utilities.js";
+import {getQueryParam} from "./script_utilities.js";
 
 var debugLogging = false;
 
@@ -12,7 +12,16 @@ export async function getGameData(passed_gameId) {
 
     try {
         const res = await fetch(`/api/db/games/${passed_gameId}`);
-        const data = await res.json();
+        if (!res || !res.ok) {
+            console.log('No response or response not ok:', res);
+            return [];
+        }
+        const text = await res.text();
+        if (!text) {
+            console.log('Response body empty');
+            return [];
+        }
+        const data = JSON.parse(text);
         //console.log('Game data:', data);
         /*        return {
                     gameId: data.ID,
@@ -36,7 +45,16 @@ export async function getGameDataV2(passed_gameId) {
 
     try {
         const res = await fetch(`/api/db/games/v2/${passed_gameId}`);
-        const data = await res.json();
+        if (!res || !res.ok) {
+            console.log('No response or response not ok:', res);
+            return [];
+        }
+        const text = await res.text();
+        if (!text) {
+            console.log('Response body empty');
+            return [];
+        }
+        const data = JSON.parse(text);
         //console.log('Game data:', data);
         return data;
     } catch (err) {
@@ -54,17 +72,37 @@ export async function getSectionsByGameId(gameId, hiddenFilter) {
     }
 
     try {
-        //console.log('made it here loadSectionsByGameId');
+        console.log('made it here loadSectionsByGameId');
         const res = await fetch(`/api/db/sections/${gameId}/${hiddenFilter}`);
-        const data = await res.json();
-        //console.log('Section data:', data);
+        if (!res || !res.ok) {
+            console.log('No response or response not ok:', res);
+            return [];
+        }
+        const text = await res.text();
+        if (!text) {
+            console.log('Response body empty');
+            return [];
+        }
+        const data = JSON.parse(text);
+        //by default, returns ordered by ListOrder asc, ID asc
+
+        //sort by SectionGroupID, ListOrder, ID
+/*        data.sort((a, b) =>
+            a.SectionGroupID - b.SectionGroupID ||
+            a.ListOrder - b.ListOrder ||
+            a.ID - b.ID
+        );*/
+        
+        
+        //need to just separate these out by groups 
+        
+        console.log('Section data:', data);
         /*        return {
                     gameId: data.ID,
                     gameNameFriendly: data.FriendlyName || passed_gameName || passed_gameId,
                     gameName: data.Name || passed_gameId,
                 };*/
         
-        //returns ordered by ListOrder asc, ID asc
         
         return data;
     } catch (err) {
@@ -80,7 +118,16 @@ export async function getSectionById(passed_sectionId) {
 
     try {
         const res = await fetch(`/api/db/section/${passed_sectionId}`);
-        const data = await res.json();
+        if (!res || !res.ok) {
+            console.log('No response or response not ok:', res);
+            return [];
+        }
+        const text = await res.text();
+        if (!text) {
+            console.log('Response body empty');
+            return [];
+        }
+        const data = JSON.parse(text);
         //console.log('Game data:', data);
         /*        return {
                     gameId: data.ID,
@@ -105,7 +152,16 @@ export async function getRecordsBySectionId(sectionId, recordOrderPreference, hi
 
     try {
         const res = await fetch(`/api/db/records/${sectionId}/order/${recordOrderPreference}/hiddenFilter/${hiddenFilter}`);
-        const data = await res.json();
+        if (!res || !res.ok) {
+            console.log('No response or response not ok:', res);
+            return [];
+        }
+        const text = await res.text();
+        if (!text) {
+            console.log('Response body empty');
+            return [];
+        }
+        const data = JSON.parse(text);
         //console.log('Records data:', data);
         /*        return {
                     gameId: data.ID,
@@ -128,7 +184,16 @@ export async function getRecordsBySectionIdV2(sectionId, recordOrderPreference, 
 
     try {
         const res = await fetch(`/api/db/records/v2/${sectionId}/hiddenFilter/${hiddenFilter}`);
-        const data = await res.json();
+        if (!res || !res.ok) {
+            console.log('No response or response not ok:', res);
+            return [];
+        }
+        const text = await res.text();
+        if (!text) {
+            console.log('Response body empty');
+            return [];
+        }
+        const data = JSON.parse(text);
         //console.log('Records data:', data);
         /*        return {
                     gameId: data.ID,
@@ -202,7 +267,16 @@ export async function getGameRecordById(passed_recordId) {
 
     try {
         const res = await fetch(`/api/db/record/${passed_recordId}`);
-        const data = await res.json();
+        if (!res || !res.ok) {
+            console.log('No response or response not ok:', res);
+            return [];
+        }
+        const text = await res.text();
+        if (!text) {
+            console.log('Response body empty');
+            return [];
+        }
+        const data = JSON.parse(text);
         //console.log('Game data:', data);
         /*        return {
                     gameId: data.ID,
@@ -228,7 +302,16 @@ export async function updateRecordCompletion(recordId, numberAlreadyCompleted){
             },
             body: JSON.stringify({ numberAlreadyCompleted: numberAlreadyCompleted }),
         });
-        const data = await res.json();
+        if (!res || !res.ok) {
+            console.log('No response or response not ok:', res);
+            return [];
+        }
+        const text = await res.text();
+        if (!text) {
+            console.log('Response body empty');
+            return [];
+        }
+        const data = JSON.parse(text);
         console.log('Updated record:', data);
         return data;
     } catch (err) {
@@ -245,7 +328,16 @@ export async function getGameTablesByGameId(gameId) {
 
     try {
         const res = await fetch(`/api/db/gameTables/${gameId}`);
-        const data = await res.json();
+        if (!res || !res.ok) {
+            console.log('No response or response not ok:', res);
+            return [];
+        }
+        const text = await res.text();
+        if (!text) {
+            console.log('Response body empty');
+            return [];
+        }
+        const data = JSON.parse(text);
         return data;
     } catch (err) {
         console.error("Error fetching game data:", err);
@@ -260,11 +352,16 @@ export async function getTableRecordsByTableId(tableId) {
 
     try {
         const res = await fetch(`/api/db/tableRecords/${tableId}`);
-        if(res === null){
-            console.error("Error fetching table data. Returned null");
-            return null;
+        if (!res || !res.ok) {
+            console.log('No response or response not ok:', res);
+            return [];
         }
-        const data = await res.json();
+        const text = await res.text();
+        if (!text) {
+            console.log('Response body empty');
+            return [];
+        }
+        const data = JSON.parse(text);
         return data;
     } catch (err) {
         console.error("Error fetching table data:", err);
@@ -287,12 +384,16 @@ export async function updateGameRecord(recordId, updateData) {
             body: JSON.stringify(updateData)
         });
 
-        if (!res.ok) {
-            console.error("Error updating game record. Status:", res.status);
-            return null;
+        if (!res || !res.ok) {
+            console.log('No response or response not ok:', res);
+            return [];
         }
-
-        const data = await res.json();
+        const text = await res.text();
+        if (!text) {
+            console.log('Response body empty');
+            return [];
+        }
+        const data = JSON.parse(text);
         return data;
     } catch (err) {
         console.error("Error updating game record:", err);
@@ -316,12 +417,16 @@ export async function insertGameRecord(recordData) {
             body: JSON.stringify(recordData)
         });
 
-        if (!res.ok) {
-            console.error("Error inserting game record. Status:", res.status);
-            return null;
+        if (!res || !res.ok) {
+            console.log('No response or response not ok:', res);
+            return [];
         }
-
-        const data = await res.json();
+        const text = await res.text();
+        if (!text) {
+            console.log('Response body empty');
+            return [];
+        }
+        const data = JSON.parse(text);
         return data;
     } catch (err) {
         console.error("Error inserting game record:", err);
@@ -346,12 +451,16 @@ export async function updateGameSection(sectionId, gameId, updateData) {
             body: JSON.stringify(updateData)
         });
 
-        if (!res.ok) {
-            console.error("Error updating game section. Status:", res.status);
-            return null;
+        if (!res || !res.ok) {
+            console.log('No response or response not ok:', res);
+            return [];
         }
-
-        const data = await res.json();
+        const text = await res.text();
+        if (!text) {
+            console.log('Response body empty');
+            return [];
+        }
+        const data = JSON.parse(text);
         return data;
     } catch (err) {
         console.error("Error updating game section:", err);
@@ -376,12 +485,16 @@ export async function insertGameSection(sectionData) {
             body: JSON.stringify(sectionData)
         });
 
-        if (!res.ok) {
-            console.error("Error inserting game section. Status:", res.status);
-            return null;
+        if (!res || !res.ok) {
+            console.log('No response or response not ok:', res);
+            return [];
         }
-
-        const data = await res.json();
+        const text = await res.text();
+        if (!text) {
+            console.log('Response body empty');
+            return [];
+        }
+        const data = JSON.parse(text);
         return data;
     } catch (err) {
         console.error("Error inserting game section:", err);
@@ -406,12 +519,16 @@ export async function updateGameSectionsListOrder(sectionUpdates) {
             body: JSON.stringify(sectionUpdates)
         });
 
-        if (!res.ok) {
-            console.error("Error updating game sections list order. Status:", res.status);
-            return null;
+        if (!res || !res.ok) {
+            console.log('No response or response not ok:', res);
+            return [];
         }
-
-        const data = await res.json();
+        const text = await res.text();
+        if (!text) {
+            console.log('Response body empty');
+            return [];
+        }
+        const data = JSON.parse(text);
         return data;
     } catch (err) {
         console.error("Error updating game sections list order:", err);
@@ -435,12 +552,16 @@ export async function updateSectionRecordsListOrder(recordUpdates) {
             body: JSON.stringify(recordUpdates)
         });
 
-        if (!res.ok) {
-            console.error("Error updating game records list order. Status:", res.status);
-            return null;
+        if (!res || !res.ok) {
+            console.log('No response or response not ok:', res);
+            return [];
         }
-
-        const data = await res.json();
+        const text = await res.text();
+        if (!text) {
+            console.log('Response body empty');
+            return [];
+        }
+        const data = JSON.parse(text);
         return data;
     } catch (err) {
         console.error("Error updating game records list order:", err);
@@ -457,12 +578,17 @@ export async function deleteGameRecord(recordId) {
             method: 'DELETE'
         });
 
-        if (res.ok) {
-            return true;
-        } else {
-            console.error("Failed to delete record. Status:", res.status);
-            return false;
+        if (!res || !res.ok) {
+            console.log('No response or response not ok:', res);
+            return [];
         }
+        const text = await res.text();
+        if (!text) {
+            console.log('Response body empty');
+            return [];
+        }
+        const data = JSON.parse(text);
+        return data;
     } catch (err) {
         console.error("Error deleting record:", err);
         return false;
@@ -479,7 +605,16 @@ export async function getSectionGroupById(sectionGroupId) {
     try {
         //console.log('made it here getSectionGroupsByGameId');
         const res = await fetch(`/api/db/sectionGroup/${sectionGroupId}`);
-        const data = await res.json();
+        if (!res || !res.ok) {
+            console.log('No response or response not ok:', res);
+            return [];
+        }
+        const text = await res.text();
+        if (!text) {
+            console.log('Response body empty');
+            return [];
+        }
+        const data = JSON.parse(text);
         //console.log('SectionGroup data:', data);
         return data;
     } catch (err) {
@@ -496,7 +631,16 @@ export async function getSectionGroupsByGameId(gameId, hiddenFilter) {
     try {
         //console.log('made it here getSectionGroupsByGameId');
         const res = await fetch(`/api/db/sectionGroups/${gameId}/${hiddenFilter}`);
-        const data = await res.json();
+        if (!res || !res.ok) {
+            console.log('No response or response not ok:', res);
+            return [];
+        }
+        const text = await res.text();
+        if (!text) {
+            console.log('Response body empty');
+            return [];
+        }
+        const data = JSON.parse(text);
         //console.log('SectionGroup data:', data);
         return data;
     } catch (err) {
@@ -515,12 +659,19 @@ export async function getSectionsBySectionGroupId(sectionGroupId, hiddenFilter) 
         //console.log('made it here loadSectionsByGameId');
         if(debugLogging) console.log('getSectionsBySectionGroupId sectionGroupId: ' + sectionGroupId);
         const res = await fetch(`/api/db/sections/sectionGroupId/${sectionGroupId}/${hiddenFilter}`);
-        const data = await res.json();
+        if (!res || !res.ok) {
+            console.log('No response or response not ok:', res);
+            return [];
+        }
+        const text = await res.text();
+        if (!text) {
+            console.log('Response body empty');
+            return [];
+        }
+        const data = JSON.parse(text);
         //console.log('Section data:', data);
         return data;
     } catch (err) {
         console.error("Error getSectionsBySectionGroupId: ", err);
     }
 }
-
-
