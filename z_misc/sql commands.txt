@@ -85,4 +85,8 @@ set name=Replace(Name, 'Costal Furniture - ', '')
 where sectionId=223
 
 
-
+SELECT r.Name, r.SectionID, r.NumberAlreadyCompleted, s.Name AS SectionName, s.ID as SectionId
+FROM GameRecords AS r
+left join GameSections AS s 
+on s.ID=r.SectionID 
+where r.GameID=11 and r.ListOrder=2

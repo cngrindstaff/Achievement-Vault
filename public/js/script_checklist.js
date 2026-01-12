@@ -48,10 +48,11 @@ if (debugLogging) console.log('sectionGroupId: ' + sectionGroupId);
 
     mainContainer.append('<h1>' + gameNameFriendly + '</h1>');
     mainContainer.append('<h2>100% Completion Checklist</h2>');
-    mainContainer.append('<h3>Section: ' + sectionGroupFriendlyName + '</h3>');
+    mainContainer.append('<h3>Section: ' + sectionGroupFriendlyName + '</h3>'); 
 
     mainContainer.append('<p id="total-completion">Total Completion: 0%</p>');
     mainContainer.append('<div style="display: flex; justify-content: flex-end; width: 100%;"><input id="filter-input" type="text" placeholder="Filter by name or description..." class="filter-input" style="width:33%;"></div>');
+    mainContainer.append('<div style="display: flex; justify-content: flex-end; width: 100%; margin-bottom: 10px;"><label style="font-size:15px;cursor:pointer;"><input type="checkbox" id="hide-completed-toggle" style="margin-right:6px;">Hide Completed</label></div>');
     mainContainer.append('<div id="grid-checklist-container"></div>');
     
 
@@ -85,11 +86,16 @@ if (debugLogging) console.log('sectionGroupId: ' + sectionGroupId);
     //The event is attached to the parent element, and the event is delegated to the children.
     //It needs to be inside the document ready function, so it's only called once. And it needs to happen after generateChecklist() is defined, but before any 
     //checkboxes are clicked.
-    $('#grid-checklist-container').on('change', 'input[type="checkbox"]', updateCompletion);
+    $('#grid-checklist-container').on('change', 'input[type="checkbox"]', updateCompletion); 
 
     // --- FILTER AND EXPAND LOGIC ---
-    $('#container').on('input', '#filter-input', async function() {
-        const filterValue = $(this).val().toLowerCase();
+    function getHideCompleted() {
+        return $("#hide-completed-toggle").is(":checked");
+    }
+
+    async function applyFilterAndRender() {
+        const filterValue = $('#filter-input').val().toLowerCase();
+        const hideCompleted = false; // Always false here
         // Re-fetch sections and records
         const sections = await dbUtils.getSectionsBySectionGroupId(sectionGroupId, false);
         const recordsPromises = sections.map(section =>
@@ -102,8 +108,8 @@ if (debugLogging) console.log('sectionGroupId: ' + sectionGroupId);
         const filteredSections = [];
         const filteredRecordsBySection = [];
         sections.forEach((section, sectionIndex) => {
-            const records = allRecordsBySection[sectionIndex] || [];
-            const filteredRecords = !filterValue ? records : records.filter(record => {
+            let records = allRecordsBySection[sectionIndex] || [];
+            let filteredRecords = !filterValue ? records : records.filter(record => {
                 return (record.Name && record.Name.toLowerCase().includes(filterValue)) ||
                        (record.Description && record.Description.toLowerCase().includes(filterValue));
             });
@@ -115,7 +121,28 @@ if (debugLogging) console.log('sectionGroupId: ' + sectionGroupId);
         renderFilteredChecklist(filteredSections, filteredRecordsBySection, filterValue);
         updateAllSectionsCompletion();
         updateTotalCompletion();
-    });
+        // After rendering, apply hide completed if toggle is checked
+        applyHideCompletedToDOM();
+    }
+
+    function applyHideCompletedToDOM() {
+        const hideCompleted = getHideCompleted();
+        $('.section').each(function() {
+            $(this).find('.grid-item-1-row, .grid-item-2-row').each(function() {
+                const checkboxes = $(this).find('input[type="checkbox"]');
+                const numTotal = checkboxes.length;
+                const numChecked = checkboxes.filter(':checked').length;
+                if (hideCompleted && numTotal === numChecked) {
+                    $(this).hide();
+                } else {
+                    $(this).show();
+                }
+            });
+        });
+    }
+
+    $('#container').on('input', '#filter-input', applyFilterAndRender);
+    $('#container').on('change', '#hide-completed-toggle', applyHideCompletedToDOM);
 
     async function renderFilteredChecklist(sections, allRecordsBySection, filterValue) {
         const gridContainer = $('#grid-checklist-container');
