@@ -747,3 +747,45 @@ mark { //this is what highlights the search terms
 	padding: 0 2px;
 	border-radius: 2px;
 } 
+
+.switch {
+  display: inline-flex;
+  align-items: center;
+  cursor: pointer;
+  font-size: 15px;
+  user-select: none;
+}
+.switch input {
+  display: none;
+}
+.switch .slider {
+  width: 40px;
+  height: 22px;
+  background: #ccc;
+  border-radius: 22px;
+  position: relative;
+  margin-right: 10px;
+  transition: background 0.2s;
+  display: inline-block;
+}
+.switch .slider:before {
+  content: "";
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 16px;
+  height: 16px;
+  background: #fff;
+  border-radius: 50%;
+  transition: transform 0.2s;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.15);
+}
+.switch input:checked + .slider {
+  background: $teal_bck_color_3;
+}
+.switch input:checked + .slider:before {
+  transform: translateX(18px);
+}
+.switch .slider {
+  box-shadow: 0 1px 3px rgba(0,0,0,0.10);
+}

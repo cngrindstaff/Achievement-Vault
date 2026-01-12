@@ -52,7 +52,8 @@ if (debugLogging) console.log('sectionGroupId: ' + sectionGroupId);
 
     mainContainer.append('<p id="total-completion">Total Completion: 0%</p>');
     mainContainer.append('<div style="display: flex; justify-content: flex-end; width: 100%;"><input id="filter-input" type="text" placeholder="Filter by name or description..." class="filter-input" style="width:33%;"></div>');
-    mainContainer.append('<div style="display: flex; justify-content: flex-end; width: 100%; margin-bottom: 10px;"><label style="font-size:15px;cursor:pointer;"><input type="checkbox" id="hide-completed-toggle" style="margin-right:6px;">Hide Completed</label></div>');
+    mainContainer.append('<div style="display: flex; justify-content: flex-end; width: 100%; margin-bottom: 10px;"><label class="switch"><input type="checkbox" id="hide-completed-toggle" checked><span class="slider"></span>Show Completed</label></div>');
+    mainContainer.append('<div style="display: flex; justify-content: flex-end; width: 100%; margin-bottom: 16px;"><label class="switch"><input type="checkbox" id="expand-all-toggle"><span class="slider"></span>Expand All</label></div>');
     mainContainer.append('<div id="grid-checklist-container"></div>');
     
 
@@ -90,12 +91,13 @@ if (debugLogging) console.log('sectionGroupId: ' + sectionGroupId);
 
     // --- FILTER AND EXPAND LOGIC ---
     function getHideCompleted() {
-        return $("#hide-completed-toggle").is(":checked");
+        // Now: checked means show completed, unchecked means hide completed
+        return !$("#hide-completed-toggle").is(":checked");
     }
 
     async function applyFilterAndRender() {
         const filterValue = $('#filter-input').val().toLowerCase();
-        const hideCompleted = false; // Always false here
+        const hideCompleted = getHideCompleted();
         // Re-fetch sections and records
         const sections = await dbUtils.getSectionsBySectionGroupId(sectionGroupId, false);
         const recordsPromises = sections.map(section =>
@@ -123,6 +125,10 @@ if (debugLogging) console.log('sectionGroupId: ' + sectionGroupId);
         updateTotalCompletion();
         // After rendering, apply hide completed if toggle is checked
         applyHideCompletedToDOM();
+        // Apply expand all if checked
+        if ($('#expand-all-toggle').is(':checked')) {
+            applyExpandAllToDOM();
+        }
     }
 
     function applyHideCompletedToDOM() {
@@ -141,8 +147,22 @@ if (debugLogging) console.log('sectionGroupId: ' + sectionGroupId);
         });
     }
 
+    function applyExpandAllToDOM() {
+        const expandAll = $("#expand-all-toggle").is(":checked");
+        $('.section').each(function() {
+            if (expandAll) {
+                $(this).show();
+                $(this).prev('.section-header').find('i').removeClass('fa-chevron-down').addClass('fa-chevron-up');
+            } else {
+                $(this).hide();
+                $(this).prev('.section-header').find('i').removeClass('fa-chevron-up').addClass('fa-chevron-down');
+            }
+        });
+    }
+
     $('#container').on('input', '#filter-input', applyFilterAndRender);
     $('#container').on('change', '#hide-completed-toggle', applyHideCompletedToDOM);
+    $('#container').on('change', '#expand-all-toggle', applyExpandAllToDOM);
 
     async function renderFilteredChecklist(sections, allRecordsBySection, filterValue) {
         const gridContainer = $('#grid-checklist-container');
