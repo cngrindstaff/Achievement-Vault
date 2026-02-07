@@ -1,196 +1,166 @@
 import * as utils from './script_utilities.js';
 import * as dbUtils from './script_db_helper.js';
 
-const linkToHomePage = './';
-
 var debugLogging = false;
 
-
-// Define these at the top level so they can be reused
 let gameId = null;
 let gameNameFriendly = null;
-let gameName = null;
-let hasDataTables = false;
-let linkToGamePage = null;
-let htmlTitle = null;
+
+const tableSectionHeaderTemplate = document.getElementById('table-section-header-template');
+const tableSectionBodyTemplate = document.getElementById('table-section-body-template');
+
 $(document).ready(async function () {
-    var passed_gameId = utils.getQueryParam('id');
+    gameId = utils.getQueryParam('id');
 
-    // Fetch game data first
-    const gameData = await dbUtils.getGameData(passed_gameId);
-    //if(debugLogging) console.log('gameData:', gameData);
+    // Fetch game data
+    const gameData = await dbUtils.getGameData(gameId);
     gameId = gameData.ID;
-    gameName = gameData.Name;
     gameNameFriendly = gameData.FriendlyName;
-    hasDataTables = gameData.HasDataTables;
-    linkToGamePage = `/game?id=${gameId}`;
-    htmlTitle = gameNameFriendly + ': Other Tables';
+    const linkToGamePage = `/game?id=${gameId}`;
 
-    //set the title field that's in the head using the variable from the game's HTML
-    $("title").text(htmlTitle);
-    
-    // Add sibling elements before grid-checklist-container
-    //.append() puts data inside an element at last index and .prepend() puts the prepending elem at first index.
-    const mainContainer = $('#container');
+    // Populate static page elements
+    document.title = gameNameFriendly + ': Other Tables';
+    document.getElementById('game-name').textContent = gameNameFriendly;
+    document.getElementById('back-link').href = linkToGamePage;
 
-    mainContainer.prepend('<h2>Tables</h2>');
-    mainContainer.prepend('<h1>' + gameNameFriendly + '</h1>');
-    
-    mainContainer.prepend(`<div class="link-container"> </div>`);
-
-    const linkContainerDiv = $('.link-container');
-    linkContainerDiv.prepend('<div class="link-icon"><a href="' + linkToGamePage + '" class="link-icon-text" title="Return to Game Page"><i class="fa fa-arrow-left fa-lg fa-border" ></i></a></div>');
-    linkContainerDiv.prepend('<div class="link-icon"><a href="' + linkToHomePage + '" class="link-icon-text"><i class="fa fa-solid fa-house fa-lg fa-border" ></i></a></div>');
-
+    // Fetch and render game tables
     const gridContainer = document.getElementById('grid-tables-container');
-    gridContainer.innerHTML = ''; // Clear previous data
-    // get the game tables
-    const gameTables = await dbUtils.getGameTablesByGameId(passed_gameId);
-    
-    let gameTableCount = gameTables.length;
-    if(gameTableCount === 0){
+    const gameTables = await dbUtils.getGameTablesByGameId(gameId);
+
+    if (!gameTables || gameTables.length === 0) {
         console.log('No game tables found for this game ID.');
-        showNoTablesMessage();
-        return;       
+        showNoTablesMessage(gridContainer);
+        return;
     }
 
-/*    gameTables.forEach((gameTable, index) => {
-        createTableSection(gameTable, index);
-    });*/
-    
     for (const gameTable of gameTables) {
         const index = gameTables.indexOf(gameTable);
-        await createTableSection(gameTable, index);
+        await createTableSection(gridContainer, gameTable, index);
     }
 
     // If no valid tables were created, show the "No tables available" message
     if (gridContainer.innerHTML.trim() === '') {
         console.log('gridContainer is empty, showing no tables message');
-        showNoTablesMessage();
+        showNoTablesMessage(gridContainer);
     }
-    
 
+    // Event delegation for section header clicks (toggle collapse)
+    gridContainer.addEventListener('click', function (e) {
+        const header = e.target.closest('.section-header');
+        if (!header) return;
+        const sectionBody = header.nextElementSibling;
+        if (!sectionBody) return;
+        const isVisible = sectionBody.style.display === 'block';
+        sectionBody.style.display = isVisible ? 'none' : 'block';
+        header.querySelector('i').classList.toggle('fa-chevron-down', isVisible);
+        header.querySelector('i').classList.toggle('fa-chevron-up', !isVisible);
+    });
 });
 
-function showNoTablesMessage() {
-    document.getElementById('grid-tables-container').innerHTML = 
-            `
-            <div class="no-tables">No tables available</div>
-            `;
+
+function showNoTablesMessage(container) {
+    const div = document.createElement('div');
+    div.className = 'no-tables';
+    div.textContent = 'No tables available';
+    container.appendChild(div);
 }
 
 
-async function createTableSection(gameTable, tableIndex) {
-    const gridContainer = document.getElementById('grid-tables-container');
-    var tableName = gameTable.Name;
-    var tableNameClean = utils.createSlug(tableName);
+async function createTableSection(gridContainer, gameTable, tableIndex) {
+    const tableName = gameTable.Name;
+    const tableNameClean = utils.createSlug(tableName);
 
+    // Clone and populate section header template
+    const headerClone = tableSectionHeaderTemplate.content.cloneNode(true);
+    const headerDiv = headerClone.querySelector('.section-header');
+    headerDiv.dataset.section = tableIndex;
 
-    // Create section header
-    const sectionHeader = document.createElement('div');
-    sectionHeader.classList.add('section-header');
-    sectionHeader.dataset.section = tableIndex;
-    sectionHeader.innerHTML = `
-                <span class="section-header-text" data-section="${tableIndex}" data-section-title="${tableName}" 
-                    data-section-title-clean="${tableNameClean}">${tableName}</span>
-                <span class="section-header-icon">
-                    <i class="fas fa-chevron-down"></i>
-                </span>
-            `;
-    // Create collapsible section
-    const sectionDiv = document.createElement('div');
-    sectionDiv.classList.add('section-table');
+    const headerText = headerClone.querySelector('.section-header-text');
+    headerText.dataset.section = tableIndex;
+    headerText.dataset.sectionTitle = tableName;
+    headerText.dataset.sectionTitleClean = tableNameClean;
+    headerText.textContent = tableName;
+
+    // Clone and populate section body template
+    const bodyClone = tableSectionBodyTemplate.content.cloneNode(true);
+    const sectionDiv = bodyClone.querySelector('.section-table');
     sectionDiv.dataset.section = tableIndex;
 
-    // Populate section with table
-    var tableRecords = await dbUtils.getTableRecordsByTableId(gameTable.ID);
-    if(tableRecords === null){
+    // Fetch table records and populate the table
+    const tableRecords = await dbUtils.getTableRecordsByTableId(gameTable.ID);
+    if (tableRecords === null) {
         return;
     }
     displayTable(sectionDiv, gameTable, tableRecords);
 
-    // Append elements to container
-    gridContainer.appendChild(sectionHeader);
-    gridContainer.appendChild(sectionDiv);
-
-    // Toggle section visibility on header click
-    sectionHeader.addEventListener('click', () => {
-        const isVisible = sectionDiv.style.display === 'block';
-        sectionDiv.style.display = isVisible ? 'none' : 'block';
-        sectionHeader.querySelector('i').classList.toggle('fa-chevron-down', isVisible);
-        sectionHeader.querySelector('i').classList.toggle('fa-chevron-up', !isVisible);
-    });
+    // Append to container
+    gridContainer.appendChild(headerClone);
+    gridContainer.appendChild(bodyClone);
 }
 
 
+function displayTable(sectionDiv, gameTable, tableRecords) {
+    const table = document.createElement('table');
+    const thead = document.createElement('thead');
+    const tbody = document.createElement('tbody');
+
+    // Build header array from available fields
+    const headerArray = [];
+    if (gameTable.FieldName_01) { headerArray.push(gameTable.FieldName_01); }
+    if (gameTable.FieldName_02) { headerArray.push(gameTable.FieldName_02); }
+    if (gameTable.FieldName_03) { headerArray.push(gameTable.FieldName_03); }
+    if (gameTable.FieldName_04) { headerArray.push(gameTable.FieldName_04); }
+    if (gameTable.FieldName_05) { headerArray.push(gameTable.FieldName_05); }
+    if (gameTable.FieldName_06) { headerArray.push(gameTable.FieldName_06); }
+
+    const headerCount = headerArray.length;
+    if (debugLogging) console.log('There are ' + headerCount + ' headers');
+
+    // Create header row
+    const headerRow = document.createElement('tr');
+    headerArray.forEach((header, index) => {
+        const th = document.createElement('th');
+        th.textContent = header;
+        th.dataset.index = index;
+        th.addEventListener('click', () => sortTable(table, index));
+        headerRow.appendChild(th);
+    });
+    thead.appendChild(headerRow);
+
+    // Create data rows
+    tableRecords.forEach((record) => {
+        if (debugLogging) console.log('record:', record);
+
+        const tr = document.createElement('tr');
+        for (let i = 0; i < headerCount; i++) {
+            const td = document.createElement('td');
+            // Force field name to always have 2 digits (Field_01, Field_02, etc.)
+            const fieldName = 'Field_' + String(i + 1).padStart(2, '0');
+            td.textContent = record[fieldName];
+            tr.appendChild(td);
+        }
+        tbody.appendChild(tr);
+    });
+
+    table.appendChild(thead);
+    table.appendChild(tbody);
+    sectionDiv.appendChild(table);
+}
 
 
-    function displayTable(sectionDiv, gameTable, tableRecords) {
-        const table = document.createElement('table');
-        const thead = document.createElement('thead');
-        const tbody = document.createElement('tbody');
+function sortTable(table, colIndex) {
+    const tbody = table.querySelector('tbody');
+    const rows = Array.from(tbody.rows);
+    const isAscending = table.dataset.sortOrder === `asc-${colIndex}`;
 
-        // Create headers
-        let headerArray = [];
-        if(gameTable.FieldName_01) { headerArray.push(gameTable.FieldName_01); }
-        if(gameTable.FieldName_02) { headerArray.push(gameTable.FieldName_02); }
-        if(gameTable.FieldName_03) { headerArray.push(gameTable.FieldName_03); }
-        if(gameTable.FieldName_04) { headerArray.push(gameTable.FieldName_04); }
-        if(gameTable.FieldName_05) { headerArray.push(gameTable.FieldName_05); }
-        if(gameTable.FieldName_06) { headerArray.push(gameTable.FieldName_06); }
-        
-        let headerCount = headerArray.length;
+    rows.sort((rowA, rowB) => {
+        const cellA = rowA.cells[colIndex].textContent.trim();
+        const cellB = rowB.cells[colIndex].textContent.trim();
+        return isAscending
+            ? cellA.localeCompare(cellB, undefined, { numeric: true })
+            : cellB.localeCompare(cellA, undefined, { numeric: true });
+    });
 
-        if(debugLogging) console.log('There are ' + headerCount + ' headers');
-        
-        const headerRow = document.createElement('tr');
-        headerArray.forEach((header, index) => {
-            const th = document.createElement('th');
-            th.textContent = header;
-            th.dataset.index = index;
-            th.addEventListener('click', () => sortTable(table, index));
-            headerRow.appendChild(th);
-        });
-        thead.appendChild(headerRow);
-        
-        //Create records
-        tableRecords.forEach((record, index) =>
-        {
-            //console.log('record' + record);
-            if(debugLogging) console.log('record:', record);
-            //Using the "+" makes everything treated as strings, and thus outputs "[output output]"
-            //Using the "," treats "record" as an object and logs it properly
-
-            const tr = document.createElement('tr');
-            for(let i = 0; i < headerCount; i++){
-                const td = document.createElement('td');
-
-                //force it to always have 2 digits
-                var recordName = 'Field_' + String(i + 1).padStart(2, '0');
-                td.textContent = record[recordName];
-                tr.appendChild(td);
-            }
-            tbody.appendChild(tr);
-
-        });
-        table.appendChild(thead);
-        table.appendChild(tbody);
-        sectionDiv.appendChild(table);
-    }
-
-    function sortTable(table, colIndex) {
-        const tbody = table.querySelector('tbody');
-        const rows = Array.from(tbody.rows);
-        const isAscending = table.dataset.sortOrder === `asc-${colIndex}`;
-
-        rows.sort((rowA, rowB) => {
-            const cellA = rowA.cells[colIndex].textContent.trim();
-            const cellB = rowB.cells[colIndex].textContent.trim();
-            return isAscending
-                ? cellA.localeCompare(cellB, undefined, { numeric: true })
-                : cellB.localeCompare(cellA, undefined, { numeric: true });
-        });
-
-        tbody.append(...rows);
-        table.dataset.sortOrder = isAscending ? `desc-${colIndex}` : `asc-${colIndex}`;
-    }
+    tbody.append(...rows);
+    table.dataset.sortOrder = isAscending ? `desc-${colIndex}` : `asc-${colIndex}`;
+}

@@ -1,15 +1,18 @@
-﻿async function loadGames() {
+const gameListItemTemplate = document.getElementById('game-list-item-template');
+
+async function loadGames() {
     try {
         const res = await fetch('/api/db/games/all');
         const games = await res.json();
-        console.log('Games:', games)
+        console.log('Games:', games);
         const container = document.getElementById('game-list-container');
+
         games.forEach(game => {
-            const p = document.createElement('p');
-            p.className = 'game-list-item';
-            p.onclick = () => window.location.href = `game?id=${game.ID}&name=${game.Name}`;
+            const clone = gameListItemTemplate.content.cloneNode(true);
+            const p = clone.querySelector('.game-list-item');
             p.textContent = game.FriendlyName;
-            container.appendChild(p);
+            p.onclick = () => window.location.href = `game?id=${game.ID}&name=${game.Name}`;
+            container.appendChild(clone);
         });
     } catch (err) {
         console.error('Failed to load games:', err);

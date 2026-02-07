@@ -92,8 +92,41 @@ Use this file to reference work you've done previously and post patch notes. Als
 
 ### Notes / Things to Be Aware Of
 - `script_home.js` is NOT an ES6 module (uses `window.onload`), while all other page scripts use `import`/`export` and `type="module"`.
-- The checklist page has two rendering paths: initial load via `processData()` and filtered re-render via `renderFilteredChecklist()` — they build similar HTML but have slightly different behavior (filtered always starts expanded with sections visible).
 - `hiddenFilter` parameter is used across many endpoints to optionally include/exclude hidden sections and records.
 - Drag-and-drop logic is duplicated between `script_manage_sections.js` and `script_manage_sectionRecords.js` (nearly identical `enableDragAndDrop`, `getDragAfterElement`, `updateListOrders`, `highlightChanged*` functions).
 - The `manage_sectionRecords.js` save button has a duplicate event listener — one inside `$(document).ready()` and one inside `initializeGameRecordsReorder()`.
-- There are commented-out integrations with SendGrid (email) and Google Sheets (logging) that are no longer active.
+
+---
+
+## Patch Notes
+
+### Feb 7, 2026 — Checklist page refactored to use `<template>` elements
+
+**Files changed:** `checklist.html`, `js/script_checklist.js`
+
+**What changed:**
+- **`checklist.html`** — No longer an empty shell. Now contains the full static page structure (nav links, headings, controls panel, grid container, total completion) plus three `<template>` elements for repeating UI patterns:
+  - `#section-header-template` — collapsible accordion bar
+  - `#section-body-template` — section content container
+  - `#checklist-item-template` — single record row (label, description, checkbox area)
+- **`script_checklist.js`** — No longer builds any HTML from strings. Changes:
+  - Static elements (nav, headings, controls) are just populated via `document.getElementById().textContent` and `.href` since they already exist in HTML
+  - `processData()` and `renderFilteredChecklist()` consolidated into one `renderChecklist(sections, allRecordsBySection, { startExpanded, filterValue })` function
+  - `renderChecklist()` uses `template.content.cloneNode(true)` to clone templates, then sets data attributes and text content on the cloned DOM nodes
+  - `generateCheckboxes()` (which returned HTML strings) replaced by `createCheckbox()` which returns a real `document.createElement('input')` element
+  - New `createChecklistItem()` function clones the checklist-item template, populates it, and returns the DOM fragment
+  - New `fetchAllRecords()` helper extracted for the parallel records fetch (used by both initial load and filter re-render)
+  - Section header click handling moved from inline `.on('click')` per header to event delegation on `#grid-checklist-container` — also fixed inconsistency where initial load didn't toggle the chevron icon but filtered view did (now both do)
+  - Removed dead code: unused `sendGridUrl`/`googleSheetsAppendUrl` constants, unused `getSectionGroupsByGameId` import, unused `hasDataTables`/`gameName`/`sectionGroupName` variables, commented-out `sendEmail`/`sendDataToSheets` functions
+  - Fixed variable scoping: `gameId` and `sectionGroupId` were re-declared with `var` inside `$(document).ready`, shadowing the module-level `let` declarations. This meant `generateCheckboxes()` (at module level) was reading `null` for `gameId`. Now properly sets the module-level variables without re-declaring.
+  - Uses `document.createDocumentFragment()` to batch all section DOM nodes before appending to the container (same performance pattern as before)
+
+**Pattern for other pages to follow:**
+1. Put static page structure in the HTML file (nav, headings, containers)
+2. Add `<template>` elements for any repeating UI patterns
+3. JS just: fetches data, clones templates, sets properties on cloned nodes, appends to container
+4. Use event delegation on parent containers instead of binding click handlers inline per element
+
+**What NOT to do (lessons from this refactor):**
+- Don't re-declare module-level variables with `var` inside callbacks — it creates silent shadowing bugs
+- Don't have two separate render functions that build the same HTML differently — consolidate into one with options

@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -16,7 +16,79 @@
     <script type="module" src="./js/script_checklist.js"></script>
 </head>
 <body>
-<div class="container" id="container"></div>
+<div class="container" id="container">
+
+    <!-- Navigation -->
+    <div class="link-container">
+        <div class="link-icon">
+            <a href="./" class="link-icon-text">
+                <i class="fa fa-solid fa-house fa-lg fa-border"></i>
+            </a>
+        </div>
+        <div class="link-icon">
+            <a id="back-link" href="#" class="link-icon-text" title="Return to Game Page">
+                <i class="fa fa-arrow-left fa-lg fa-border"></i>
+            </a>
+        </div>
+    </div>
+
+    <!-- Page headings -->
+    <h1 id="game-name"></h1>
+    <h2>100% Completion Checklist</h2>
+    <h3>Section: <span id="section-group-name"></span></h3>
+
+    <!-- Controls panel -->
+    <div class="controls-panel">
+        <div style="display: flex; justify-content: flex-end; width: 100%;">
+            <input id="filter-input" type="text" placeholder="Filter by name or description..." class="filter-input" style="width:33%;">
+        </div>
+        <div style="display: flex; justify-content: flex-end; width: 100%; margin-bottom: 10px;">
+            <label class="switch">
+                <input type="checkbox" id="hide-completed-toggle" checked>
+                <span class="slider"></span>Show Completed
+            </label>
+        </div>
+        <div style="display: flex; justify-content: flex-end; width: 100%; margin-bottom: 10px;">
+            <label class="switch">
+                <input type="checkbox" id="expand-all-toggle">
+                <span class="slider"></span>Expand All
+            </label>
+        </div>
+    </div>
+
+    <!-- Checklist content rendered here by JS -->
+    <div id="grid-checklist-container"></div>
+
+    <p id="total-completion">Total Completion: 0%</p>
+</div>
+
+<!-- ===================== TEMPLATES ===================== -->
+
+<!-- Section header (collapsible accordion bar) -->
+<template id="section-header-template">
+    <div class="section-header">
+        <span class="section-header-text"></span>
+        <span class="section-header-icon">
+            <i class="fas fa-chevron-down"></i>
+        </span>
+    </div>
+</template>
+
+<!-- Section body (content area below the header) -->
+<template id="section-body-template">
+    <div class="section"></div>
+</template> 
+
+<!-- Single checklist item (record row with label, optional description, and checkboxes) -->
+<template id="checklist-item-template">
+    <div class="checklist-item">
+        <div class="column1"> 
+            <div class="label"></div>
+            <div class="description"></div>
+        </div>
+        <div class="column2"></div>
+    </div>
+</template>
 
 </body>
 </html>

@@ -1,111 +1,80 @@
 import * as utils from './script_utilities.js';
 import * as dbUtils from './script_db_helper.js';
-import {getSectionGroupsByGameId} from "./script_db_helper.js";
-
-const sendGridUrl = '/api/send-email';
-const googleSheetsAppendUrl = '/api/google-sheets-append';
-const linkToHomePage = './';
 
 var debugLogging = false;
 
-// Define these at the top level so they can be reused
+// Page-level state
 let gameId = null;
 let gameNameFriendly = null;
-let gameName = null;
-let hasDataTables = false;
 let linkToGamePage = null;
 let sectionGroupId = null;
-let sectionGroupName = null;
 let sectionGroupFriendlyName = null;
 
+// Template references (cached on load)
+let sectionHeaderTemplate = null;
+let sectionBodyTemplate = null;
+let checklistItemTemplate = null;
+
 $(document).ready(async function () {
-    var gameId = utils.getQueryParam('gameId');
-    var sectionGroupId = utils.getQueryParam('sectionGroupId');
-if (debugLogging) console.log('sectionGroupId: ' + sectionGroupId);
-    // Fetch game data first
+    // Cache template references
+    sectionHeaderTemplate = document.getElementById('section-header-template');
+    sectionBodyTemplate = document.getElementById('section-body-template');
+    checklistItemTemplate = document.getElementById('checklist-item-template');
+
+    // Read query params — no 'var' so we set the module-level variables
+    gameId = utils.getQueryParam('gameId');
+    sectionGroupId = utils.getQueryParam('sectionGroupId');
+    if (debugLogging) console.log('sectionGroupId: ' + sectionGroupId);
+
+    // Fetch game and section group data
     const gameData = await dbUtils.getGameData(gameId);
-    //console.log('gameData:', gameData);
-    gameName = gameData.Name;
     gameNameFriendly = gameData.FriendlyName;
     linkToGamePage = '/game?id=' + gameId;
 
     const sectionGroupData = await dbUtils.getSectionGroupById(sectionGroupId);
     if (debugLogging) console.log('sectionGroupData:', sectionGroupData);
-    sectionGroupName = sectionGroupData.Name;
-    sectionGroupFriendlyName = sectionGroupData.FriendlyName;
-    
-    //set the title field that's in the head using the variable from the game's HTML
-    const titleElement = document.querySelector('title');
-    titleElement.textContent = gameNameFriendly + ' 100% Completion Checklist';
+    sectionGroupFriendlyName = sectionGroupData.FriendlyName; 
 
-    //.append() puts data inside an element at last index and .prepend() puts the prepending elem at first index.
-    const mainContainer = $('#container');
+    // Populate static page elements (these already exist in the HTML)
+    document.title = gameNameFriendly + ' 100% Completion Checklist';
+    document.getElementById('game-name').textContent = gameNameFriendly;
+    document.getElementById('section-group-name').textContent = sectionGroupFriendlyName;
+    document.getElementById('back-link').href = linkToGamePage;
 
-    mainContainer.append('<div class="link-container"> </div>');
-    const linkContainerDiv = $('.link-container');
-    linkContainerDiv.append('<div class="link-icon"><a href="' + linkToHomePage + '" class="link-icon-text"><i class="fa fa-solid fa-house fa-lg fa-border" ></i></a></div>');
-    linkContainerDiv.append('<div class="link-icon"><a href="' + linkToGamePage + '" class="link-icon-text" title="Return to Game Page"><i class="fa fa-arrow-left fa-lg fa-border" ></i></a></div>');
-
-    mainContainer.append('<h1>' + gameNameFriendly + '</h1>');
-    mainContainer.append('<h2>100% Completion Checklist</h2>');
-    mainContainer.append('<h3>Section: ' + sectionGroupFriendlyName + '</h3>'); 
-
-    // Controls panel
-    const controlsPanel = $('<div class="controls-panel"></div>');
-    controlsPanel.append('<input id="filter-input" type="text" placeholder="Filter by name or description..." class="filter-input" style="width:33%;">');
-    controlsPanel.append('<label class="switch"><input type="checkbox" id="hide-completed-toggle" checked><span class="slider"></span>Show Completed</label>');
-    controlsPanel.append('<label class="switch"><input type="checkbox" id="expand-all-toggle"><span class="slider"></span>Expand All</label>');
-    mainContainer.append(controlsPanel);
-    mainContainer.append('<div id="grid-checklist-container"></div>');
-    mainContainer.append('<p id="total-completion">Total Completion: 0%</p>'); 
-
-    /*
-        mainContainer.prepend('<p id="total-completion">Total Completion: 0%</p>');
-        mainContainer.prepend('<h1>' + gameNameFriendly + ' 100% Completion Checklist</h1>');
-    
-        mainContainer.prepend(`<div class="link-container"> </div>`);
-        const linkContainerDiv = $('.link-container');
-        if(hasDataTables){
-            linkContainerDiv.prepend('<div class="link-icon"><a href="' + linkToGamePage + '" class="link-icon-text" title="Return to Game Page"><i class="fa fa-arrow-left fa-lg fa-border" ></i></a></div>');
-        }
-        linkContainerDiv.prepend('<div class="link-icon"><a href="' + linkToHomePage + '" class="link-icon-text"><i class="fa fa-solid fa-house fa-lg fa-border" ></i></a></div>');
-    */
-
-
-    // Fetch sections for that game
+    // Fetch sections and render
     const sections = await dbUtils.getSectionsBySectionGroupId(sectionGroupId, false);
+    const allRecordsBySection = await fetchAllRecords(sections);
+    renderChecklist(sections, allRecordsBySection, { startExpanded: false, filterValue: null });
+    updateAllSectionsCompletion();
+    updateTotalCompletion();
 
-    await processData(sections);
-    updateAllSectionsCompletion(); // Update section percentages
-    updateTotalCompletion(); // Calculate initial total completion percentage    
+    // Event delegation for checkbox changes
+    // https://chatgpt.com/share/67c0f24e-db90-8004-be01-0dec495fc388
+    // This prevents multiple event bindings by using event delegation.
+    // The event is attached to the parent element and delegated to the children.
+    $('#grid-checklist-container').on('change', 'input[type="checkbox"]', updateCompletion);
 
+    // Event delegation for section header clicks (toggle collapse)
+    $('#grid-checklist-container').on('click', '.section-header', function () {
+        $(this).next('.section').toggle();
+        $(this).find('i').toggleClass('fa-chevron-down fa-chevron-up');
+    });
 
-    //https://chatgpt.com/share/67c0f24e-db90-8004-be01-0dec495fc388
-    // 🔥 This line prevents multiple event bindings by using event delegation
-    //Previously, I was using Direct Binding, and every time new elements were added dynamically (i.e., checkboxes were added inside generateChecklist), the listener got 
-    //reattached.
-    //This line changes from Direct Binding to Event Delegation. 
-    //The event is attached to the parent element, and the event is delegated to the children.
-    //It needs to be inside the document ready function, so it's only called once. And it needs to happen after generateChecklist() is defined, but before any 
-    //checkboxes are clicked.
-    $('#grid-checklist-container').on('change', 'input[type="checkbox"]', updateCompletion); 
+    // --- FILTER AND TOGGLE LOGIC ---
+    $('#container').on('input', '#filter-input', applyFilterAndRender);
+    $('#container').on('change', '#hide-completed-toggle', applyHideCompletedToDOM);
+    $('#container').on('change', '#expand-all-toggle', applyExpandAllToDOM);
 
-    // --- FILTER AND EXPAND LOGIC ---
     function getHideCompleted() {
-        // Now: checked means show completed, unchecked means hide completed
-        return !$("#hide-completed-toggle").is(":checked");
-    }
+        // checked = show completed, unchecked = hide completed
+        return !$('#hide-completed-toggle').is(':checked');
+    } 
 
     async function applyFilterAndRender() {
         const filterValue = $('#filter-input').val().toLowerCase();
-        const hideCompleted = getHideCompleted();
         // Re-fetch sections and records
         const sections = await dbUtils.getSectionsBySectionGroupId(sectionGroupId, false);
-        const recordsPromises = sections.map(section =>
-            dbUtils.getRecordsBySectionIdV2(section.ID, section.RecordOrderPreference || null, false)
-                .catch(() => [])
-        );
-        const allRecordsBySection = await Promise.all(recordsPromises);
+        const allRecordsBySection = await fetchAllRecords(sections);
 
         // Filter records by name/description
         const filteredSections = [];
@@ -121,12 +90,11 @@ if (debugLogging) console.log('sectionGroupId: ' + sectionGroupId);
                 filteredRecordsBySection.push(filteredRecords);
             }
         });
-        renderFilteredChecklist(filteredSections, filteredRecordsBySection, filterValue);
+
+        renderChecklist(filteredSections, filteredRecordsBySection, { startExpanded: true, filterValue });
         updateAllSectionsCompletion();
         updateTotalCompletion();
-        // After rendering, apply hide completed if toggle is checked
         applyHideCompletedToDOM();
-        // Apply expand all if checked
         if ($('#expand-all-toggle').is(':checked')) {
             applyExpandAllToDOM();
         }
@@ -134,8 +102,8 @@ if (debugLogging) console.log('sectionGroupId: ' + sectionGroupId);
 
     function applyHideCompletedToDOM() {
         const hideCompleted = getHideCompleted();
-        $('.section').each(function() {
-            $(this).find('.grid-item-1-row, .grid-item-2-row').each(function() {
+        $('.section').each(function () {
+            $(this).find('.grid-item-1-row, .grid-item-2-row').each(function () {
                 const checkboxes = $(this).find('input[type="checkbox"]');
                 const numTotal = checkboxes.length;
                 const numChecked = checkboxes.filter(':checked').length;
@@ -149,8 +117,8 @@ if (debugLogging) console.log('sectionGroupId: ' + sectionGroupId);
     }
 
     function applyExpandAllToDOM() {
-        const expandAll = $("#expand-all-toggle").is(":checked");
-        $('.section').each(function() {
+        const expandAll = $('#expand-all-toggle').is(':checked');
+        $('.section').each(function () {
             if (expandAll) {
                 $(this).show();
                 $(this).prev('.section-header').find('i').removeClass('fa-chevron-down').addClass('fa-chevron-up');
@@ -160,328 +128,221 @@ if (debugLogging) console.log('sectionGroupId: ' + sectionGroupId);
             }
         });
     }
-
-    $('#container').on('input', '#filter-input', applyFilterAndRender);
-    $('#container').on('change', '#hide-completed-toggle', applyHideCompletedToDOM);
-    $('#container').on('change', '#expand-all-toggle', applyExpandAllToDOM);
-
-    async function renderFilteredChecklist(sections, allRecordsBySection, filterValue) {
-        const gridContainer = $('#grid-checklist-container');
-        gridContainer.empty();
-        const sectionFragments = [];
-        sections.forEach((section, sectionIndex) => {
-            const sectionId = section.ID;
-            const sectionTitle = section.Name;
-            const sectionTitleClean = utils.createSlug(sectionTitle);
-            const sectionHeader = $(`
-                <div class="section-header" data-section="${sectionIndex}">
-                    <span class="section-header-text" data-section="${sectionIndex}" data-section-title="${sectionTitle}" data-section-title-clean="${sectionTitleClean}">
-                        ${sectionTitle} (0%)
-                    </span>
-                    <span class="section-header-icon">
-                        <i class="fas fa-chevron-up"></i>
-                    </span>
-                </div>
-            `);
-            // Section body is visible for filtered
-            const sectionBody = $(`<div class="section" data-section="${sectionIndex}" style="display: block;"></div>`);
-            const records = allRecordsBySection[sectionIndex] || [];
-            if (records.length === 0) {
-                sectionBody.append(`<div class="no-records">No checklist items found for this section.</div>`);
-            } else {
-                records.forEach((record, recordIndex) => {
-                    const recordName = record.Name;
-                    const recordId = record.ID;
-                    const recordDescription = record.Description;
-                    const totalCheckboxes = record.NumberOfCheckboxes || 0;
-                    const completedCheckboxes = record.NumberAlreadyCompleted || 0;
-                    const recordNameClean = utils.createSlug(recordName);
-                    const checkboxesHTML = generateCheckboxes(
-                        sectionIndex,
-                        recordIndex,
-                        totalCheckboxes,
-                        completedCheckboxes,
-                        sectionTitleClean,
-                        recordNameClean,
-                        recordId
-                    );
-                    // Highlight match
-                    let labelHTML = recordName;
-                    let descHTML = recordDescription ? recordDescription : '';
-                    if (filterValue) {
-                        const re = new RegExp(`(${filterValue.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&')})`, 'gi');
-                        labelHTML = recordName.replace(re, '<mark>$1</mark>');
-                        if (descHTML) descHTML = descHTML.replace(re, '<mark>$1</mark>');
-                    }
-                    const recordHTML = `
-                        <div class="grid-item-${recordDescription ? '2' : '1'}-row">
-                            <div class="column1">
-                                <div class="label">${labelHTML}</div>
-                                ${descHTML ? `<div class="description">${descHTML}</div>` : ''}
-                            </div>
-                            <div class="column2">
-                                ${checkboxesHTML}
-                            </div>
-                        </div>
-                    `;
-                    sectionBody.append(recordHTML);
-                });
-            }
-            sectionHeader.on('click', function () {
-                $(this).next('.section').toggle();
-                // Toggle icon
-                const icon = $(this).find('i');
-                icon.toggleClass('fa-chevron-down fa-chevron-up');
-            });
-            sectionFragments.push(sectionHeader, sectionBody);
-        });
-        gridContainer.append(sectionFragments);
-    }
-
 });
 
-async function processData(sections) {
-    const gridContainer = $('#grid-checklist-container');
-    gridContainer.empty();
 
-    // Pre-fetch all records in parallel
+/*************************************** DATA FETCHING ***************************************/
+
+// Fetch all records for all sections in parallel
+async function fetchAllRecords(sections) {
     const recordsPromises = sections.map(section =>
         dbUtils.getRecordsBySectionIdV2(section.ID, section.RecordOrderPreference || null, false)
             .catch(err => {
                 console.error(`Failed to load records for section ${section.Name} (ID: ${section.ID})`, err);
-                return []; // Fallback to empty array on error
+                return [];
             })
     );
-    const allRecordsBySection = await Promise.all(recordsPromises);
+    return await Promise.all(recordsPromises);
+}
 
-    const sectionFragments = [];
+
+/*************************************** RENDERING ***************************************/
+
+// Single unified render function — replaces both processData() and renderFilteredChecklist()
+function renderChecklist(sections, allRecordsBySection, options) {
+    const { startExpanded = false, filterValue = null } = options;
+    const gridContainer = document.getElementById('grid-checklist-container');
+    gridContainer.innerHTML = '';
+
+    const fragment = document.createDocumentFragment();
 
     sections.forEach((section, sectionIndex) => {
-        const sectionId = section.ID;
         const sectionTitle = section.Name;
         const sectionTitleClean = utils.createSlug(sectionTitle);
 
-        const sectionHeader = $(`
-            <div class="section-header" data-section="${sectionIndex}">
-                <span class="section-header-text" data-section="${sectionIndex}" data-section-title="${sectionTitle}" data-section-title-clean="${sectionTitleClean}">
-                    ${sectionTitle} (0%)
-                </span>
-                <span class="section-header-icon">
-                    <i class="fas fa-chevron-down"></i>
-                </span>
-            </div>
-        `);
+        // Clone and populate section header template
+        const headerClone = sectionHeaderTemplate.content.cloneNode(true);
+        const headerDiv = headerClone.querySelector('.section-header');
+        headerDiv.dataset.section = sectionIndex;
 
-        const sectionBody = $(`<div class="section" data-section="${sectionIndex}" style="display: none;"></div>`);
+        const headerText = headerClone.querySelector('.section-header-text');
+        headerText.dataset.section = sectionIndex;
+        headerText.dataset.sectionTitle = sectionTitle;
+        headerText.dataset.sectionTitleClean = sectionTitleClean;
+        headerText.textContent = sectionTitle + ' (0%)';
 
+        // Set chevron direction based on whether sections start expanded
+        if (startExpanded) {
+            const chevron = headerClone.querySelector('i');
+            chevron.classList.remove('fa-chevron-down');
+            chevron.classList.add('fa-chevron-up');
+        }
+
+        // Clone and populate section body template
+        const bodyClone = sectionBodyTemplate.content.cloneNode(true);
+        const bodyDiv = bodyClone.querySelector('.section');
+        bodyDiv.dataset.section = sectionIndex;
+        bodyDiv.style.display = startExpanded ? 'block' : 'none';
+
+        // Populate with records
         const records = allRecordsBySection[sectionIndex] || [];
         if (records.length === 0) {
-            sectionBody.append(`<div class="no-records">No checklist items found for this section.</div>`);
+            const noRecords = document.createElement('div');
+            noRecords.className = 'no-records';
+            noRecords.textContent = 'No checklist items found for this section.';
+            bodyDiv.appendChild(noRecords);
         } else {
             records.forEach((record, recordIndex) => {
-                const recordName = record.Name;
-                const recordId = record.ID;
-                const recordDescription = record.Description;
-                const totalCheckboxes = record.NumberOfCheckboxes || 0;
-                const completedCheckboxes = record.NumberAlreadyCompleted || 0;
-                const recordNameClean = utils.createSlug(recordName);
-
-                const checkboxesHTML = generateCheckboxes(
-                    sectionIndex,
-                    recordIndex,
-                    totalCheckboxes,
-                    completedCheckboxes,
-                    sectionTitleClean,
-                    recordNameClean,
-                    recordId
+                bodyDiv.appendChild(
+                    createChecklistItem(record, recordIndex, sectionIndex, sectionTitleClean, filterValue)
                 );
-
-                const recordHTML = `
-                    <div class="grid-item-${recordDescription ? '2' : '1'}-row">
-                        <div class="column1">
-                            <div class="label">${recordName}</div>
-                            ${recordDescription ? `<div class="description">${recordDescription}</div>` : ''}
-                        </div>
-                        <div class="column2">
-                            ${checkboxesHTML}
-                        </div>
-                    </div>
-                `;
-
-                sectionBody.append(recordHTML);
             });
         }
 
-        sectionHeader.on('click', function () {
-            $(this).next('.section').toggle();
-        });
-
-        sectionFragments.push(sectionHeader, sectionBody);
+        fragment.appendChild(headerClone);
+        fragment.appendChild(bodyClone);
     });
 
-    gridContainer.append(sectionFragments);
+    gridContainer.appendChild(fragment);
 }
 
 
-/*async function sendEmail(thisSubject, thisText) {
-    try {
-        const response = await fetch(sendGridUrl, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                subject: thisSubject,
-                text: thisText
-            })
-        });
+// Create a single checklist item by cloning the template
+function createChecklistItem(record, recordIndex, sectionIndex, sectionTitleClean, filterValue) {
+    const clone = checklistItemTemplate.content.cloneNode(true);
 
-        const emailResponse = await response.json();
-        if (debugLogging) console.log("Response:", emailResponse);
-    } catch (error) {
-        console.error("Error:", error);
+    const recordName = record.Name;
+    const recordDescription = record.Description;
+    const totalCheckboxes = record.NumberOfCheckboxes || 0;
+    const completedCheckboxes = record.NumberAlreadyCompleted || 0;
+    const recordNameClean = utils.createSlug(recordName);
+
+    // Set the outer div class: 2-row if there's a description, 1-row if not
+    const itemDiv = clone.querySelector('.checklist-item');
+    itemDiv.className = recordDescription ? 'grid-item-2-row' : 'grid-item-1-row';
+
+    // Populate label and description
+    const labelDiv = clone.querySelector('.label');
+    const descDiv = clone.querySelector('.description');
+
+    if (filterValue) {
+        // Highlight matching text with <mark> tags
+        const re = new RegExp(`(${filterValue.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&')})`, 'gi');
+        labelDiv.innerHTML = recordName.replace(re, '<mark>$1</mark>');
+        if (recordDescription) {
+            descDiv.innerHTML = recordDescription.replace(re, '<mark>$1</mark>');
+        } else {
+            descDiv.remove();
+        }
+    } else {
+        labelDiv.textContent = recordName;
+        if (recordDescription) {
+            descDiv.textContent = recordDescription;
+        } else {
+            descDiv.remove();
+        }
     }
-}*/
+
+    // Create checkbox elements
+    const column2 = clone.querySelector('.column2');
+    for (let i = 1; i <= totalCheckboxes; i++) {
+        column2.appendChild(
+            createCheckbox(sectionIndex, recordIndex, i, totalCheckboxes, i <= completedCheckboxes, sectionTitleClean, recordNameClean, record.ID)
+        );
+    }
+
+    return clone;
+}
 
 
-/*async function sendDataToSheets(gameName, sectionName, itemName, action, checkboxNumberClicked) {
-    const dateTimeNowUtc = new Date().toISOString()
-    const data = [dateTimeNowUtc, gameName, sectionName, itemName, action, checkboxNumberClicked]; 
+// Create a single checkbox input element with all data attributes
+function createCheckbox(sectionIndex, itemIndex, checkboxNumber, totalCheckboxes, isChecked, sectionTitleClean, itemNameClean, recordId) {
+    const checkbox = document.createElement('input');
+    checkbox.type = 'checkbox';
 
-    const response = await fetch(googleSheetsAppendUrl, {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ rowData: data }),
-    });
+    const checkboxName = createStorageItemName(gameId, sectionTitleClean, itemNameClean, checkboxNumber);
+    checkbox.className = 'checkbox-' + checkboxName;
 
-    const sheetsResponse = await response.json();
-    if (debugLogging) console.log(sheetsResponse);
-}*/
+    checkbox.dataset.section = sectionIndex;
+    checkbox.dataset.item = itemIndex;
+    checkbox.dataset.numCheckboxClicked = checkboxNumber;
+    checkbox.dataset.numTotalCheckboxes = totalCheckboxes;
+    checkbox.dataset.sectionTitleClean = sectionTitleClean;
+    checkbox.dataset.itemNameClean = itemNameClean;
+    checkbox.dataset.recordId = recordId;
+    checkbox.checked = isChecked;
+
+    return checkbox;
+}
+
 
 function createStorageItemName(gameName, sectionNameClean, itemNameClean, i) {
-    var storageItemName = `${gameName}--checkbox--${sectionNameClean}--${itemNameClean}--${i}`;
-    return storageItemName;
+    return `${gameName}--checkbox--${sectionNameClean}--${itemNameClean}--${i}`;
 }
 
 
-// Helper function to generate checkboxes, using the DB info for if the item has been checked or not
-function generateCheckboxes(sectionIndex, itemIndex, item_checkboxes_total, item_checkboxes_checked, sectionTitleClean, 
-                            itemNameClean, recordId) {
-    const checkboxes = [];
-    for (let i = 1; i <= item_checkboxes_total; i++) {
-        const isChecked = i <= item_checkboxes_checked ? 'checked' : '';
-        var checkboxName = createStorageItemName(gameId, sectionTitleClean, itemNameClean, i);
-        checkboxes.push(`
-            <input type="checkbox" 
-                class="checkbox-${checkboxName}" 
-                data-section="${sectionIndex}" 
-                data-item="${itemIndex}" 
-                data-num-checkbox-clicked="${i}" 
-                data-num-total-checkboxes="${item_checkboxes_total}" 
-                data-section-title-clean="${sectionTitleClean}" 
-                data-item-name-clean="${itemNameClean}" 
-                data-record-id="${recordId}" 
-                ${isChecked}>
-        `);
-    }
-    return checkboxes.join('');
-}
-
+/*************************************** CHECKBOX INTERACTION ***************************************/
 
 function updateCompletion() {
     const sectionIndex = $(this).data('section');
     const itemIndex = $(this).data('item');
-    const checkboxNum = $(this).data('num-checkbox-clicked');
-    const sectionTitleClean = $(this).data('section-title-clean');
-    const itemNameClean = $(this).data('item-name-clean');
-    const recordId = $(this).data('record-id');
-    
+    const checkboxNum = $(this).data('numCheckboxClicked');
+    const sectionTitleClean = $(this).data('sectionTitleClean');
+    const itemNameClean = $(this).data('itemNameClean');
+    const recordId = $(this).data('recordId');
+
     if (debugLogging) {
         console.log("updateCompletion called - sectionIndex " + sectionIndex + ". itemIndex " + itemIndex + ". checkboxNum " + checkboxNum +
             ". sectionTitleClean " + sectionTitleClean + ". itemNameClean " + itemNameClean + ". recordId " + recordId);
     }
-    
-    //get the section-header-text div
-    var sectionHeaderTextDiv = $(`span.section-header-text[data-section="${sectionIndex}"]`);
-    
-    // Get the text inside the "section-header-text" element
-    const sectionHeaderText = sectionHeaderTextDiv.text().trim();
-    if (debugLogging) console.log("Section Header Text:", sectionHeaderText);
 
-    // Get the sectionTitle data attribute value from "section-header-text" element
+    var sectionHeaderTextDiv = $(`span.section-header-text[data-section="${sectionIndex}"]`);
     const sectionTitle = sectionHeaderTextDiv.attr('data-section-title');
     if (debugLogging) console.log('sectionTitle: ' + sectionTitle);
 
-    // Get the sectionTitleClean data attribute value from "section-header-text" element
-/*    const sectionTitleClean = sectionHeaderTextDiv.attr('data-section-title-clean');
-    if (debugLogging) console.log('sectionTitleClean: ' + sectionTitleClean);*/
-
-    // Get the text inside the sibling element's label
     const checkboxItemName = $(this).closest('.grid-item-2-row, .grid-item-1-row').find('.label').text().trim();
     if (debugLogging) console.log("checkboxItemName:", checkboxItemName);
-    
-    // Is this the first, second, third, etc checkbox?
-    const checkboxNumberClicked = $(this).attr('data-num-checkbox-clicked');
-    if (debugLogging) console.log('checkboxNumberClicked: ' + checkboxNumberClicked);
 
-    //How many checkboxes are there for this item?
+    const checkboxNumberClicked = $(this).attr('data-num-checkbox-clicked');
     const numberOfCheckboxes = $(this).attr('data-num-total-checkboxes');
+    if (debugLogging) console.log('checkboxNumberClicked: ' + checkboxNumberClicked);
     if (debugLogging) console.log('numberOfCheckboxes: ' + numberOfCheckboxes);
 
-    let action = ''; // Will be either "added" or "removed"
-    
-    
+    let action = '';
+
     if ($(this).is(':checked')) {
         if (debugLogging) console.log('this item is checked. CheckboxNum: ' + checkboxNum);
         for (let i = 1; i <= checkboxNum; i++) {
             $(`.checkbox-${sectionIndex}-${itemIndex}-${i}`).prop('checked', true);
-            //var storageItemName = createStorageItemName(gameId, sectionTitleClean, itemNameClean, checkboxNum);
-            //localStorage.setItem(storageItemName, 'checked');
-            //if (debugLogging) console.log('checked item in local storage. storageItemName: ' + storageItemName);
         }
         action = 'added';
     } else {
         if (debugLogging) console.log('this item is not checked. CheckboxNum: ' + checkboxNum);
         for (let i = checkboxNum; i <= $(`input[data-section="${sectionIndex}"][data-item="${itemIndex}"]`).length; i++) {
             $(`.checkbox-${sectionIndex}-${itemIndex}-${i}`).prop('checked', false);
-            //var storageItemName = createStorageItemName(gameId, sectionTitleClean, itemNameClean, checkboxNum);
-            //localStorage.removeItem(storageItemName);
-            //if (debugLogging) console.log('removed item from local storage. storageItemName: ' + storageItemName);
         }
         action = 'removed';
     }
 
-    var subject = `Record updated for ${gameNameFriendly}`
-    var emailText = `A record was ${action} for ${gameNameFriendly}.\nSection: ${sectionTitle}\nItem: ${checkboxItemName}`
-    if(numberOfCheckboxes > 1){
-        emailText += `\nCheckbox Number Clicked: ${checkboxNumberClicked}`
-    }
-
     var numberAlreadyCompleted = "";
-    
-    if (action) {
-        //sendEmail(subject, emailText);
 
-        if(action === "added"){
+    if (action) {
+        if (action === "added") {
             numberAlreadyCompleted = checkboxNumberClicked;
         }
-        else {//action === "removed"
-            if(checkboxNumberClicked === 1) numberAlreadyCompleted = 0;
+        else {
+            if (checkboxNumberClicked === 1) numberAlreadyCompleted = 0;
             else numberAlreadyCompleted = checkboxNumberClicked - 1;
-            
         }
         dbUtils.updateRecordCompletion(recordId, numberAlreadyCompleted);
-/*        if(numberOfCheckboxes > 1) {
-            sendDataToSheets(gameNameFriendly, sectionTitle, checkboxItemName, action, checkboxNumberClicked);
-        }
-        else {
-            sendDataToSheets(gameNameFriendly, sectionTitle, checkboxItemName, action, null);
-        }*/
     }
 
     updateSectionCompletion(sectionIndex);
     updateTotalCompletion();
 }
+
+
+/*************************************** COMPLETION TRACKING ***************************************/
 
 function updateSectionCompletion(sectionIndex) {
     const sectionHeaderTextDiv = $(`span.section-header-text[data-section="${sectionIndex}"]`);
@@ -509,17 +370,16 @@ function updateSectionCompletion(sectionIndex) {
 
 function updateTotalCompletion() {
     try {
-        if (debugLogging) console.log('updateTotalCompletion - made it here')
+        if (debugLogging) console.log('updateTotalCompletion - made it here');
         let totalCompletionPercent = 0;
         var totalCompletionText = '';
         const sections = $('div.section-header');
         const totalSections = sections.length;
-        if (debugLogging) console.log('updateTotalCompletion - totalSections ' + totalSections)
+        if (debugLogging) console.log('updateTotalCompletion - totalSections ' + totalSections);
 
         var totalCheckedCheckboxes = 0;
         var totalCheckboxes = 0;
-        sections.each(function() {
-            var thisSectionTitle = $(this).text();
+        sections.each(function () {
             var sectionCheckedCheckboxesInt = parseInt($(this).attr('checked-checkboxes'));
             var sectionTotalCheckboxesInt = parseInt($(this).attr('total-checkboxes'));
             if (debugLogging) console.log('sectionCheckedCheckboxesInt ' + sectionCheckedCheckboxesInt);
@@ -540,7 +400,7 @@ function updateTotalCompletion() {
 }
 
 function updateAllSectionsCompletion() {
-    $('span.section-header-text').each(function() {
+    $('span.section-header-text').each(function () {
         const sectionIndex = $(this).data('section');
         updateSectionCompletion(sectionIndex);
     });

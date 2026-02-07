@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -17,7 +17,44 @@
 </head>
 <body>
 <div class="container" id="container">
+    <!-- Navigation -->
+    <div class="link-container">
+        <div class="link-icon">
+            <a href="./" class="link-icon-text">
+                <i class="fa fa-solid fa-house fa-lg fa-border"></i>
+            </a>
+        </div>
+        <div class="link-icon">
+            <a id="back-link" href="#" class="link-icon-text" title="Return to Game Page">
+                <i class="fa fa-arrow-left fa-lg fa-border"></i>
+            </a>
+        </div>
+    </div>
+
+    <!-- Page headings -->
+    <h1 id="game-name"></h1>
+    <h2>Tables</h2>
+
+    <!-- Table sections rendered here by JS -->
     <div id="grid-tables-container"></div>
 </div>
+
+<!-- Templates -->
+
+<!-- Section header (collapsible accordion bar for a table) -->
+<template id="table-section-header-template">
+    <div class="section-header">
+        <span class="section-header-text"></span>
+        <span class="section-header-icon">
+            <i class="fas fa-chevron-down"></i>
+        </span>
+    </div>
+</template>
+
+<!-- Section body (content area below the header) -->
+<template id="table-section-body-template">
+    <div class="section-table"></div>
+</template>
+
 </body>
 </html>
