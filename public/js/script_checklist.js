@@ -50,13 +50,14 @@ if (debugLogging) console.log('sectionGroupId: ' + sectionGroupId);
     mainContainer.append('<h2>100% Completion Checklist</h2>');
     mainContainer.append('<h3>Section: ' + sectionGroupFriendlyName + '</h3>'); 
 
-    mainContainer.append('<p id="total-completion">Total Completion: 0%</p>');
-    mainContainer.append('<div style="display: flex; justify-content: flex-end; width: 100%;"><input id="filter-input" type="text" placeholder="Filter by name or description..." class="filter-input" style="width:33%;"></div>');
-    mainContainer.append('<div style="display: flex; justify-content: flex-end; width: 100%; margin-bottom: 10px;"><label class="switch"><input type="checkbox" id="hide-completed-toggle" checked><span class="slider"></span>Show Completed</label></div>');
-    mainContainer.append('<div style="display: flex; justify-content: flex-end; width: 100%; margin-bottom: 16px;"><label class="switch"><input type="checkbox" id="expand-all-toggle"><span class="slider"></span>Expand All</label></div>');
+    // Controls panel
+    const controlsPanel = $('<div class="controls-panel"></div>');
+    controlsPanel.append('<input id="filter-input" type="text" placeholder="Filter by name or description..." class="filter-input" style="width:33%;">');
+    controlsPanel.append('<label class="switch"><input type="checkbox" id="hide-completed-toggle" checked><span class="slider"></span>Show Completed</label>');
+    controlsPanel.append('<label class="switch"><input type="checkbox" id="expand-all-toggle"><span class="slider"></span>Expand All</label>');
+    mainContainer.append(controlsPanel);
     mainContainer.append('<div id="grid-checklist-container"></div>');
-    
-
+    mainContainer.append('<p id="total-completion">Total Completion: 0%</p>'); 
 
     /*
         mainContainer.prepend('<p id="total-completion">Total Completion: 0%</p>');
