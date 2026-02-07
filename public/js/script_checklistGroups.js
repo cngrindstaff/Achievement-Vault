@@ -1,62 +1,46 @@
-﻿import * as dbUtils from './script_db_helper.js';
-import * as utils from "./script_utilities.js";
-
-
-let gameId = null;
-let gameNameFriendly = null;
-let gameName = null;
-let htmlTitle = null;
-let linkToGamePage = null;
-const linkToHomePage = './';
+import * as dbUtils from './script_db_helper.js';
+import * as utils from './script_utilities.js';
 
 var debugLogging = false;
 
+let gameId = null;
+let gameNameFriendly = null;
+
+const sectionGroupItemTemplate = document.getElementById('section-group-item-template');
+
 $(document).ready(async function () {
-    var passed_gameId = utils.getQueryParam('gameId');
-    gameId = passed_gameId;
+    gameId = utils.getQueryParam('gameId');
 
-    // Fetch game data first
-    const gameData = await dbUtils.getGameData(passed_gameId);
-    //if(debugLogging) console.log('gameData:', gameData);
+    // Fetch game data
+    const gameData = await dbUtils.getGameData(gameId);
     gameId = gameData.ID;
-    gameName = gameData.Name;
     gameNameFriendly = gameData.FriendlyName;
-    linkToGamePage = `/game?id=${gameId}`;
-    if(debugLogging) console.log('linkToGamePage:', linkToGamePage);
-    htmlTitle = gameNameFriendly + ': Checklist Groups';
-    
-    $("title").text(htmlTitle);
+    const linkToGamePage = `/game?id=${gameId}`;
+    if (debugLogging) console.log('linkToGamePage:', linkToGamePage);
 
-    const mainContainer = $('#container');
-    mainContainer.append(`<div class="link-container"> </div>`);
-    
-    const linkContainerDiv = $('.link-container');
-    linkContainerDiv.append('<div class="link-icon"><a href="' + linkToHomePage + '" class="link-icon-text"><i class="fa fa-solid fa-house fa-lg fa-border" ></i></a></div>');
-    linkContainerDiv.append('<div class="link-icon"><a href="' + linkToGamePage + '" class="link-icon-text" title="Return to Game Page"><i class="fa fa-arrow-left fa-lg fa-border" ></i></a></div>');
+    // Populate static page elements
+    document.title = gameNameFriendly + ': Checklist Groups';
+    document.getElementById('game-name').textContent = gameNameFriendly;
+    document.getElementById('back-link').href = linkToGamePage;
 
-    mainContainer.append('<h1>' + gameNameFriendly + '</h1>');
-    mainContainer.append('<h2>Checklist Groups</h2>');
-
-    mainContainer.append('<div id="section-group-list-container"></div>');
-
-    loadSectionGroups();
+    // Load and render section groups
+    await loadSectionGroups();
 });
 
 async function loadSectionGroups() {
     try {
         const sectionGroups = await dbUtils.getSectionGroupsByGameId(gameId, false);
-        if(debugLogging) console.log('SectionGroups:', sectionGroups)
-        const sectionGroupContainer = document.getElementById('section-group-list-container');
-        if(debugLogging) console.log('sectionGroupContainer:', sectionGroupContainer);
+        if (debugLogging) console.log('SectionGroups:', sectionGroups);
+        const container = document.getElementById('section-group-list-container');
+
         sectionGroups.forEach(sectionGroup => {
-            const p = document.createElement('p');
-            p.className = 'game-list-item';
-            p.onclick = () => window.location.href = `checklist?gameId=${gameId}&sectionGroupId=${sectionGroup.ID}`;
+            const clone = sectionGroupItemTemplate.content.cloneNode(true);
+            const p = clone.querySelector('.game-list-item');
             p.textContent = sectionGroup.FriendlyName;
-            sectionGroupContainer.appendChild(p);
+            p.onclick = () => window.location.href = `checklist?gameId=${gameId}&sectionGroupId=${sectionGroup.ID}`;
+            container.appendChild(clone);
         });
     } catch (err) {
         console.error('Failed to load sectionGroups:', err);
     }
 }
-

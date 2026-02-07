@@ -1,50 +1,47 @@
 import { getGameDataV2 } from "./script_db_helper.js";
 import { getQueryParam } from "./script_utilities.js";
 
-// Define these at the top level so they can be reused
 let gameId = null;
 let gameNameFriendly = null;
-let gameName = null;
 let hasDataTables = false;
-let countOfSectionGroups = 1;
+
+const gameLinkTemplate = document.getElementById('game-link-template');
 
 $(document).ready(async function () {
-    var passed_gameId = getQueryParam('id');
-    var passed_gameName = getQueryParam('name');
+    gameId = getQueryParam('id');
 
-    // Fetch game data first
-    const result = await getGameDataV2(passed_gameId);
+    // Fetch game data
+    const result = await getGameDataV2(gameId);
     console.log('result:', result);
     gameId = result.ID;
-    gameName = result.Name;
     gameNameFriendly = result.FriendlyName;
-    hasDataTables = result.GameTableCount > 0
-    countOfSectionGroups = result.SectionGroupCount;
+    hasDataTables = result.GameTableCount > 0;
+    const countOfSectionGroups = result.SectionGroupCount;
     console.log('gameId:' + gameId + ', hasDataTables:' + hasDataTables + ', # of sectionGroups:' + countOfSectionGroups);
 
-    // Now safely use the values
-    //Set the HTML title
-    $("title").text(gameNameFriendly);
-    //Set the .game-name element
-    document.querySelector('.game-name').textContent = gameNameFriendly;
-    
-    
-    //Generate the URLs
-    var linkToChecklistPage = `/checklist?id=${gameId}`;
-    var linkToTablesPage = `/table?id=${gameId}`;
-    var linkToManageSectionsPage = `/manage_sections?gameId=${gameId}`;
-    var linkToSectionGroupsPage = `/checklistGroups?gameId=${gameId}`;
+    // Populate static page elements
+    document.title = gameNameFriendly;
+    document.getElementById('game-name').textContent = gameNameFriendly;
 
-    // $('#grid-link-container').append(`<a class="section-header link-checklist" href="${linkToChecklistPage}">100% Checklist</a>`);
-    
-    $('#grid-link-container').append(`<a class="section-header link-checklist" href="${linkToSectionGroupsPage}">Checklists</a>`);
+    // Build navigation links from template
+    const linkContainer = document.getElementById('grid-link-container');
 
-    if(hasDataTables){
-        $('#grid-link-container').append(`<a class="section-header link-tables" href="${linkToTablesPage}">Other Tables</a>`);
+    appendGameLink(linkContainer, `/checklistGroups?gameId=${gameId}`, 'Checklists', 'link-checklist');
+
+    if (hasDataTables) {
+        appendGameLink(linkContainer, `/table?id=${gameId}`, 'Other Tables', 'link-tables');
     }
-    
-    $('#grid-link-container').append(`<a class="section-header link-checklist" href="${linkToManageSectionsPage}">Admin</a>`);
 
+    appendGameLink(linkContainer, `/manage_sections?gameId=${gameId}`, 'Admin', 'link-checklist');
 });
 
-
+function appendGameLink(container, href, text, extraClass) {
+    const clone = gameLinkTemplate.content.cloneNode(true);
+    const link = clone.querySelector('a');
+    link.href = href;
+    link.textContent = text;
+    if (extraClass) {
+        link.classList.add(extraClass);
+    }
+    container.appendChild(clone);
+}

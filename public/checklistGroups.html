@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8" />
@@ -15,7 +15,34 @@
 
     <script type="module" src="./js/script_checklistGroups.js"></script>
 </head>
-    <body>
-        <div class="container" id="container"></div>
-    </body>
+<body>
+<div class="container" id="container">
+    <!-- Navigation -->
+    <div class="link-container">
+        <div class="link-icon">
+            <a href="./" class="link-icon-text">
+                <i class="fa fa-solid fa-house fa-lg fa-border"></i>
+            </a>
+        </div>
+        <div class="link-icon">
+            <a id="back-link" href="#" class="link-icon-text" title="Return to Game Page">
+                <i class="fa fa-arrow-left fa-lg fa-border"></i>
+            </a>
+        </div>
+    </div>
+
+    <!-- Page headings -->
+    <h1 id="game-name"></h1>
+    <h2>Checklist Groups</h2>
+
+    <!-- Section groups rendered here by JS -->
+    <div id="section-group-list-container"></div>
+</div>
+
+<!-- Templates -->
+<template id="section-group-item-template">
+    <p class="game-list-item"></p>
+</template>
+
+</body>
 </html>
