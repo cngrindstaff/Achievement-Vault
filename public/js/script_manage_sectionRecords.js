@@ -90,7 +90,8 @@ $(document).ready(async function () {
     const newRecordForm = document.getElementById('new-record-form');
 
     addRecordButton.addEventListener('click', () => {
-        const hasUnsavedChanges = [...container.children].some((card) => {
+        const gridContainer = document.getElementById('grid-manage-records-container');
+        const hasUnsavedChanges = [...gridContainer.children].some((card) => {
             return card.dataset.currentOrder !== card.dataset.originalOrder;
         });
 
@@ -250,23 +251,6 @@ $(document).ready(async function () {
         restoreDefaultStyling();
     });
 
-    document.getElementById('save-button').addEventListener('click', async () => {
-        const updatedRecords = [...container.children]
-            .map((card) => ({
-                ID: Number(card.dataset.id),
-                ListOrder: Number(card.dataset.currentOrder),
-                OriginalOrder: Number(card.dataset.originalOrder)
-            }))
-            .filter((record) => record.ListOrder !== record.OriginalOrder);
-
-        if (updatedRecords.length > 0) {
-            const success = await dbUtils.UpdateSectionRecordsListOrder(updatedRecords);
-            if (success) alert('List order updated successfully!');
-            else alert('Failed to update list order.');
-        } else {
-            alert('No changes to save.');
-        }
-    });
 })
 
 
@@ -279,12 +263,18 @@ function createRecordCard(record, gameId, container) {
     card.dataset.currentOrder = record.ListOrder;
     card.innerHTML = `
         <div class="record-card-content">
-            <input type="number" class="list-order" value="${record.ListOrder}" readonly />
+            <input type="number" class="list-order" value="${record.ListOrder}" min="0" />
             <span class="record-name">${record.Name}</span>
             <button class="edit-button" data-id="${record.ID}">Edit</button>
             <button class="delete-button" data-id="${record.ID}">Delete</button>
        </div>
     `;
+
+    // Allow manual order editing
+    card.querySelector('.list-order').addEventListener('change', function () {
+        card.dataset.currentOrder = parseInt(this.value) || 0;
+        highlightChangedRecords(container);
+    });
 
     // Handle the Edit button click
     card.querySelector('.edit-button').addEventListener('click', async (event) => {
@@ -453,7 +443,7 @@ async function initializeGameRecordsReorder(sectionId, containerId, resetButtonI
             .filter((record) => record.ListOrder !== record.OriginalOrder);
 
         if (updatedRecords.length > 0) {
-            const success = await dbUtils.UpdateSectionRecordsListOrder(updatedRecords);
+            const success = await dbUtils.updateSectionRecordsListOrder(updatedRecords);
             if (success) alert('List order updated successfully!');
             else alert('Failed to update list order.');
         } else {
