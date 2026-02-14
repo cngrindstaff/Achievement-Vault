@@ -742,9 +742,17 @@ tr:nth-child(odd) {
 		padding-right: 10px;
 	}
 
+	.multi-toggle {
+		margin-bottom: 12px;
+	}
+
 	.add-record {
 		display: flex;
 		flex-direction: column;
+
+		&.hidden {
+			display: none;
+		}
 	}
 
 	.modern-checkbox.add-record {

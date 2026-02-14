@@ -1,4 +1,4 @@
-﻿// backend/routes/games.js
+// backend/routes/games.js
 import express from "express";
 const router = express.Router();
 import db from '../config/mysqlConnector.js';
@@ -332,6 +332,24 @@ router.post('/db/record/insert', async (req, res) => {
         res.json({ message: 'Game record inserted successfully' });
     } catch (err) {
         console.error('Error inserting game record:', err);
+        res.status(500).json({ error: 'Database error' });
+    }
+});
+
+//************************************ INSERT MULTIPLE GAME RECORDS ************************************//
+router.post('/db/records/insertMultiple', async (req, res) => {
+    const records = req.body;
+
+    if (!Array.isArray(records) || records.length === 0) {
+        return res.status(400).json({ error: 'Invalid input. Expected a non-empty array of records.' });
+    }
+
+    try {
+        const jsonString = JSON.stringify(records);
+        await db.query('CALL InsertMultipleGameRecords(?)', [jsonString]);
+        res.json({ message: `${records.length} game records inserted successfully` });
+    } catch (err) {
+        console.error('Error inserting multiple game records:', err);
         res.status(500).json({ error: 'Database error' });
     }
 });

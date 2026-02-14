@@ -435,6 +435,32 @@ export async function insertGameRecord(recordData) {
 }
 
 
+//************************************ INSERT MULTIPLE GAME RECORDS ************************************//
+export async function insertMultipleGameRecords(records) {
+    if (!Array.isArray(records) || records.length === 0) {
+        alert("No records to insert.");
+        return null;
+    }
+
+    try {
+        const res = await fetch('/api/db/records/insertMultiple', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(records)
+        });
+
+        if (!res || !res.ok) {
+            console.log('No response or response not ok:', res);
+            return null;
+        }
+        return await res.json();
+    } catch (err) {
+        console.error("Error inserting multiple game records:", err);
+        return null;
+    }
+}
+
+
 //************************************ UPDATE GAME SECTION ************************************//
 export async function updateGameSection(sectionId, gameId, updateData) {
     if (!sectionId || !gameId || !updateData) {
