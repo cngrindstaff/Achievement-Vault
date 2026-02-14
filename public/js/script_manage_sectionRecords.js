@@ -48,10 +48,10 @@ $(document).ready(async function () {
     mainContainer.append('<h2>Section: ' + sectionName + '</h2>');
     mainContainer.append('<h3>Records <span id="record-count" class="record-count"></span></h3>');
 
+    mainContainer.append('<button id="add-record-button" class="add-record-button">Add Record</button>');
     mainContainer.append('<div id="grid-manage-records-container"></div>');
     mainContainer.append('<button id="save-button" class="save-button">Save Order</button>');
     mainContainer.append('<button id="reset-button" class="reset-button">Reset Changes</button>');
-    mainContainer.append('<button id="add-record-button" class="add-record-button">Add Record</button>');
 
     // Add modal HTML
     mainContainer.append(`
