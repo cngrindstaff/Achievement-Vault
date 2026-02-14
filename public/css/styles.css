@@ -772,6 +772,21 @@ tr:nth-child(odd) {
   margin-top: 24px;
   text-align: center;
 }
+.modal .button-container .delete-button {
+  background-color: #d94452;
+  color: #fff;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  margin-left: 8px;
+  transition: background-color 0.15s ease, transform 0.15s ease;
+}
+.modal .button-container .delete-button:hover {
+  background-color: #c13340;
+  transform: translateY(-1px);
+}
 .modal .modern-checkbox {
   display: flex;
   align-items: center;
