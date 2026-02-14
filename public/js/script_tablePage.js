@@ -73,6 +73,45 @@ $(document).ready(async function () {
         $(sectionBody).slideToggle(250);
         header.classList.toggle('open');
     });
+
+    // --- TABLE SEARCH / FILTER ---
+    const filterInput = document.getElementById('table-filter-input');
+    filterInput.addEventListener('input', function () {
+        const query = this.value.trim().toLowerCase();
+        const headers = gridContainer.querySelectorAll('.section-header');
+
+        headers.forEach(header => {
+            const sectionBody = header.nextElementSibling;
+            if (!sectionBody) return;
+
+            const headerText = header.querySelector('.section-header-text').textContent.toLowerCase();
+            const rows = sectionBody.querySelectorAll('tbody tr');
+            let anyRowVisible = false;
+
+            if (!query) {
+                // No filter — show everything
+                rows.forEach(row => row.style.display = '');
+                header.style.display = '';
+                sectionBody.style.display = '';
+                return;
+            }
+
+            // Check if the section name itself matches
+            const headerMatches = headerText.includes(query);
+
+            rows.forEach(row => {
+                const cells = Array.from(row.cells);
+                const rowText = cells.map(c => c.textContent.toLowerCase()).join(' ');
+                const matches = headerMatches || rowText.includes(query);
+                row.style.display = matches ? '' : 'none';
+                if (matches) anyRowVisible = true;
+            });
+
+            // Hide entire section if no rows match
+            header.style.display = anyRowVisible ? '' : 'none';
+            sectionBody.style.display = anyRowVisible ? '' : 'none';
+        });
+    });
 });
 
 
