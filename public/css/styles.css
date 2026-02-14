@@ -683,6 +683,14 @@ tr:nth-child(odd) {
 .modal .add-record.hidden {
   display: none;
 }
+.modal .add-record-row {
+  display: flex;
+  gap: 16px;
+}
+.modal .add-record-row .add-record {
+  flex: 1;
+  min-width: 0;
+}
 .modal .modern-checkbox.add-record {
   flex-direction: row;
   justify-content: flex-start;

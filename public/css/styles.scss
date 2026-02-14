@@ -808,6 +808,16 @@ tr:nth-child(odd) {
 		}
 	}
 
+	.add-record-row {
+		display: flex;
+		gap: 16px;
+
+		.add-record {
+			flex: 1;
+			min-width: 0;
+		}
+	}
+
 	.modern-checkbox.add-record {
 		flex-direction: row;
 		justify-content: flex-start;
