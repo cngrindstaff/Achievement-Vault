@@ -2,7 +2,7 @@ import * as utils from './script_utilities.js';
 import * as dbUtils from './script_db_helper.js';
 import { initNav } from './script_nav.js';
 
-var debugLogging = false;
+var debugLogging = process.env.DEBUG_LOGGING === 'true';
 
 let gameId = null;
 let gameNameFriendly = null;

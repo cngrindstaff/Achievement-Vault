@@ -101,6 +101,15 @@ export function initNav({ currentPage, gameId, gameNameFriendly }) {
             closeNav();
         }
     });
+
+    // Inject site footer
+    const footerHTML = `
+        <footer class="site-footer">
+            <p>Site designed and created by Chelsea Grindstaff</p>
+            <p><a href="https://www.flaticon.com/free-icons/gaming" title="gaming icons">Gaming favicon created by Us and Up - Flaticon</a></p>
+        </footer>
+    `;
+    document.body.insertAdjacentHTML('beforeend', footerHTML);
 }
 
 function getBackHref(currentPage, gameId) {

@@ -1,6 +1,6 @@
 ﻿export function getQueryParam(param) {
     const urlParams = new URLSearchParams(window.location.search);
-    //console.log('urlParams: ' + urlParams);
+    //if(debugLogging) console.log('urlParams: ' + urlParams);
     return urlParams.get(param);
 }
 
@@ -13,7 +13,7 @@ function trimBeforeParenthesis(str) {
 }
 function removeTrailingSpace (str){
     if(str.endsWith(" ")){
-        //console.log('trimming end space')
+        //if(debugLogging) console.log('trimming end space')
         str = str.trimEnd();
     }
     return str;
@@ -31,7 +31,7 @@ function logAllAttributes(thisElement){
 
 
 export function createSlug(str) {
-    //console.log('str:', str);
+    //if(debugLogging) console.log('str:', str);
 
     if (!str || typeof str !== 'string') {
         console.warn('Bad input to createSlug:', str);
@@ -56,4 +56,4 @@ function removeDiacritics(str) {
 }
 
 // Example usage:
-//console.log(createSlug("Hello Wórld! This --is a test_")); // Output: "hello-world-this-is-a-test"
+//if(debugLogging) console.log(createSlug("Hello Wórld! This --is a test_")); // Output: "hello-world-this-is-a-test"

@@ -57,7 +57,9 @@ body {
 	line-height: 1.5;
 	margin: 0;
 	display: flex;
-	justify-content: center;
+	flex-direction: column;
+	align-items: center;
+	min-height: 100vh;
 	padding: 24px 16px;
 }
 
@@ -252,6 +254,35 @@ h3 {
 	&:hover {
 		background-color: $bg-hover;
 		color: $accent-600;
+	}
+}
+
+// ==================== SITE FOOTER ====================
+
+.site-footer {
+	margin-top: 48px;
+	padding: 24px 16px;
+	text-align: center;
+	font-size: 12px;
+	color: $text-muted;
+	width: 100%;
+	max-width: 700px;
+	border-top: 1px solid $bg-surface-alt;
+
+	p {
+		margin: 4px 0;
+	}
+
+	a {
+		color: $text-muted;
+		text-decoration: underline;
+		text-decoration-style: dotted;
+		text-underline-offset: 2px;
+
+		&:hover {
+			color: $accent-500;
+			text-decoration-style: solid;
+		}
 	}
 }
 
@@ -701,6 +732,7 @@ th {
 .section-table {
 	@extend .section;
 	background-color: $bg-surface;
+	display: block; // override .section's display:none — table sections start visible
 }
 
 tr:nth-child(even) {

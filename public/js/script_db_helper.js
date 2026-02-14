@@ -1,6 +1,7 @@
-import {getQueryParam} from "./script_utilities.js";
+﻿import {getQueryParam} from "./script_utilities.js";
 
-var debugLogging = false;
+var debugLogging = process.env.DEBUG_LOGGING === 'true';
+
 
 
 //************************************ GET GAME BY ID ************************************//
@@ -22,7 +23,7 @@ export async function getGameData(passed_gameId) {
             return [];
         }
         const data = JSON.parse(text);
-        //console.log('Game data:', data);
+        //if(debugLogging) console.log('Game data:', data);
         /*        return {
                     gameId: data.ID,
                     gameNameFriendly: data.FriendlyName || passed_gameName || passed_gameId,
@@ -55,7 +56,7 @@ export async function getGameDataV2(passed_gameId) {
             return [];
         }
         const data = JSON.parse(text);
-        //console.log('Game data:', data);
+        //if(debugLogging) console.log('Game data:', data);
         return data;
     } catch (err) {
         console.error("Error fetching game data:", err);
@@ -72,7 +73,7 @@ export async function getSectionsByGameId(gameId, hiddenFilter) {
     }
 
     try {
-        //console.log('made it here loadSectionsByGameId');
+        //if(debugLogging) console.log('made it here loadSectionsByGameId');
         const res = await fetch(`/api/db/sections/${gameId}/${hiddenFilter}`);
         if (!res || !res.ok) {
             console.log('No response or response not ok:', res);
@@ -96,7 +97,7 @@ export async function getSectionsByGameId(gameId, hiddenFilter) {
         
         //need to just separate these out by groups 
         
-        //console.log('Section data:', data);
+        //if(debugLogging) console.log('Section data:', data);
         /*        return {
                     gameId: data.ID,
                     gameNameFriendly: data.FriendlyName || passed_gameName || passed_gameId,
@@ -128,7 +129,7 @@ export async function getSectionById(passed_sectionId) {
             return [];
         }
         const data = JSON.parse(text);
-        //console.log('Game data:', data);
+        //if(debugLogging) console.log('Game data:', data);
         /*        return {
                     gameId: data.ID,
                     gameNameFriendly: data.FriendlyName || passed_gameName || passed_gameId,
@@ -148,7 +149,7 @@ export async function getRecordsBySectionId(sectionId, recordOrderPreference, hi
         alert("Missing sectionId in URL.");
         return;
     }
-    //console.log('sectionId: ' + sectionId + ' recordOrderPreference: ' + recordOrderPreference);
+    //if(debugLogging) console.log('sectionId: ' + sectionId + ' recordOrderPreference: ' + recordOrderPreference);
 
     try {
         const res = await fetch(`/api/db/records/${sectionId}/order/${recordOrderPreference}/hiddenFilter/${hiddenFilter}`);
@@ -162,7 +163,7 @@ export async function getRecordsBySectionId(sectionId, recordOrderPreference, hi
             return [];
         }
         const data = JSON.parse(text);
-        //console.log('Records data:', data);
+        //if(debugLogging) console.log('Records data:', data);
         /*        return {
                     gameId: data.ID,
                     gameNameFriendly: data.FriendlyName || passed_gameName || passed_gameId,
@@ -180,7 +181,7 @@ export async function getRecordsBySectionIdV2(sectionId, recordOrderPreference, 
         alert("Missing sectionId in URL.");
         return;
     }
-    //console.log('sectionId: ' + sectionId );
+    //if(debugLogging) console.log('sectionId: ' + sectionId );
 
     try {
         const res = await fetch(`/api/db/records/v2/${sectionId}/hiddenFilter/${hiddenFilter}`);
@@ -194,7 +195,7 @@ export async function getRecordsBySectionIdV2(sectionId, recordOrderPreference, 
             return [];
         }
         const data = JSON.parse(text);
-        //console.log('Records data:', data);
+        //if(debugLogging) console.log('Records data:', data);
         /*        return {
                     gameId: data.ID,
                     gameNameFriendly: data.FriendlyName || passed_gameName || passed_gameId,
@@ -277,7 +278,7 @@ export async function getGameRecordById(passed_recordId) {
             return [];
         }
         const data = JSON.parse(text);
-        //console.log('Game data:', data);
+        //if(debugLogging) console.log('Game data:', data);
         /*        return {
                     gameId: data.ID,
                     gameNameFriendly: data.FriendlyName || passed_gameName || passed_gameId,
@@ -629,7 +630,7 @@ export async function getSectionGroupById(sectionGroupId) {
     }
 
     try {
-        //console.log('made it here getSectionGroupsByGameId');
+        //if(debugLogging) console.log('made it here getSectionGroupsByGameId');
         const res = await fetch(`/api/db/sectionGroup/${sectionGroupId}`);
         if (!res || !res.ok) {
             console.log('No response or response not ok:', res);
@@ -641,7 +642,7 @@ export async function getSectionGroupById(sectionGroupId) {
             return [];
         }
         const data = JSON.parse(text);
-        //console.log('SectionGroup data:', data);
+        //if(debugLogging) console.log('SectionGroup data:', data);
         return data;
     } catch (err) {
         console.error("Error fetching SectionGroup data:", err);
@@ -655,7 +656,7 @@ export async function getSectionGroupsByGameId(gameId, hiddenFilter) {
     }
 
     try {
-        //console.log('made it here getSectionGroupsByGameId');
+        //if(debugLogging) console.log('made it here getSectionGroupsByGameId');
         const res = await fetch(`/api/db/sectionGroups/${gameId}/${hiddenFilter}`);
         if (!res || !res.ok) {
             console.log('No response or response not ok:', res);
@@ -667,7 +668,7 @@ export async function getSectionGroupsByGameId(gameId, hiddenFilter) {
             return [];
         }
         const data = JSON.parse(text);
-        //console.log('SectionGroup data:', data);
+        //if(debugLogging) console.log('SectionGroup data:', data);
         return data;
     } catch (err) {
         console.error("Error fetching SectionGroup data:", err);
@@ -682,7 +683,7 @@ export async function getSectionsBySectionGroupId(sectionGroupId, hiddenFilter) 
     }
 
     try {
-        //console.log('made it here loadSectionsByGameId');
+        //if(debugLogging) console.log('made it here loadSectionsByGameId');
         if(debugLogging) console.log('getSectionsBySectionGroupId sectionGroupId: ' + sectionGroupId);
         const res = await fetch(`/api/db/sections/sectionGroupId/${sectionGroupId}/${hiddenFilter}`);
         if (!res || !res.ok) {
@@ -695,7 +696,7 @@ export async function getSectionsBySectionGroupId(sectionGroupId, hiddenFilter) 
             return [];
         }
         const data = JSON.parse(text);
-        //console.log('Section data:', data);
+        //if(debugLogging) console.log('Section data:', data);
         return data;
     } catch (err) {
         console.error("Error getSectionsBySectionGroupId: ", err);
