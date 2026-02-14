@@ -185,6 +185,7 @@ h3 {
 
 .game-list-item:hover, .section-header:hover, .game-section-item:hover {
 	background-color: $accent-400;
+	color: #fff;
 	box-shadow: $shadow-md;
 	transform: translateY(-1px);
 }

@@ -119,6 +119,7 @@ h3 {
 
 .game-list-item:hover, .section-header:hover, .game-section-item:hover {
   background-color: #2fbfc6;
+  color: #fff;
   box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
   transform: translateY(-1px);
 }
