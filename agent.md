@@ -227,3 +227,44 @@ Use this file to reference work you've done previously and post patch notes. Als
 - `script_tablePage.js` (biggest win): Had a `for...of await` loop that fetched each table's records one-by-one sequentially. With 5 tables, that's 5 sequential HTTP round trips. Now all table records are fetched in parallel with `Promise.all`, then the DOM is built in one synchronous pass with a fragment. `createTableSection()` changed from `async` to synchronous since it no longer fetches data itself.
 
 **Lesson:** When refactoring rendering patterns, also audit the data-fetching layer. Sequential `await` in loops is a common hidden bottleneck — always check if independent fetches can be parallelized.
+
+### Feb 7, 2026 — Checklist layout & controls panel redesign
+
+**Files changed:** `checklist.html`, `css/styles.scss`
+
+**Checkbox column moved to the left:**
+- Template DOM order swapped: `.column2` (checkboxes) now comes before `.column1` (label/description)
+- Grid columns flipped from `1fr auto` to `auto 1fr` — checkbox column sizes to content on the left, text takes remaining space
+- Added `align-items: center` on row types so checkboxes vertically center with labels
+- Checkbox margin changed from `auto 5px auto auto` (push right) to `auto auto auto 0` (sit left)
+- New `.column2` flex rule with `gap: 4px` for tidy horizontal checkbox clusters
+
+**Controls panel slimmed down:**
+- Stripped the card appearance (background, border, shadow, border-radius, heavy padding)
+- Changed from vertical stacked layout to horizontal inline toolbar with `justify-content: flex-end`
+- Cleaned up HTML — removed inline `style` wrapper divs, grouped toggles in a `.controls-toggles` container
+- Filter input set to fixed `240px` width, font sizes reduced to `13px`
+- On mobile (<600px), stacks vertically with filter going full-width
+
+### Feb 7, 2026 — Session-based authentication (extended login persistence)
+
+**Files changed:** `backend/server.js`, `backend/middleware/authMiddleware.js`, `.env`, `sample.env`, `package.json`
+
+**Problem:** The app uses HTTP Basic Auth, which is entirely browser-managed — there's no cookie or session. The browser caches credentials in memory and drops them unpredictably, forcing frequent re-login.
+
+**Solution:** Added `express-session` as a session layer on top of the existing Basic Auth.
+
+**How it works:**
+1. First visit — no session exists, middleware falls through to Basic Auth, browser prompts for credentials
+2. Credentials accepted — `req.session.authenticated = true` is set, `express-session` sends a `connect.sid` cookie to the browser
+3. Subsequent requests — cookie comes back, session is found, middleware calls `next()` immediately (no Basic Auth prompt)
+4. After 7 days — cookie expires, session is gone, user gets prompted again
+
+**Implementation details:**
+- Installed `express-session` package
+- Added `AV_SESSION_SECRET` to `.env` (random 32-byte hex) and `sample.env`
+- `server.js`: Session middleware registered before auth middleware with `maxAge: 7 * 24 * 60 * 60 * 1000` (7 days), `httpOnly: true`, `sameSite: 'lax'`
+- `authMiddleware.js`: First checks `req.session.authenticated` — if true, skips Basic Auth. After successful Basic Auth, sets `req.session.authenticated = true`
+- Session store is default in-memory (fine for single-instance app; sessions reset on server restart)
+
+**To change session duration:** Edit the `maxAge` value in `server.js`. E.g., `30 * 24 * 60 * 60 * 1000` for 30 days.

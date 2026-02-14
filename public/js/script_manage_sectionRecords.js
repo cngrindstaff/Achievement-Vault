@@ -46,12 +46,12 @@ $(document).ready(async function () {
 
     mainContainer.append('<h1>' + gameNameFriendly + '</h1>');
     mainContainer.append('<h2>Section: ' + sectionName + '</h2>');
-    mainContainer.append('<h3>Records</h3>');
+    mainContainer.append('<h3>Records <span id="record-count" class="record-count"></span></h3>');
 
+    mainContainer.append('<button id="add-record-button" class="add-record-button">Add Record</button>');
     mainContainer.append('<div id="grid-manage-records-container"></div>');
     mainContainer.append('<button id="save-button" class="save-button">Save Order</button>');
     mainContainer.append('<button id="reset-button" class="reset-button">Reset Changes</button>');
-    mainContainer.append('<button id="add-record-button" class="add-record-button">Add Record</button>');
 
     // Add modal HTML
     mainContainer.append(`
@@ -61,9 +61,9 @@ $(document).ready(async function () {
                 <form id="new-record-form" class="add-record-container">
                     <label class="add-record">Name:<input type="text" id="recordName" class="add-record" required></label>
                     <label class="add-record">Description:<textarea id="description" class="add-record" rows="3"></textarea></label>
-                    <label class="add-record">Number of Checkboxes:<input type="number" id="numberOfCheckboxes" class="add-record" min="0" value="1" required></label>
-                    <label class="add-record">Number Already Completed:<input type="number" id="numberAlreadyCompleted" class="add-record" min="0" value="0" required></label>
-                    <label class="add-record">List Order:<input type="number" id="listOrder" class="add-record" min="0" required></label>
+                    <label class="add-record">Number of Checkboxes:<input type="number" id="numberOfCheckboxes" class="add-record default-value" min="0" value="1" required></label>
+                    <label class="add-record">Number Already Completed:<input type="number" id="numberAlreadyCompleted" class="add-record default-value" min="0" value="1" required></label>
+                    <label class="add-record">List Order:<input type="number" id="listOrder" class="add-record default-value" min="0" value="100" required></label>
                     <label class="add-record">Long Description:<textarea id="longDescription" class="add-record" rows="5"></textarea></label>
                     <label class="modern-checkbox add-record">
                         <input type="checkbox" id="hidden">
@@ -90,7 +90,8 @@ $(document).ready(async function () {
     const newRecordForm = document.getElementById('new-record-form');
 
     addRecordButton.addEventListener('click', () => {
-        const hasUnsavedChanges = [...container.children].some((card) => {
+        const gridContainer = document.getElementById('grid-manage-records-container');
+        const hasUnsavedChanges = [...gridContainer.children].some((card) => {
             return card.dataset.currentOrder !== card.dataset.originalOrder;
         });
 
@@ -102,6 +103,7 @@ $(document).ready(async function () {
     closeModal.addEventListener('click', () => {
         modal.classList.add('hidden');
         newRecordForm.reset();
+        restoreDefaultStyling();
     });
 
     // Close modal when clicking outside
@@ -109,6 +111,7 @@ $(document).ready(async function () {
         if (event.target === modal) {
             modal.classList.add('hidden');
             newRecordForm.reset();
+            restoreDefaultStyling();
         }
     });
 
@@ -207,30 +210,47 @@ $(document).ready(async function () {
         }
     });
 
+    // Title-case the name field value when user leaves the field
+    const lowercaseWords = new Set([
+        'a', 'an', 'the',                          // articles
+        'and', 'but', 'or', 'nor', 'for', 'yet', 'so',  // conjunctions
+        'in', 'on', 'at', 'to', 'by', 'of', 'up', 'as', 'if',  // prepositions
+        'from', 'into', 'with', 'over', 'than'
+    ]);
+
+    document.getElementById('recordName').addEventListener('blur', function () {
+        this.value = this.value
+            .split(' ')
+            .map((word, i) => {
+                if (!word) return word;
+                const lower = word.toLowerCase();
+                if (i > 0 && lowercaseWords.has(lower)) return lower;
+                return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
+            })
+            .join(' ');
+    });
+
+    // Remove default-value styling when user interacts with a field
+    const defaultFields = newRecordForm.querySelectorAll('.default-value');
+    defaultFields.forEach(field => {
+        field.addEventListener('focus', () => field.classList.remove('default-value'));
+    });
+
+    // Re-add default-value styling when form is reset
+    function restoreDefaultStyling() {
+        document.getElementById('numberOfCheckboxes').classList.add('default-value');
+        document.getElementById('numberAlreadyCompleted').classList.add('default-value');
+        document.getElementById('listOrder').classList.add('default-value');
+    }
+
     // Handle reset button
     document.getElementById('reset-record-button').addEventListener('click', () => {
         newRecordForm.reset();
         // Clear the edit ID when resetting
         delete newRecordForm.dataset.editId;
+        restoreDefaultStyling();
     });
 
-    document.getElementById('save-button').addEventListener('click', async () => {
-        const updatedRecords = [...container.children]
-            .map((card) => ({
-                ID: Number(card.dataset.id),
-                ListOrder: Number(card.dataset.currentOrder),
-                OriginalOrder: Number(card.dataset.originalOrder)
-            }))
-            .filter((record) => record.ListOrder !== record.OriginalOrder);
-
-        if (updatedRecords.length > 0) {
-            const success = await dbUtils.UpdateSectionRecordsListOrder(updatedRecords);
-            if (success) alert('List order updated successfully!');
-            else alert('Failed to update list order.');
-        } else {
-            alert('No changes to save.');
-        }
-    });
 })
 
 
@@ -243,12 +263,18 @@ function createRecordCard(record, gameId, container) {
     card.dataset.currentOrder = record.ListOrder;
     card.innerHTML = `
         <div class="record-card-content">
-            <input type="number" class="list-order" value="${record.ListOrder}" readonly />
+            <input type="number" class="list-order" value="${record.ListOrder}" min="0" />
             <span class="record-name">${record.Name}</span>
             <button class="edit-button" data-id="${record.ID}">Edit</button>
             <button class="delete-button" data-id="${record.ID}">Delete</button>
        </div>
     `;
+
+    // Allow manual order editing
+    card.querySelector('.list-order').addEventListener('change', function () {
+        card.dataset.currentOrder = parseInt(this.value) || 0;
+        highlightChangedRecords(container);
+    });
 
     // Handle the Edit button click
     card.querySelector('.edit-button').addEventListener('click', async (event) => {
@@ -265,6 +291,11 @@ function createRecordCard(record, gameId, container) {
             document.getElementById("listOrder").value = recordData.ListOrder;
             document.getElementById("longDescription").value = recordData.LongDescription || '';
             document.getElementById("hidden").checked = recordData.Hidden === 1;
+
+            // Remove default styling since these are real values
+            document.getElementById("numberOfCheckboxes").classList.remove('default-value');
+            document.getElementById("numberAlreadyCompleted").classList.remove('default-value');
+            document.getElementById("listOrder").classList.remove('default-value');
 
             // Show the modal
             const modal = document.getElementById('add-record-modal');
@@ -286,7 +317,8 @@ function createRecordCard(record, gameId, container) {
             const success = await dbUtils.deleteGameRecord(recordId);
             if (success) {
                 alert("Record deleted successfully!");
-                card.remove(); // Remove the card from the DOM
+                card.remove();
+                updateRecordCount();
             } else {
                 alert("Failed to delete record. Please try again.");
             }
@@ -298,6 +330,12 @@ function createRecordCard(record, gameId, container) {
 function renderRecords(records, container, gameId) {
     container.innerHTML = '';
     records.forEach(record => container.appendChild(createRecordCard(record, gameId, container)));
+    updateRecordCount();
+}
+
+function updateRecordCount() {
+    const count = document.getElementById('grid-manage-records-container').children.length;
+    document.getElementById('record-count').textContent = `(${count})`;
 }
 
 function enableDragAndDrop(container) {
@@ -405,7 +443,7 @@ async function initializeGameRecordsReorder(sectionId, containerId, resetButtonI
             .filter((record) => record.ListOrder !== record.OriginalOrder);
 
         if (updatedRecords.length > 0) {
-            const success = await dbUtils.UpdateSectionRecordsListOrder(updatedRecords);
+            const success = await dbUtils.updateSectionRecordsListOrder(updatedRecords);
             if (success) alert('List order updated successfully!');
             else alert('Failed to update list order.');
         } else {

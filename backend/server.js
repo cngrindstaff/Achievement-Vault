@@ -1,6 +1,7 @@
-﻿import "dotenv/config";
+import "dotenv/config";
 import express from "express";
 import cors from "cors";
+import session from "express-session";
 import path from "path";
 import { fileURLToPath } from "url";  // Needed for __dirname in ES6
 
@@ -19,6 +20,20 @@ const PORT = process.env.PORT || 3000;
 
 app.use(express.json());
 app.use(cors());
+
+// Session middleware — keeps users logged in after Basic Auth succeeds once
+const sessionDays = parseInt(process.env.AV_SESSION_DAYS) || 7;
+app.use(session({
+    secret: process.env.AV_SESSION_SECRET || 'fallback-dev-secret',
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+        maxAge: sessionDays * 24 * 60 * 60 * 1000,
+        httpOnly: true,
+        sameSite: 'lax'
+    }
+}));
+
 app.use(basicAuthMiddleware); // Apply authentication globally
 
 // API Routes

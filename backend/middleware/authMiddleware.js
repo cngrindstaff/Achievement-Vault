@@ -1,8 +1,13 @@
-﻿import "dotenv/config";
+import "dotenv/config";
 const AV_USERNAME = process.env.AV_USERNAME;
 const AV_PASSWORD = process.env.AV_PASSWORD;
 
 export default function basicAuthMiddleware(req, res, next) {
+    // If user already has a valid session, skip Basic Auth prompt
+    if (req.session && req.session.authenticated) {
+        return next();
+    }
+
     const authHeader = req.headers.authorization;
 
     if (!authHeader || !authHeader.startsWith("Basic ")) {
@@ -22,6 +27,8 @@ export default function basicAuthMiddleware(req, res, next) {
         return res.status(401).send("Unauthorized: Incorrect user");
     }
 
-    next(); // Continue to next middleware
+    // Credentials valid — mark the session so future requests skip the prompt
+    req.session.authenticated = true;
+    next();
 }
 
