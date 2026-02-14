@@ -261,11 +261,52 @@ h3 .record-count {
   color: #1c2b2d;
   font-weight: 500;
 }
+.label.has-details {
+  cursor: pointer;
+  text-decoration: underline;
+  text-decoration-style: dotted;
+  text-underline-offset: 3px;
+  text-decoration-color: #8a9696;
+}
+.label.has-details:hover {
+  text-decoration-style: solid;
+  text-decoration-color: #1f7f84;
+}
 
 .description {
   font-size: 13px;
   color: #556565;
   line-height: 1.4;
+}
+
+.detail-modal-content {
+  max-width: 500px;
+}
+.detail-modal-content h3 {
+  margin-bottom: 16px;
+  font-family: "Merriweather", Georgia, serif;
+  color: #1c2b2d;
+}
+.detail-modal-content h4 {
+  font-size: 13px;
+  font-weight: 600;
+  color: #8a9696;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 4px;
+}
+.detail-modal-content .detail-section {
+  margin-bottom: 16px;
+}
+.detail-modal-content .detail-section p {
+  font-size: 15px;
+  color: #556565;
+  line-height: 1.5;
+  white-space: pre-wrap;
+}
+.detail-modal-content .detail-empty {
+  color: #8a9696;
+  font-style: italic;
 }
 
 .no-records, .no-tables {

@@ -338,12 +338,61 @@ h3 {
 	font-size: 15px;
 	color: $text-primary;
 	font-weight: 500;
+
+	&.has-details {
+		cursor: pointer;
+		text-decoration: underline;
+		text-decoration-style: dotted;
+		text-underline-offset: 3px;
+		text-decoration-color: $text-muted;
+
+		&:hover {
+			text-decoration-style: solid;
+			text-decoration-color: $accent-500;
+		}
+	}
 }
 
 .description {
 	font-size: 13px;
 	color: $text-secondary;
 	line-height: 1.4;
+}
+
+// Detail modal for viewing record descriptions
+.detail-modal-content {
+	max-width: 500px;
+
+	h3 {
+		margin-bottom: 16px;
+		font-family: $font-heading;
+		color: $text-primary;
+	}
+
+	h4 {
+		font-size: 13px;
+		font-weight: 600;
+		color: $text-muted;
+		text-transform: uppercase;
+		letter-spacing: 0.5px;
+		margin-bottom: 4px;
+	}
+
+	.detail-section {
+		margin-bottom: 16px;
+
+		p {
+			font-size: 15px;
+			color: $text-secondary;
+			line-height: 1.5;
+			white-space: pre-wrap;
+		}
+	}
+
+	.detail-empty {
+		color: $text-muted;
+		font-style: italic;
+	}
 }
 
 .no-records, .no-tables {
