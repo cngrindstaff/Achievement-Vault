@@ -19,7 +19,7 @@ $(document).ready(async function () {
     const gameData = await dbUtils.getGameData(passed_gameId);
     //if(debugLogging) console.log('gameData:', gameData);
     gameId = gameData.ID;
-    gameName = gameData.Name;
+    gameName = gameData.Name; 
     gameNameFriendly = gameData.FriendlyName;
     linkToGamePage = `/game?id=${gameId}`;
     htmlTitle = gameNameFriendly + ': Sections';
