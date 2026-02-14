@@ -339,3 +339,14 @@ Use this file to reference work you've done previously and post patch notes. Als
 - `public/js/script_checklist.js` — replaced ~160 lines of modal code with `initRecordModal()` call
 - `public/js/script_manage_sectionRecords.js` — replaced ~200 lines of modal code with `initRecordModal()` call; edit button now calls `window._recordModal.openForEdit(recordId)`
 - `public/checklist.html` — removed hardcoded modal HTML (30 lines)
+
+**Edit records from checklist page:**
+- Added a pencil icon button (`.checklist-edit-btn`) to the `checklist-item-template` in `checklist.html`
+- Each checklist item div stores `data-record-id` for lookup
+- Event delegation on `#grid-checklist-container` handles `.checklist-edit-btn` clicks → calls `window._recordModal.openForEdit(recordId)`
+- Pencil icon always visible at 30% opacity; brightens to 70% on row hover; fully opaque with accent color on direct icon hover
+- CSS: added third `auto` column to `.grid-item-1-row` and `.grid-item-2-row` grid layouts; `.checklist-edit-btn` uses `grid-row: 1 / -1` to vertically center across multi-row items
+- Added `justify-self: start; width: 100%` to `.column1` to keep label/description left-aligned after the grid column change
+- After saving an edit, the checklist re-fetches and re-renders (same `onSave` callback as add)
+
+**Bug fix:** `openForEdit` used `recordData.SectionId` but the DB column is `SectionID` (capital D) — casing mismatch caused `sectionId` to be `NULL` in the update call. Fixed in `script_recordModal.js`.

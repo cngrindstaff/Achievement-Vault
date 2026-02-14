@@ -74,6 +74,13 @@ $(document).ready(async function () {
         window._recordModal.openForAdd(sectionId, sectionName);
     });
 
+    // Event delegation for edit-record button on checklist items
+    $('#grid-checklist-container').on('click', '.checklist-edit-btn', function (e) {
+        e.stopPropagation();
+        const recordId = $(this).closest('[data-record-id]').data('recordId');
+        if (recordId) window._recordModal.openForEdit(recordId);
+    });
+
     // --- FILTER AND TOGGLE LOGIC ---
     $('#container').on('input', '#filter-input', applyFilterAndRender);
     $('#container').on('change', '#hide-completed-toggle', applyHideCompletedToDOM);
@@ -251,6 +258,7 @@ function createChecklistItem(record, recordIndex, sectionIndex, sectionTitleClea
     // Set the outer div class: 2-row if there's a description, 1-row if not
     const itemDiv = clone.querySelector('.checklist-item');
     itemDiv.className = recordDescription ? 'grid-item-2-row' : 'grid-item-1-row';
+    itemDiv.dataset.recordId = record.ID;
 
     // Populate label and description
     const labelDiv = clone.querySelector('.label');

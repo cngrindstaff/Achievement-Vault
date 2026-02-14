@@ -162,7 +162,7 @@ export function initRecordModal({ gameId, defaultAlreadyCompleted = 0, onSave })
         const recordData = await dbUtils.getGameRecordById(recordId);
         if (!recordData) return;
 
-        currentSectionId = recordData.SectionId;
+        currentSectionId = recordData.SectionID;
         modalSectionHeading.textContent = 'Edit Record';
 
         // Populate form with existing data

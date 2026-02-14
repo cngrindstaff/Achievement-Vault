@@ -192,7 +192,7 @@ h3 .record-count {
 
 .grid-item-2-row {
   display: grid;
-  grid-template-columns: auto 1fr;
+  grid-template-columns: auto 1fr auto;
   grid-template-rows: auto auto;
   padding: 4px 10px;
   margin-bottom: 1px;
@@ -204,7 +204,7 @@ h3 .record-count {
 
 .grid-item-1-row {
   display: grid;
-  grid-template-columns: auto 1fr;
+  grid-template-columns: auto 1fr auto;
   padding: 8px 10px;
   margin-bottom: 2px;
   gap: 15px;
@@ -216,18 +216,44 @@ h3 .record-count {
 .grid-item-1-row:hover,
 .grid-item-2-row:hover {
   background-color: #eae7e2;
+}
+
+.checklist-edit-btn {
+  background: none;
+  border: none;
+  color: #8a9696;
   cursor: pointer;
+  padding: 4px 6px;
+  font-size: 13px;
+  border-radius: 6px;
+  opacity: 0.3;
+  transition: opacity 0.15s ease, color 0.15s ease, background-color 0.15s ease;
+  grid-column: 3;
+  grid-row: 1/-1;
+}
+.checklist-edit-btn:hover {
+  opacity: 1;
+  color: #1f7f84;
+  background-color: rgba(0, 0, 0, 0.06);
+}
+
+.grid-item-1-row:hover .checklist-edit-btn,
+.grid-item-2-row:hover .checklist-edit-btn {
+  opacity: 0.7;
 }
 
 .column2 {
   display: flex;
   align-items: center;
   gap: 4px;
+  grid-column: 1;
 }
 
 .column1 {
   display: grid;
   gap: 0.3rem;
+  grid-column: 2;
+  text-align: left;
 }
 
 .label {
