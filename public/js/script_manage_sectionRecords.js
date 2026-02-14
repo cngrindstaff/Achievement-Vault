@@ -48,7 +48,7 @@ $(document).ready(async function () {
     mainContainer.append('<h2>Section: ' + sectionName + '</h2>');
     mainContainer.append('<h3>Records <span id="record-count" class="record-count"></span></h3>');
 
-    mainContainer.append('<button id="add-record-button" class="add-record-button">Add Record</button>');
+    mainContainer.append('<button id="add-record-button" class="add-record-button">Add Record(s)</button>');
     mainContainer.append('<div id="grid-manage-records-container"></div>');
     mainContainer.append('<button id="save-button" class="save-button">Save Order</button>');
     mainContainer.append('<button id="reset-button" class="reset-button">Reset Changes</button>');
@@ -59,7 +59,12 @@ $(document).ready(async function () {
             <div class="modal-content">
                 <span class="close-modal">&times;</span>
                 <form id="new-record-form" class="add-record-container">
-                    <label class="add-record">Name:<input type="text" id="recordName" class="add-record" required></label>
+                    <label class="switch multi-toggle">
+                        <input type="checkbox" id="multi-mode-toggle">
+                        <span class="slider"></span>Add Multiple
+                    </label>
+                    <label class="add-record" id="single-name-label">Name:<input type="text" id="recordName" class="add-record" required></label>
+                    <label class="add-record hidden" id="multi-name-label">Names (one per line):<textarea id="recordNames" class="add-record" rows="6" placeholder="Record One&#10;Record Two&#10;Record Three"></textarea></label>
                     <label class="add-record">Description:<textarea id="description" class="add-record" rows="3"></textarea></label>
                     <label class="add-record">Number of Checkboxes:<input type="number" id="numberOfCheckboxes" class="add-record default-value" min="0" value="1" required></label>
                     <label class="add-record">Number Already Completed:<input type="number" id="numberAlreadyCompleted" class="add-record default-value" min="0" value="1" required></label>
@@ -88,6 +93,26 @@ $(document).ready(async function () {
     const modal = document.getElementById('add-record-modal');
     const closeModal = document.querySelector('.close-modal');
     const newRecordForm = document.getElementById('new-record-form');
+
+    // Multi-mode toggle
+    const multiModeToggle = document.getElementById('multi-mode-toggle');
+    const singleNameLabel = document.getElementById('single-name-label');
+    const multiNameLabel = document.getElementById('multi-name-label');
+    const recordNameInput = document.getElementById('recordName');
+    const recordNamesTextarea = document.getElementById('recordNames');
+
+    multiModeToggle.addEventListener('change', () => {
+        const isMulti = multiModeToggle.checked;
+        singleNameLabel.classList.toggle('hidden', isMulti);
+        multiNameLabel.classList.toggle('hidden', !isMulti);
+        // Toggle required so form validation works correctly
+        recordNameInput.required = !isMulti;
+        if (isMulti) {
+            recordNameInput.value = '';
+        } else {
+            recordNamesTextarea.value = '';
+        }
+    });
 
     addRecordButton.addEventListener('click', () => {
         const gridContainer = document.getElementById('grid-manage-records-container');
@@ -119,7 +144,7 @@ $(document).ready(async function () {
     newRecordForm.addEventListener('submit', async (event) => {
         event.preventDefault();
 
-        const recordName = document.getElementById("recordName").value.trim();
+        const isMultiMode = multiModeToggle.checked;
         const description = document.getElementById("description").value.trim();
         const numberOfCheckboxes = parseInt(document.getElementById("numberOfCheckboxes").value);
         const numberAlreadyCompleted = parseInt(document.getElementById("numberAlreadyCompleted").value);
@@ -143,22 +168,24 @@ $(document).ready(async function () {
             alert("Error: 'Number Already Completed' cannot be greater than 'Number of Checkboxes'.");
             return;
         } else {
-            // Remove any existing error styles
             document.getElementById("numberAlreadyCompleted").classList.remove("invalid-input");
             document.getElementById("numberOfCheckboxes").classList.remove("invalid-input");
         }
 
-        const recordData = {
-            recordName,
-            description,
-            sectionId: parseInt(sectionId),
-            gameId: parseInt(gameId),
-            numberOfCheckboxes,
-            numberAlreadyCompleted,
-            listOrder,
-            longDescription,
-            hidden
-        };
+        // Validate names
+        if (isMultiMode) {
+            const names = recordNamesTextarea.value.split('\n').map(n => n.trim()).filter(n => n.length > 0);
+            if (names.length === 0) {
+                alert("Please enter at least one name.");
+                return;
+            }
+        } else {
+            const recordName = document.getElementById("recordName").value.trim();
+            if (!recordName) {
+                alert("Please enter a name.");
+                return;
+            }
+        }
 
         const spinner = document.getElementById('loading-spinner');
         const successMessage = document.getElementById('success-message');
@@ -174,12 +201,39 @@ $(document).ready(async function () {
         try {
             let success;
             const editId = newRecordForm.dataset.editId;
-            
-            if (editId) {
+
+            if (isMultiMode && !editId) {
+                // Multi-insert mode
+                const names = recordNamesTextarea.value.split('\n').map(n => n.trim()).filter(n => n.length > 0);
+                const records = names.map(name => ({
+                    name,
+                    description,
+                    sectionId: parseInt(sectionId),
+                    gameId: parseInt(gameId),
+                    numberOfCheckboxes,
+                    numberAlreadyCompleted,
+                    listOrder,
+                    longDescription,
+                    hidden
+                }));
+                success = await dbUtils.insertMultipleGameRecords(records);
+            } else if (editId) {
                 // Update existing record
+                const recordName = document.getElementById("recordName").value.trim();
+                const recordData = {
+                    recordName, description,
+                    sectionId: parseInt(sectionId), gameId: parseInt(gameId),
+                    numberOfCheckboxes, numberAlreadyCompleted, listOrder, longDescription, hidden
+                };
                 success = await dbUtils.updateGameRecord(editId, recordData);
             } else {
-                // Insert new record
+                // Single insert
+                const recordName = document.getElementById("recordName").value.trim();
+                const recordData = {
+                    recordName, description,
+                    sectionId: parseInt(sectionId), gameId: parseInt(gameId),
+                    numberOfCheckboxes, numberAlreadyCompleted, listOrder, longDescription, hidden
+                };
                 success = await dbUtils.insertGameRecord(recordData);
             }
 
@@ -210,24 +264,34 @@ $(document).ready(async function () {
         }
     });
 
-    // Title-case the name field value when user leaves the field
+    // Title-case logic
     const lowercaseWords = new Set([
-        'a', 'an', 'the',                          // articles
-        'and', 'but', 'or', 'nor', 'for', 'yet', 'so',  // conjunctions
-        'in', 'on', 'at', 'to', 'by', 'of', 'up', 'as', 'if',  // prepositions
+        'a', 'an', 'the',
+        'and', 'but', 'or', 'nor', 'for', 'yet', 'so',
+        'in', 'on', 'at', 'to', 'by', 'of', 'up', 'as', 'if',
         'from', 'into', 'with', 'over', 'than'
     ]);
 
+    function toTitleCase(str) {
+        return str.split(' ').map((word, i) => {
+            if (!word) return word;
+            const lower = word.toLowerCase();
+            if (i > 0 && lowercaseWords.has(lower)) return lower;
+            return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
+        }).join(' ');
+    }
+
+    // Title-case single name field on blur
     document.getElementById('recordName').addEventListener('blur', function () {
-        this.value = this.value
-            .split(' ')
-            .map((word, i) => {
-                if (!word) return word;
-                const lower = word.toLowerCase();
-                if (i > 0 && lowercaseWords.has(lower)) return lower;
-                return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
-            })
-            .join(' ');
+        this.value = toTitleCase(this.value);
+    });
+
+    // Title-case each line in multi-name textarea on blur
+    document.getElementById('recordNames').addEventListener('blur', function () {
+        this.value = this.value.split('\n').map(line => {
+            const trimmed = line.trim();
+            return trimmed ? toTitleCase(trimmed) : '';
+        }).join('\n');
     });
 
     // Remove default-value styling when user interacts with a field
@@ -236,11 +300,17 @@ $(document).ready(async function () {
         field.addEventListener('focus', () => field.classList.remove('default-value'));
     });
 
-    // Re-add default-value styling when form is reset
+    // Re-add default-value styling and reset multi mode when form is reset
     function restoreDefaultStyling() {
         document.getElementById('numberOfCheckboxes').classList.add('default-value');
         document.getElementById('numberAlreadyCompleted').classList.add('default-value');
         document.getElementById('listOrder').classList.add('default-value');
+        // Reset multi mode
+        multiModeToggle.checked = false;
+        singleNameLabel.classList.remove('hidden');
+        multiNameLabel.classList.add('hidden');
+        recordNameInput.required = true;
+        document.querySelector('.multi-toggle').classList.remove('hidden');
     }
 
     // Handle reset button
@@ -296,6 +366,9 @@ function createRecordCard(record, gameId, container) {
             document.getElementById("numberOfCheckboxes").classList.remove('default-value');
             document.getElementById("numberAlreadyCompleted").classList.remove('default-value');
             document.getElementById("listOrder").classList.remove('default-value');
+
+            // Hide multi-mode toggle when editing
+            document.querySelector('.multi-toggle').classList.add('hidden');
 
             // Show the modal
             const modal = document.getElementById('add-record-modal');
@@ -444,8 +517,14 @@ async function initializeGameRecordsReorder(sectionId, containerId, resetButtonI
 
         if (updatedRecords.length > 0) {
             const success = await dbUtils.updateSectionRecordsListOrder(updatedRecords);
-            if (success) alert('List order updated successfully!');
-            else alert('Failed to update list order.');
+            if (success) {
+                alert('List order updated successfully!');
+                // Re-fetch and re-render with the new order
+                const freshRecords = await dbUtils.getRecordsBySectionId(sectionId, null);
+                renderRecords(freshRecords, container, gameId);
+            } else {
+                alert('Failed to update list order.');
+            }
         } else {
             alert('No changes to save.');
         }

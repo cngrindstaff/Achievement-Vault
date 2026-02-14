@@ -267,4 +267,47 @@ Use this file to reference work you've done previously and post patch notes. Als
 - `authMiddleware.js`: First checks `req.session.authenticated` — if true, skips Basic Auth. After successful Basic Auth, sets `req.session.authenticated = true`
 - Session store is default in-memory (fine for single-instance app; sessions reset on server restart)
 
-**To change session duration:** Edit the `maxAge` value in `server.js`. E.g., `30 * 24 * 60 * 60 * 1000` for 30 days.
+**To change session duration:** Edit the `AV_SESSION_DAYS` env var in `.env`. Defaults to 7 if not set.
+
+### Feb 7, 2026 — Manage Section Records improvements
+
+**Files changed:** `js/script_manage_sectionRecords.js`, `js/script_db_helper.js`, `backend/routes/db.js`, `css/styles.scss`
+**Files created:** `sql/InsertMultipleGameRecords.sql`
+
+**Modal default values:**
+- NumberOfCheckboxes defaults to `1`, NumberAlreadyCompleted to `1`, ListOrder to `100`
+- Defaults render in muted gray (`.default-value` class) to signal they're changeable
+- Gray styling removed on focus, restored on form reset/modal close
+- When editing an existing record, defaults are replaced with real values (no gray)
+
+**Title Case for Name field:**
+- On blur, the name value is converted to proper Title Case
+- Minor words (`of`, `in`, `the`, `for`, `and`, `a`, `an`, `by`, `to`, `as`, `but`, `or`, `with`, `from`, `into`, `over`, `than`, etc.) stay lowercase unless they're the first word
+
+**Record count display:**
+- Heading shows "Records (N)" with live count
+- `updateRecordCount()` called after initial render, after add/edit save, and after delete
+
+**Editable list order on cards:**
+- Removed `readonly` from the `.list-order` input on record cards
+- On change, updates `currentOrder` data attribute and triggers highlight logic
+- Subtle border and brighter background on focus to indicate editability
+
+**Add Record button moved to top** (above the grid, before Save Order / Reset)
+
+**Bulk insert ("Add Multiple" mode):**
+- Toggle switch at top of modal switches between single and multi mode
+- Multi mode swaps the Name text input for a textarea (one name per line)
+- All other fields (description, checkboxes, list order, etc.) are shared across all records
+- Toggle hidden when editing an existing record
+- Resets to single mode on modal close/reset
+
+- **MySQL stored procedure** `InsertMultipleGameRecords` — accepts a JSON array, uses `JSON_TABLE` to bulk-insert all records in one `INSERT...SELECT`. SQL file at `sql/InsertMultipleGameRecords.sql` (needs `DELIMITER $$` wrapper for MySQL Workbench).
+- **Backend route** `POST /api/db/records/insertMultiple` — stringifies the array and passes to the stored procedure
+- **Frontend helper** `insertMultipleGameRecords(records)` in `script_db_helper.js`
+
+**Bug fixes found along the way:**
+- `dbUtils.UpdateSectionRecordsListOrder` → `dbUtils.updateSectionRecordsListOrder` (wrong casing, pre-existing bug — function was exported lowercase but called uppercase)
+- Duplicate save-button event listener removed from `$(document).ready()` — it referenced an undefined `container` variable, causing all save data to be `null`. The correct handler inside `initializeGameRecordsReorder()` was kept.
+- Fixed `container` reference in add-record button's unsaved-changes check (same undefined variable issue)
+- CSS specificity fix: `.modal .add-record` was overriding `.hidden` — added `.add-record.hidden { display: none }` inside modal scope
