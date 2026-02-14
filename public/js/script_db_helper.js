@@ -1,8 +1,7 @@
 ﻿import {getQueryParam} from "./script_utilities.js";
 
-var debugLogging = process.env.DEBUG_LOGGING === 'true';
-
-
+//can't use env var on client-side js file, so make sure this is 'false' when checking in to GitHub
+var debugLogging = false
 
 //************************************ GET GAME BY ID ************************************//
 export async function getGameData(passed_gameId) {

@@ -4,7 +4,8 @@ import { initNav } from './script_nav.js';
 
 const linkToHomePage = './';
 
-var debugLogging = false;
+//can't use env var on client-side js file, so make sure this is 'false' when checking in to GitHub
+var debugLogging = false
 
 // Define these at the top level so they can be reused
 let gameId = null;

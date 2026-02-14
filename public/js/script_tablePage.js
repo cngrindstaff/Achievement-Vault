@@ -2,7 +2,8 @@ import * as utils from './script_utilities.js';
 import * as dbUtils from './script_db_helper.js';
 import { initNav } from './script_nav.js';
 
-var debugLogging = process.env.DEBUG_LOGGING === 'true';
+//can't use env var on client-side js file, so make sure this is 'false' when checking in to GitHub
+var debugLogging = false
 
 let gameId = null;
 let gameNameFriendly = null;
