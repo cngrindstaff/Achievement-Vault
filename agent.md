@@ -130,3 +130,53 @@ Use this file to reference work you've done previously and post patch notes. Als
 **What NOT to do (lessons from this refactor):**
 - Don't re-declare module-level variables with `var` inside callbacks — it creates silent shadowing bugs
 - Don't have two separate render functions that build the same HTML differently — consolidate into one with options
+
+### Feb 7, 2026 — Template refactor applied to home, game, checklistGroups, and table pages
+
+**Files changed:** `index.html`, `js/script_home.js`, `game.html`, `js/script_gamePage.js`, `checklistGroups.html`, `js/script_checklistGroups.js`, `table.html`, `js/script_tablePage.js`
+
+**What changed (same pattern as checklist refactor, applied to four more pages):**
+- **`index.html`** + `script_home.js` — Added `#game-list-item-template`. JS clones it per game instead of `document.createElement('p')`. Template reference cached at module level.
+- **`game.html`** + `script_gamePage.js` — Static nav/heading already existed; added `id="game-name"` to h1. Added `#game-link-template` for the navigation links (Checklists, Tables, Admin). New `appendGameLink()` helper clones template and sets href/text/class. Fixed home link href from `../../` to `./`. Removed unused variables (`gameName`, `passed_gameName`, `countOfSectionGroups` at module level).
+- **`checklistGroups.html`** + `script_checklistGroups.js` — Was a completely empty shell. Now has full static structure (nav, headings, list container) plus `#section-group-item-template`. All `mainContainer.append(...)` string building removed. Removed unused variables (`gameName`, `htmlTitle`, `linkToHomePage`).
+- **`table.html`** + `script_tablePage.js` — Was a near-empty shell. Now has full static structure plus `#table-section-header-template` and `#table-section-body-template`. `createTableSection()` clones templates instead of building HTML strings. Section header click handling moved to event delegation. `showNoTablesMessage()` uses `document.createElement` instead of `.innerHTML`. `displayTable()` and `sortTable()` were already using `createElement` so those just got minor cleanup. Removed unused variables (`gameName`, `hasDataTables`, `htmlTitle`, `linkToHomePage`).
+
+**Pages still using old pattern (not yet refactored):**
+- `manage_sections.html` + `script_manage_sections.js`
+- `manage_sectionRecords.html` + `script_manage_sectionRecords.js`
+
+### Feb 7, 2026 — Full CSS/SCSS redesign
+
+**Files changed:** `css/styles.scss` (compiled to `css/styles.css`)
+
+**Design direction:** Warm neutral "soft mode" — not dark mode, not stark white. Easy on the eyes in any lighting.
+
+**Color palette:**
+- Body: `#dfdbd5` (warm stone gray)
+- Surfaces: `#f2efeb` (warm off-white for cards, sections, controls — sits above body with box-shadow)
+- Accent: teal refined — `#175f63` for headers/interactive, `#1f7f84` for hover, `#2fbfc6` for active states
+- Text: `#1c2b2d` primary, `#556565` secondary, `#8a9696` muted (warm charcoal tones)
+- Status: `#2d9d5c` success, `#d94452` danger, `#ffe066` filter highlight
+
+**Typography:**
+- Headings: Merriweather serif (was loaded from CDN but never used until now)
+- Body: Roboto sans-serif (unchanged)
+- Better size/weight hierarchy: h1 1.75rem bold, h2 1.15rem light, h3 1rem light
+
+**Component changes:**
+- Cards with depth: game list items, section headers, admin cards have `box-shadow` and `translateY(-1px)` lift on hover
+- Styled native checkboxes: `appearance: none` with custom teal fill + white checkmark on all `<input type="checkbox">`
+- Collapsible sections: warm off-white surface instead of bright teal, clean subtle border
+- Table headers: dark teal with uppercase letter-spacing, even/odd rows alternate surface colors
+- Buttons: consistent dark teal, shadow, lift on hover
+- Modal: warm off-white surface, larger radius, shadow, cleaner close button
+- Controls panel: white card with shadow, clean white filter input
+- Toggle switches: muted gray off, teal on, inset shadow for depth
+
+**Structural cleanup:**
+- Replaced all old `$teal_*` variables with organized design token system (`$bg-*`, `$accent-*`, `$text-*`, `$shadow-*`, `$radius-*`)
+- Consolidated duplicate `@keyframes shake` into one
+- Removed unused `createCorners`/`createLinearGradient` mixins from styles.scss (still in mixins.scss)
+- Used modern Sass syntax (no deprecated `darken()` calls)
+- Added `box-sizing: border-box` global reset
+- Added `$transition-fast` / `$transition-normal` tokens for consistent animation timing
