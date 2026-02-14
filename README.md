@@ -78,3 +78,10 @@ The `game.html` file creates a landing page for the game. It then calls `script_
 4. table.html - Additional tables page
 5. manage_sectionRecords.html - Page to add a new record
 6. manage_sections.html - Page to add a new section
+
+Icon came from https://www.flaticon.com/free-icon/game-controller_8002123?term=controller&page=1&position=12&origin=search&related_id=8002123
+
+Other Alternatives: 
+* https://www.flaticon.com/free-icon/joystick_8495854
+* https://www.flaticon.com/free-icon/game-console_9052623
+* https://www.flaticon.com/free-icon/joystick_8495842 
