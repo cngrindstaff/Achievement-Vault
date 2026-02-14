@@ -6,14 +6,17 @@ async function loadGames() {
         const games = await res.json();
         console.log('Games:', games);
         const container = document.getElementById('game-list-container');
+        const fragment = document.createDocumentFragment();
 
         games.forEach(game => {
             const clone = gameListItemTemplate.content.cloneNode(true);
             const p = clone.querySelector('.game-list-item');
             p.textContent = game.FriendlyName;
             p.onclick = () => window.location.href = `game?id=${game.ID}&name=${game.Name}`;
-            container.appendChild(clone);
+            fragment.appendChild(clone);
         });
+
+        container.appendChild(fragment);
     } catch (err) {
         console.error('Failed to load games:', err);
     }
