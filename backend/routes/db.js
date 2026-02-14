@@ -446,7 +446,7 @@ router.get('/db/tableRecords/:tableId', async (req, res) => {
         //if(debugLogging) console.log('rows:', rows);
         if (!rows || rows.length === 0 || (Array.isArray(rows[0]) && rows[0].length === 0)) {
             if (debugLogging) console.log("No records returned.");
-            return null;
+            return res.json([]);
         }
 
         const result = rows[0];
