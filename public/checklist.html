@@ -58,12 +58,15 @@
     <div id="grid-checklist-container"></div>
 </div>
 
+<!-- Modal is injected by script_recordModal.js -->
+
 <!-- ===================== TEMPLATES ===================== -->
 
 <!-- Section header (collapsible accordion bar) -->
 <template id="section-header-template">
     <div class="section-header">
         <span class="section-header-text"></span>
+        <button class="section-add-btn" title="Add record to this section">+</button>
         <span class="section-header-icon">
             <i class="fas fa-chevron-down"></i>
         </span>
@@ -78,6 +81,7 @@
 <!-- Single checklist item (record row with label, optional description, and checkboxes) -->
 <template id="checklist-item-template">
     <div class="checklist-item">
+        <button class="checklist-edit-btn" title="Edit record"><i class="fas fa-pencil-alt"></i></button>
         <div class="column2"></div>
         <div class="column1"> 
             <div class="label"></div>

@@ -138,6 +138,30 @@ h3 .record-count {
   flex-grow: 1;
 }
 
+.section-add-btn {
+  background: none;
+  border: 1.5px solid rgba(255, 255, 255, 0.4);
+  color: rgba(255, 255, 255, 0.8);
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 1;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 8px;
+  flex-shrink: 0;
+  transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+.section-add-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+  border-color: rgba(255, 255, 255, 0.7);
+  color: #fff;
+}
+
 .section-header-icon {
   font-size: 14px;
   display: inline-flex;
@@ -168,7 +192,7 @@ h3 .record-count {
 
 .grid-item-2-row {
   display: grid;
-  grid-template-columns: auto 1fr;
+  grid-template-columns: auto auto 1fr;
   grid-template-rows: auto auto;
   padding: 4px 10px;
   margin-bottom: 1px;
@@ -180,7 +204,7 @@ h3 .record-count {
 
 .grid-item-1-row {
   display: grid;
-  grid-template-columns: auto 1fr;
+  grid-template-columns: auto auto 1fr;
   padding: 8px 10px;
   margin-bottom: 2px;
   gap: 15px;
@@ -192,18 +216,44 @@ h3 .record-count {
 .grid-item-1-row:hover,
 .grid-item-2-row:hover {
   background-color: #eae7e2;
+}
+
+.checklist-edit-btn {
+  background: none;
+  border: none;
+  color: #8a9696;
   cursor: pointer;
+  padding: 4px 6px;
+  font-size: 13px;
+  border-radius: 6px;
+  opacity: 0.3;
+  transition: opacity 0.15s ease, color 0.15s ease, background-color 0.15s ease;
+  grid-column: 1;
+  grid-row: 1/-1;
+}
+.checklist-edit-btn:hover {
+  opacity: 1;
+  color: #1f7f84;
+  background-color: rgba(0, 0, 0, 0.06);
+}
+
+.grid-item-1-row:hover .checklist-edit-btn,
+.grid-item-2-row:hover .checklist-edit-btn {
+  opacity: 0.7;
 }
 
 .column2 {
   display: flex;
   align-items: center;
   gap: 4px;
+  grid-column: 2;
 }
 
 .column1 {
   display: grid;
   gap: 0.3rem;
+  grid-column: 3;
+  text-align: left;
 }
 
 .label {
@@ -632,6 +682,14 @@ tr:nth-child(odd) {
 }
 .modal .add-record.hidden {
   display: none;
+}
+.modal .add-record-row {
+  display: flex;
+  gap: 16px;
+}
+.modal .add-record-row .add-record {
+  flex: 1;
+  min-width: 0;
 }
 .modal .modern-checkbox.add-record {
   flex-direction: row;

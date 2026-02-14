@@ -1,5 +1,6 @@
 import * as utils from './script_utilities.js';
 import * as dbUtils from './script_db_helper.js';
+import { initRecordModal } from './script_recordModal.js';
 
 var debugLogging = false;
 
@@ -57,9 +58,27 @@ $(document).ready(async function () {
     $('#grid-checklist-container').on('change', 'input[type="checkbox"]', updateCompletion);
 
     // Event delegation for section header clicks (toggle collapse)
-    $('#grid-checklist-container').on('click', '.section-header', function () {
+    // Ignore clicks on the add button
+    $('#grid-checklist-container').on('click', '.section-header', function (e) {
+        if ($(e.target).closest('.section-add-btn').length) return;
         $(this).next('.section').slideToggle(250);
         $(this).toggleClass('open');
+    });
+
+    // Event delegation for add-record button in section headers
+    $('#grid-checklist-container').on('click', '.section-add-btn', function (e) {
+        e.stopPropagation();
+        const header = $(this).closest('.section-header');
+        const sectionId = header.data('sectionId');
+        const sectionName = header.find('.section-header-text').data('sectionTitle');
+        window._recordModal.openForAdd(sectionId, sectionName);
+    });
+
+    // Event delegation for edit-record button on checklist items
+    $('#grid-checklist-container').on('click', '.checklist-edit-btn', function (e) {
+        e.stopPropagation();
+        const recordId = $(this).closest('[data-record-id]').data('recordId');
+        if (recordId) window._recordModal.openForEdit(recordId);
     });
 
     // --- FILTER AND TOGGLE LOGIC ---
@@ -130,6 +149,23 @@ $(document).ready(async function () {
             }
         });
     }
+
+    // --- ADD/EDIT RECORD MODAL (shared module) ---
+    const recordModal = initRecordModal({
+        gameId,
+        defaultAlreadyCompleted: 0,
+        onSave: async (savedSectionId) => {
+            // Re-fetch and re-render — only expand the section that was changed
+            const sections = await dbUtils.getSectionsBySectionGroupId(sectionGroupId, false);
+            const allRecordsBySection = await fetchAllRecords(sections);
+            renderChecklist(sections, allRecordsBySection, { startExpanded: false, expandSectionId: savedSectionId });
+            updateAllSectionsCompletion();
+            updateTotalCompletion();
+        }
+    });
+
+    // Wire up the + button in section headers
+    window._recordModal = recordModal;
 });
 
 
@@ -152,7 +188,7 @@ async function fetchAllRecords(sections) {
 
 // Single unified render function — replaces both processData() and renderFilteredChecklist()
 function renderChecklist(sections, allRecordsBySection, options) {
-    const { startExpanded = false, filterValue = null } = options;
+    const { startExpanded = false, filterValue = null, expandSectionId = null } = options;
     const gridContainer = document.getElementById('grid-checklist-container');
     gridContainer.innerHTML = '';
 
@@ -166,6 +202,7 @@ function renderChecklist(sections, allRecordsBySection, options) {
         const headerClone = sectionHeaderTemplate.content.cloneNode(true);
         const headerDiv = headerClone.querySelector('.section-header');
         headerDiv.dataset.section = sectionIndex;
+        headerDiv.dataset.sectionId = section.ID;
 
         const headerText = headerClone.querySelector('.section-header-text');
         headerText.dataset.section = sectionIndex;
@@ -173,8 +210,9 @@ function renderChecklist(sections, allRecordsBySection, options) {
         headerText.dataset.sectionTitleClean = sectionTitleClean;
         headerText.textContent = sectionTitle + ' (0%)';
 
-        // Set open state based on whether sections start expanded
-        if (startExpanded) {
+        // Set open state based on whether sections start expanded or this specific section should expand
+        const shouldExpand = startExpanded || (expandSectionId != null && String(section.ID) === String(expandSectionId));
+        if (shouldExpand) {
             headerDiv.classList.add('open');
         }
 
@@ -182,7 +220,7 @@ function renderChecklist(sections, allRecordsBySection, options) {
         const bodyClone = sectionBodyTemplate.content.cloneNode(true);
         const bodyDiv = bodyClone.querySelector('.section');
         bodyDiv.dataset.section = sectionIndex;
-        bodyDiv.style.display = startExpanded ? 'block' : 'none';
+        bodyDiv.style.display = shouldExpand ? 'block' : 'none';
 
         // Populate with records
         const records = allRecordsBySection[sectionIndex] || [];
@@ -220,6 +258,7 @@ function createChecklistItem(record, recordIndex, sectionIndex, sectionTitleClea
     // Set the outer div class: 2-row if there's a description, 1-row if not
     const itemDiv = clone.querySelector('.checklist-item');
     itemDiv.className = recordDescription ? 'grid-item-2-row' : 'grid-item-1-row';
+    itemDiv.dataset.recordId = record.ID;
 
     // Populate label and description
     const labelDiv = clone.querySelector('.label');
