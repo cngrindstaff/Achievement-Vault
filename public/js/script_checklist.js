@@ -3,7 +3,8 @@ import * as dbUtils from './script_db_helper.js';
 import { initRecordModal } from './script_recordModal.js';
 import { initNav } from './script_nav.js';
 
-var debugLogging = false;
+//can't use env var on client-side js file, so make sure this is 'false' when checking in to GitHub
+var debugLogging = false
 
 // Page-level state
 let gameId = null;
@@ -26,7 +27,7 @@ $(document).ready(async function () {
     // Read query params — no 'var' so we set the module-level variables
     gameId = utils.getQueryParam('gameId');
     sectionGroupId = utils.getQueryParam('sectionGroupId');
-    if (debugLogging) console.log('sectionGroupId: ' + sectionGroupId);
+    console.log('sectionGroupId: ' + sectionGroupId);
 
     // Fetch game data, section group data, and sections in parallel
     const [gameData, sectionGroupData, sections] = await Promise.all([
@@ -37,7 +38,7 @@ $(document).ready(async function () {
 
     gameNameFriendly = gameData.FriendlyName;
     linkToGamePage = '/game?id=' + gameId;
-    if (debugLogging) console.log('sectionGroupData:', sectionGroupData);
+    console.log('sectionGroupData:', sectionGroupData);
     sectionGroupFriendlyName = sectionGroupData.FriendlyName;
 
     // Populate static page elements (these already exist in the HTML)
@@ -108,8 +109,8 @@ $(document).ready(async function () {
     detailModal.querySelector('.close-modal').addEventListener('click', () => detailModal.classList.add('hidden'));
     window.addEventListener('click', (e) => { if (e.target === detailModal) detailModal.classList.add('hidden'); });
 
-    // Open detail modal when clicking on the label
-    $('#grid-checklist-container').on('click', '.label', function (e) {
+    // Open detail modal when clicking on a label that has details
+    $('#grid-checklist-container').on('click', '.label.has-details', function (e) {
         e.stopPropagation();
         const item = $(this).closest('[data-record-id]')[0];
         if (!item) return;
