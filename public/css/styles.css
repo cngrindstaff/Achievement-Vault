@@ -54,6 +54,12 @@ h3 {
   font-weight: 400;
   margin: 0 0 20px 0;
 }
+h3 .record-count {
+  font-family: "Roboto", -apple-system, BlinkMacSystemFont, sans-serif;
+  font-weight: 400;
+  color: #8a9696;
+  font-size: 0.9rem;
+}
 
 .link-container {
   display: flex;

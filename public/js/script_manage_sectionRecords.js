@@ -46,7 +46,7 @@ $(document).ready(async function () {
 
     mainContainer.append('<h1>' + gameNameFriendly + '</h1>');
     mainContainer.append('<h2>Section: ' + sectionName + '</h2>');
-    mainContainer.append('<h3>Records</h3>');
+    mainContainer.append('<h3>Records <span id="record-count" class="record-count"></span></h3>');
 
     mainContainer.append('<div id="grid-manage-records-container"></div>');
     mainContainer.append('<button id="save-button" class="save-button">Save Order</button>');
@@ -307,7 +307,8 @@ function createRecordCard(record, gameId, container) {
             const success = await dbUtils.deleteGameRecord(recordId);
             if (success) {
                 alert("Record deleted successfully!");
-                card.remove(); // Remove the card from the DOM
+                card.remove();
+                updateRecordCount();
             } else {
                 alert("Failed to delete record. Please try again.");
             }
@@ -319,6 +320,12 @@ function createRecordCard(record, gameId, container) {
 function renderRecords(records, container, gameId) {
     container.innerHTML = '';
     records.forEach(record => container.appendChild(createRecordCard(record, gameId, container)));
+    updateRecordCount();
+}
+
+function updateRecordCount() {
+    const count = document.getElementById('grid-manage-records-container').children.length;
+    document.getElementById('record-count').textContent = `(${count})`;
 }
 
 function enableDragAndDrop(container) {
