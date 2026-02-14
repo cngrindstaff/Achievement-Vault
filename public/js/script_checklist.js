@@ -81,6 +81,65 @@ $(document).ready(async function () {
         if (recordId) window._recordModal.openForEdit(recordId);
     });
 
+    // --- DETAIL MODAL (shows description + long description on tap) ---
+    const detailModalHTML = `
+        <div id="detail-modal" class="modal hidden">
+            <div class="modal-content detail-modal-content">
+                <span class="close-modal">&times;</span>
+                <h3 id="detail-modal-title"></h3>
+                <div id="detail-modal-description" class="detail-section hidden">
+                    <h4>Description</h4>
+                    <p id="detail-modal-desc-text"></p>
+                </div>
+                <div id="detail-modal-long-description" class="detail-section hidden">
+                    <h4>Long Description</h4>
+                    <p id="detail-modal-longdesc-text"></p>
+                </div>
+                <p id="detail-modal-empty" class="detail-empty hidden">No description available.</p>
+            </div>
+        </div>
+    `;
+    document.body.insertAdjacentHTML('beforeend', detailModalHTML);
+
+    const detailModal = document.getElementById('detail-modal');
+    detailModal.querySelector('.close-modal').addEventListener('click', () => detailModal.classList.add('hidden'));
+    window.addEventListener('click', (e) => { if (e.target === detailModal) detailModal.classList.add('hidden'); });
+
+    // Open detail modal when clicking on the label
+    $('#grid-checklist-container').on('click', '.label', function (e) {
+        e.stopPropagation();
+        const item = $(this).closest('[data-record-id]')[0];
+        if (!item) return;
+
+        const name = this.textContent;
+        const desc = item.dataset.description || '';
+        const longDesc = item.dataset.longDescription || '';
+
+        document.getElementById('detail-modal-title').textContent = name;
+
+        const descSection = document.getElementById('detail-modal-description');
+        const longDescSection = document.getElementById('detail-modal-long-description');
+        const emptyMsg = document.getElementById('detail-modal-empty');
+
+        if (desc) {
+            document.getElementById('detail-modal-desc-text').textContent = desc;
+            descSection.classList.remove('hidden');
+        } else {
+            descSection.classList.add('hidden');
+        }
+
+        if (longDesc) {
+            document.getElementById('detail-modal-longdesc-text').textContent = longDesc;
+            longDescSection.classList.remove('hidden');
+        } else {
+            longDescSection.classList.add('hidden');
+        }
+
+        emptyMsg.classList.toggle('hidden', !!(desc || longDesc));
+
+        detailModal.classList.remove('hidden');
+    });
+
     // --- FILTER AND TOGGLE LOGIC ---
     $('#container').on('input', '#filter-input', applyFilterAndRender);
     $('#container').on('change', '#hide-completed-toggle', applyHideCompletedToDOM);
@@ -250,36 +309,35 @@ function createChecklistItem(record, recordIndex, sectionIndex, sectionTitleClea
     const clone = checklistItemTemplate.content.cloneNode(true);
 
     const recordName = record.Name;
-    const recordDescription = record.Description;
+    const recordDescription = record.Description || '';
+    const recordLongDescription = record.LongDescription || '';
     const totalCheckboxes = record.NumberOfCheckboxes || 0;
     const completedCheckboxes = record.NumberAlreadyCompleted || 0;
     const recordNameClean = utils.createSlug(recordName);
 
-    // Set the outer div class: 2-row if there's a description, 1-row if not
     const itemDiv = clone.querySelector('.checklist-item');
-    itemDiv.className = recordDescription ? 'grid-item-2-row' : 'grid-item-1-row';
+    itemDiv.className = 'grid-item-1-row';
     itemDiv.dataset.recordId = record.ID;
 
-    // Populate label and description
+    // Store descriptions as data attributes for the detail modal
+    if (recordDescription) itemDiv.dataset.description = recordDescription;
+    if (recordLongDescription) itemDiv.dataset.longDescription = recordLongDescription;
+
+    // Populate label only (description is shown on tap via modal)
     const labelDiv = clone.querySelector('.label');
     const descDiv = clone.querySelector('.description');
+    descDiv.remove(); // description no longer shown inline
+
+    // Add a subtle indicator if the record has description content
+    if (recordDescription || recordLongDescription) {
+        labelDiv.classList.add('has-details');
+    }
 
     if (filterValue) {
-        // Highlight matching text with <mark> tags
         const re = new RegExp(`(${filterValue.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&')})`, 'gi');
         labelDiv.innerHTML = recordName.replace(re, '<mark>$1</mark>');
-        if (recordDescription) {
-            descDiv.innerHTML = recordDescription.replace(re, '<mark>$1</mark>');
-        } else {
-            descDiv.remove();
-        }
     } else {
         labelDiv.textContent = recordName;
-        if (recordDescription) {
-            descDiv.textContent = recordDescription;
-        } else {
-            descDiv.remove();
-        }
     }
 
     // Create checkbox elements
