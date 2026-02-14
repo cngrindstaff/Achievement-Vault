@@ -66,6 +66,7 @@ export function initRecordModal({ gameId, defaultAlreadyCompleted = 0, onSave })
                     <div class="button-container">
                         <button type="submit" id="save-record-button" class="save-button">Save Record</button>
                         <button type="button" id="reset-record-button" class="reset-button">Reset Changes</button>
+                        <button type="button" id="delete-record-button" class="delete-button hidden">Delete Record</button>
                     </div>
                     <div id="loading-spinner" class="spinner hidden"></div>
                     <div id="success-message" class="success-message hidden">Record saved successfully!</div>
@@ -86,6 +87,7 @@ export function initRecordModal({ gameId, defaultAlreadyCompleted = 0, onSave })
     const recordNamesTextarea = document.getElementById('recordNames');
     const multiToggleLabel = modal.querySelector('.multi-toggle');
     const modalSectionHeading = document.getElementById('modal-section-name');
+    const deleteButton = document.getElementById('delete-record-button');
 
     let currentSectionId = null;
 
@@ -128,6 +130,7 @@ export function initRecordModal({ gameId, defaultAlreadyCompleted = 0, onSave })
         multiNameLabel.classList.add('hidden');
         recordNameInput.required = true;
         multiToggleLabel.classList.remove('hidden');
+        deleteButton.classList.add('hidden');
     }
 
     // ─── Open / Close ────────────────────────────────────────────
@@ -181,8 +184,9 @@ export function initRecordModal({ gameId, defaultAlreadyCompleted = 0, onSave })
         document.getElementById('numberAlreadyCompleted').classList.remove('default-value');
         document.getElementById('listOrder').classList.remove('default-value');
 
-        // Hide multi toggle when editing
+        // Hide multi toggle when editing, show delete button
         multiToggleLabel.classList.add('hidden');
+        deleteButton.classList.remove('hidden');
 
         // Store edit ID
         form.dataset.editId = recordId;
@@ -287,6 +291,29 @@ export function initRecordModal({ gameId, defaultAlreadyCompleted = 0, onSave })
             console.error(error);
         } finally {
             spinner.classList.add('hidden');
+        }
+    });
+
+    // ─── Delete Record ─────────────────────────────────────────
+
+    deleteButton.addEventListener('click', async () => {
+        const editId = form.dataset.editId;
+        if (!editId) return;
+
+        if (!confirm('Are you sure you want to delete this record? This cannot be undone.')) return;
+
+        try {
+            const success = await dbUtils.deleteGameRecord(editId);
+            if (success) {
+                const savedSectionId = currentSectionId;
+                closeModal();
+                if (onSave) await onSave(savedSectionId);
+            } else {
+                alert('Failed to delete record. Please try again.');
+            }
+        } catch (error) {
+            alert('An error occurred while deleting.');
+            console.error(error);
         }
     });
 

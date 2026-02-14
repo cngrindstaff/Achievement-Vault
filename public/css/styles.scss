@@ -909,6 +909,23 @@ tr:nth-child(odd) {
 	.button-container {
 		margin-top: 24px;
 		text-align: center;
+
+		.delete-button {
+			background-color: $danger;
+			color: #fff;
+			border: none;
+			padding: 10px 20px;
+			border-radius: $radius-sm;
+			cursor: pointer;
+			font-size: 14px;
+			margin-left: 8px;
+			transition: background-color $transition-fast, transform 0.15s ease;
+
+			&:hover {
+				background-color: $danger-hover;
+				transform: translateY(-1px);
+			}
+		}
 	}
 
 	.modern-checkbox {
