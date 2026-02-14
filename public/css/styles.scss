@@ -205,6 +205,31 @@ h3 {
 	flex-grow: 1;
 }
 
+.section-add-btn {
+	background: none;
+	border: 1.5px solid rgba(255, 255, 255, 0.4);
+	color: rgba(255, 255, 255, 0.8);
+	width: 26px;
+	height: 26px;
+	border-radius: 50%;
+	font-size: 16px;
+	font-weight: 700;
+	line-height: 1;
+	cursor: pointer;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	margin-right: 8px;
+	flex-shrink: 0;
+	transition: background $transition-fast, border-color $transition-fast, color $transition-fast;
+
+	&:hover {
+		background: rgba(255, 255, 255, 0.2);
+		border-color: rgba(255, 255, 255, 0.7);
+		color: #fff;
+	}
+}
+
 .section-header-icon {
 	font-size: 14px;
 	display: inline-flex;

@@ -57,9 +57,20 @@ $(document).ready(async function () {
     $('#grid-checklist-container').on('change', 'input[type="checkbox"]', updateCompletion);
 
     // Event delegation for section header clicks (toggle collapse)
-    $('#grid-checklist-container').on('click', '.section-header', function () {
+    // Ignore clicks on the add button
+    $('#grid-checklist-container').on('click', '.section-header', function (e) {
+        if ($(e.target).closest('.section-add-btn').length) return;
         $(this).next('.section').slideToggle(250);
         $(this).toggleClass('open');
+    });
+
+    // Event delegation for add-record button in section headers
+    $('#grid-checklist-container').on('click', '.section-add-btn', function (e) {
+        e.stopPropagation();
+        const header = $(this).closest('.section-header');
+        const sectionId = header.data('sectionId');
+        const sectionName = header.find('.section-header-text').data('sectionTitle');
+        openAddRecordModal(sectionId, sectionName);
     });
 
     // --- FILTER AND TOGGLE LOGIC ---
@@ -130,6 +141,165 @@ $(document).ready(async function () {
             }
         });
     }
+
+    // --- ADD RECORD MODAL LOGIC ---
+    const modal = document.getElementById('add-record-modal');
+    const closeModal = document.querySelector('.close-modal');
+    const newRecordForm = document.getElementById('new-record-form');
+    const multiModeToggle = document.getElementById('multi-mode-toggle');
+    const singleNameLabel = document.getElementById('single-name-label');
+    const multiNameLabel = document.getElementById('multi-name-label');
+    const recordNameInput = document.getElementById('recordName');
+    const recordNamesTextarea = document.getElementById('recordNames');
+    let modalSectionId = null;
+
+    // Title-case logic
+    const lowercaseWords = new Set([
+        'a', 'an', 'the',
+        'and', 'but', 'or', 'nor', 'for', 'yet', 'so',
+        'in', 'on', 'at', 'to', 'by', 'of', 'up', 'as', 'if',
+        'from', 'into', 'with', 'over', 'than'
+    ]);
+
+    function toTitleCase(str) {
+        return str.split(' ').map((word, i) => {
+            if (!word) return word;
+            const lower = word.toLowerCase();
+            if (i > 0 && lowercaseWords.has(lower)) return lower;
+            return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
+        }).join(' ');
+    }
+
+    recordNameInput.addEventListener('blur', function () {
+        this.value = toTitleCase(this.value);
+    });
+
+    recordNamesTextarea.addEventListener('blur', function () {
+        this.value = this.value.split('\n').map(line => {
+            const trimmed = line.trim();
+            return trimmed ? toTitleCase(trimmed) : '';
+        }).join('\n');
+    });
+
+    // Multi-mode toggle
+    multiModeToggle.addEventListener('change', () => {
+        const isMulti = multiModeToggle.checked;
+        singleNameLabel.classList.toggle('hidden', isMulti);
+        multiNameLabel.classList.toggle('hidden', !isMulti);
+        recordNameInput.required = !isMulti;
+        if (isMulti) recordNameInput.value = '';
+        else recordNamesTextarea.value = '';
+    });
+
+    function openAddRecordModal(sectionId, sectionName) {
+        modalSectionId = sectionId;
+        document.getElementById('modal-section-name').textContent = 'Add to: ' + sectionName;
+        modal.classList.remove('hidden');
+    }
+
+    function closeAddRecordModal() {
+        modal.classList.add('hidden');
+        newRecordForm.reset();
+        restoreModalDefaults();
+    }
+
+    function restoreModalDefaults() {
+        document.getElementById('numberOfCheckboxes').classList.add('default-value');
+        document.getElementById('numberAlreadyCompleted').classList.add('default-value');
+        document.getElementById('listOrder').classList.add('default-value');
+        multiModeToggle.checked = false;
+        singleNameLabel.classList.remove('hidden');
+        multiNameLabel.classList.add('hidden');
+        recordNameInput.required = true;
+    }
+
+    closeModal.addEventListener('click', closeAddRecordModal);
+    window.addEventListener('click', (e) => {
+        if (e.target === modal) closeAddRecordModal();
+    });
+
+    // Default-value styling removal on focus
+    newRecordForm.querySelectorAll('.default-value').forEach(field => {
+        field.addEventListener('focus', () => field.classList.remove('default-value'));
+    });
+
+    document.getElementById('reset-record-button').addEventListener('click', () => {
+        newRecordForm.reset();
+        restoreModalDefaults();
+    });
+
+    // Form submission
+    newRecordForm.addEventListener('submit', async (event) => {
+        event.preventDefault();
+
+        const isMultiMode = multiModeToggle.checked;
+        const description = document.getElementById('description').value.trim();
+        const numberOfCheckboxes = parseInt(document.getElementById('numberOfCheckboxes').value);
+        const numberAlreadyCompleted = parseInt(document.getElementById('numberAlreadyCompleted').value);
+        const listOrder = parseInt(document.getElementById('listOrder').value);
+        const longDescription = document.getElementById('longDescription').value.trim();
+        const hidden = document.getElementById('hidden').checked ? 1 : 0;
+
+        if (numberAlreadyCompleted > numberOfCheckboxes) {
+            alert("Error: 'Number Already Completed' cannot be greater than 'Number of Checkboxes'.");
+            return;
+        }
+
+        const spinner = document.getElementById('loading-spinner');
+        const successMessage = document.getElementById('success-message');
+        const saveButton = document.getElementById('save-record-button');
+
+        saveButton.classList.add('bounce');
+        setTimeout(() => saveButton.classList.remove('bounce'), 500);
+        spinner.classList.remove('hidden');
+        successMessage.classList.add('hidden');
+
+        try {
+            let success;
+
+            if (isMultiMode) {
+                const names = recordNamesTextarea.value.split('\n').map(n => n.trim()).filter(n => n.length > 0);
+                if (names.length === 0) { alert('Please enter at least one name.'); return; }
+                const records = names.map(name => ({
+                    name, description,
+                    sectionId: parseInt(modalSectionId), gameId: parseInt(gameId),
+                    numberOfCheckboxes, numberAlreadyCompleted, listOrder, longDescription, hidden
+                }));
+                success = await dbUtils.insertMultipleGameRecords(records);
+            } else {
+                const recordName = recordNameInput.value.trim();
+                if (!recordName) { alert('Please enter a name.'); return; }
+                success = await dbUtils.insertGameRecord({
+                    recordName, description,
+                    sectionId: parseInt(modalSectionId), gameId: parseInt(gameId),
+                    numberOfCheckboxes, numberAlreadyCompleted, listOrder, longDescription, hidden
+                });
+            }
+
+            if (success) {
+                successMessage.classList.remove('hidden');
+                setTimeout(async () => {
+                    successMessage.classList.add('fade-out');
+                    setTimeout(async () => {
+                        closeAddRecordModal();
+                        // Re-fetch and re-render — only expand the section that was added to
+                        const sections = await dbUtils.getSectionsBySectionGroupId(sectionGroupId, false);
+                        const allRecordsBySection = await fetchAllRecords(sections);
+                        renderChecklist(sections, allRecordsBySection, { startExpanded: false, expandSectionId: modalSectionId });
+                        updateAllSectionsCompletion();
+                        updateTotalCompletion();
+                    }, 300);
+                }, 500);
+            } else {
+                alert('Failed to save record. Please try again.');
+            }
+        } catch (error) {
+            alert('An error occurred. Please try again.');
+            console.error(error);
+        } finally {
+            spinner.classList.add('hidden');
+        }
+    });
 });
 
 
@@ -152,7 +322,7 @@ async function fetchAllRecords(sections) {
 
 // Single unified render function — replaces both processData() and renderFilteredChecklist()
 function renderChecklist(sections, allRecordsBySection, options) {
-    const { startExpanded = false, filterValue = null } = options;
+    const { startExpanded = false, filterValue = null, expandSectionId = null } = options;
     const gridContainer = document.getElementById('grid-checklist-container');
     gridContainer.innerHTML = '';
 
@@ -166,6 +336,7 @@ function renderChecklist(sections, allRecordsBySection, options) {
         const headerClone = sectionHeaderTemplate.content.cloneNode(true);
         const headerDiv = headerClone.querySelector('.section-header');
         headerDiv.dataset.section = sectionIndex;
+        headerDiv.dataset.sectionId = section.ID;
 
         const headerText = headerClone.querySelector('.section-header-text');
         headerText.dataset.section = sectionIndex;
@@ -173,8 +344,9 @@ function renderChecklist(sections, allRecordsBySection, options) {
         headerText.dataset.sectionTitleClean = sectionTitleClean;
         headerText.textContent = sectionTitle + ' (0%)';
 
-        // Set open state based on whether sections start expanded
-        if (startExpanded) {
+        // Set open state based on whether sections start expanded or this specific section should expand
+        const shouldExpand = startExpanded || (expandSectionId != null && String(section.ID) === String(expandSectionId));
+        if (shouldExpand) {
             headerDiv.classList.add('open');
         }
 
@@ -182,7 +354,7 @@ function renderChecklist(sections, allRecordsBySection, options) {
         const bodyClone = sectionBodyTemplate.content.cloneNode(true);
         const bodyDiv = bodyClone.querySelector('.section');
         bodyDiv.dataset.section = sectionIndex;
-        bodyDiv.style.display = startExpanded ? 'block' : 'none';
+        bodyDiv.style.display = shouldExpand ? 'block' : 'none';
 
         // Populate with records
         const records = allRecordsBySection[sectionIndex] || [];
