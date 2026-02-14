@@ -51,11 +51,13 @@ export function initRecordModal({ gameId, defaultAlreadyCompleted = 0, onSave })
                     </label>
                     <label class="add-record" id="single-name-label">Name:<input type="text" id="recordName" class="add-record" required></label>
                     <label class="add-record hidden" id="multi-name-label">Names (one per line):<textarea id="recordNames" class="add-record" rows="6" placeholder="Record One&#10;Record Two&#10;Record Three"></textarea></label>
-                    <label class="add-record">Description:<textarea id="description" class="add-record" rows="3"></textarea></label>
-                    <label class="add-record">Number of Checkboxes:<input type="number" id="numberOfCheckboxes" class="add-record default-value" min="0" value="1" required></label>
-                    <label class="add-record">Number Already Completed:<input type="number" id="numberAlreadyCompleted" class="add-record default-value" min="0" value="${defaultAlreadyCompleted}" required></label>
+                    <label class="add-record">Description:<textarea id="description" class="add-record" rows="2"></textarea></label>
+                    <div class="add-record-row">
+                        <label class="add-record">Number of Checkboxes:<input type="number" id="numberOfCheckboxes" class="add-record default-value" min="0" value="1" required></label>
+                        <label class="add-record">Number Already Completed:<input type="number" id="numberAlreadyCompleted" class="add-record default-value" min="0" value="${defaultAlreadyCompleted}" required></label>
+                    </div>
                     <label class="add-record">List Order:<input type="number" id="listOrder" class="add-record default-value" min="0" value="100" required></label>
-                    <label class="add-record">Long Description:<textarea id="longDescription" class="add-record" rows="5"></textarea></label>
+                    <label class="add-record">Long Description:<textarea id="longDescription" class="add-record" rows="2"></textarea></label>
                     <label class="modern-checkbox add-record">
                         <input type="checkbox" id="hidden">
                         <span class="checkmark"></span>
