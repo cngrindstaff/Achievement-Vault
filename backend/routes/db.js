@@ -3,13 +3,13 @@ import express from "express";
 const router = express.Router();
 import db from '../config/mysqlConnector.js';
 
-var debugLogging = false;
+var debugLogging = process.env.DEBUG_LOGGING === 'true';
 
 
 //#region Games
 //************************************ GET ALL GAMES ************************************//
 router.get('/db/games/all', async (req, res) => {
-    //console.log('made it here');
+    //if(debugLogging) console.log('made it here');
     try {
         const [rows] = await db.query('CALL GetAllGames()');
         const games = rows[0]; // CALL returns an array of result sets
@@ -23,7 +23,7 @@ router.get('/db/games/all', async (req, res) => {
 //************************************ GET GAME BY ID ************************************//
 router.get('/db/games/:gameId', async (req, res) => {
     const gameId = req.params.gameId;
-    //console.log('gameId: ' + gameId);
+    //if(debugLogging) console.log('gameId: ' + gameId);
     try {
         const [rows] = await db.query('CALL GetGameById(?)', [gameId]);
         const result = rows[0];
@@ -42,7 +42,7 @@ router.get('/db/games/:gameId', async (req, res) => {
 //************************************ GET GAME BY ID V2 - includes # of tables, sectionGroups ************************************//
 router.get('/db/games/v2/:gameId', async (req, res) => {
     const gameId = req.params.gameId;
-    //console.log('gameId: ' + gameId);
+    //if(debugLogging) console.log('gameId: ' + gameId);
     try {
         const [rows] = await db.query('CALL GetGameByIdV2(?)', [gameId]);
         const result = rows[0];
@@ -67,7 +67,7 @@ router.get('/db/games/v2/:gameId', async (req, res) => {
 
 //************************************ GET ALL SECTIONS FOR A GAME BY GAME ID ************************************//
 router.get('/db/sections/:gameId/:hiddenFilter', async (req, res) => {
-    //console.log('made it here sections/gameid');
+    //if(debugLogging) console.log('made it here sections/gameid');
     const gameId = req.params.gameId;
     let hiddenFilter = req.params.hiddenFilter;
 
@@ -80,7 +80,7 @@ router.get('/db/sections/:gameId/:hiddenFilter', async (req, res) => {
         hiddenFilter = null; // Let SQL default it if invalid or missing
     }
 
-    //console.log('gameId: ' + gameId + ' hiddenFilter: ' + hiddenFilter);
+    //if(debugLogging) console.log('gameId: ' + gameId + ' hiddenFilter: ' + hiddenFilter);
     try {
         const [rows] = await db.query('CALL GetGameSectionsByGameID(?, ?)', [gameId, hiddenFilter]);
         const result = rows[0];
@@ -99,9 +99,9 @@ router.get('/db/sections/:gameId/:hiddenFilter', async (req, res) => {
 //************************************ GET SECTION BY SECTION ID ************************************//
 
 router.get('/db/section/:sectionId', async (req, res) => {
-    //console.log('made it here2');
+    //if(debugLogging) console.log('made it here2');
     const sectionId = req.params.sectionId;
-    //console.log('sectionId: ' + sectionId);
+    //if(debugLogging) console.log('sectionId: ' + sectionId);
     try {
         const [rows] = await db.query('CALL GetSectionById(?)', [sectionId]);
         const result = rows[0];
@@ -206,7 +206,7 @@ router.put('/db/sections/updateListOrder', async (req, res) => {
 
 //************************************ GET ALL RECORDS FOR A SECTION BY SECTION ID, WITH ORDERING ************************************//
 router.get('/db/records/:sectionId/order/:recordOrderPreference/hiddenFilter/:hiddenFilter', async (req, res) => {
-    //console.log('made it records/sectionId');
+    //if(debugLogging) console.log('made it records/sectionId');
     const sectionId = req.params.sectionId;
     const recordOrderPreference = req.params.recordOrderPreference
 
@@ -242,7 +242,7 @@ router.get('/db/records/:sectionId/order/:recordOrderPreference/hiddenFilter/:hi
 
 //************************************ GET ALL RECORDS FOR A SECTION BY SECTION ID, V2, WITHOUT ORDERING ************************************//
 router.get('/db/records/v2/:sectionId/hiddenFilter/:hiddenFilter', async (req, res) => {
-    //console.log('made it records/sectionId');
+    //if(debugLogging) console.log('made it records/sectionId');
     const sectionId = req.params.sectionId;
 
     let hiddenFilter = req.params.hiddenFilter;
@@ -278,9 +278,9 @@ router.get('/db/records/v2/:sectionId/hiddenFilter/:hiddenFilter', async (req, r
 //************************************ GET RECORD BY RECORD ID ************************************//
 
 router.get('/db/record/:recordId', async (req, res) => {
-    //console.log('made it here2');
+    //if(debugLogging) console.log('made it here2');
     const recordId = req.params.recordId;
-    //console.log('recordId: ' + recordId);
+    //if(debugLogging) console.log('recordId: ' + recordId);
     try {
         const [rows] = await db.query('CALL GetGameRecordByRecordID(?)', [recordId]);
         const result = rows[0];
@@ -300,7 +300,7 @@ router.put('/db/record/updateCompletion/:recordId', async (req, res) => {
     const recordId = req.params.recordId;
     const { numberAlreadyCompleted } = req.body;
 
-    //console.log('recordId: ' + recordId + ". numberAlreadyCompleted: " + numberAlreadyCompleted);
+    //if(debugLogging) console.log('recordId: ' + recordId + ". numberAlreadyCompleted: " + numberAlreadyCompleted);
 
     if (numberAlreadyCompleted === undefined) {
         return res.status(400).json({ error: 'Missing required field: numberAlreadyCompleted' });
@@ -359,7 +359,7 @@ router.put('/db/record/update/:recordId', async (req, res) => {
     const { recordId } = req.params;
     const { recordName, description, gameId, numberOfCheckboxes, numberAlreadyCompleted, 
         listOrder, longDescription, hidden, sectionId } = req.body;
-    console.log('recordId: ' + recordId + ' sectionId: ' + sectionId + ' recordName: ' + recordName + ' description: ' + description + ' gameId: ' + gameId + ' numberOfCheckboxes: ' + numberOfCheckboxes + ' numberAlreadyCompleted: ' + numberAlreadyCompleted + ' listOrder: ' + listOrder + ' longDescription: ' + longDescription + ' hidden: ' + hidden);
+    if (debugLogging) console.log('recordId: ' + recordId + ' sectionId: ' + sectionId + ' recordName: ' + recordName + ' description: ' + description + ' gameId: ' + gameId + ' numberOfCheckboxes: ' + numberOfCheckboxes + ' numberAlreadyCompleted: ' + numberAlreadyCompleted + ' listOrder: ' + listOrder + ' longDescription: ' + longDescription + ' hidden: ' + hidden);
     try {
         await db.query(
             'CALL UpdateGameRecord(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
@@ -420,9 +420,9 @@ router.put('/db/records/updateListOrder', async (req, res) => {
 
 //************************************ GET ALL GAME TABLES BY GAME ID ************************************//
 router.get('/db/gameTables/:gameId', async (req, res) => {
-    //console.log('made it here sections/gameid');
+    //if(debugLogging) console.log('made it here sections/gameid');
     const gameId = req.params.gameId;
-    //console.log('gameId: ' + gameId);
+    //if(debugLogging) console.log('gameId: ' + gameId);
     try {
         const [rows] = await db.query('CALL GetAllGameTablesByGameID(?)', [gameId]);
         const result = rows[0];
@@ -443,10 +443,10 @@ router.get('/db/tableRecords/:tableId', async (req, res) => {
     const gameId = req.params.tableId;
     try {
         const [rows] = await db.query('CALL GetAllTableRecordsByTableID(?)', [gameId]);
-        //console.log('rows:', rows);
+        //if(debugLogging) console.log('rows:', rows);
         if (!rows || rows.length === 0 || (Array.isArray(rows[0]) && rows[0].length === 0)) {
-            console.log("No records returned.");
-            return null;
+            if (debugLogging) console.log("No records returned.");
+            return res.json([]);
         }
 
         const result = rows[0];
@@ -466,7 +466,7 @@ router.get('/db/tableRecords/:tableId', async (req, res) => {
 
 //************************************ GET ALL SECTIONGROUPS FOR A GAME BY GAME ID ************************************//
 router.get('/db/sectionGroups/:gameId/:hiddenFilter', async (req, res) => {
-    //console.log('made it here sectionGroups/gameid');
+    //if(debugLogging) console.log('made it here sectionGroups/gameid');
     const gameId = req.params.gameId;
     let hiddenFilter = req.params.hiddenFilter;
 
@@ -479,7 +479,7 @@ router.get('/db/sectionGroups/:gameId/:hiddenFilter', async (req, res) => {
         hiddenFilter = null; // Let SQL default it if invalid or missing
     }
 
-    //console.log('gameId: ' + gameId + ' hiddenFilter: ' + hiddenFilter);
+    //if(debugLogging) console.log('gameId: ' + gameId + ' hiddenFilter: ' + hiddenFilter);
     try {
         const [rows] = await db.query('CALL GetSectionGroupsByGameID(?, ?)', [gameId, hiddenFilter]);
         const result = rows[0];
@@ -499,7 +499,7 @@ router.get('/db/sectionGroups/:gameId/:hiddenFilter', async (req, res) => {
 //************************************ GET  SECTIONGROUPS SECTIONGROUP ID ************************************//
 router.get('/db/sectionGroup/:sectionGroupId', async (req, res) => {
     const sectionGroupId = req.params.sectionGroupId;
-    //console.log('gameId: ' + gameId);
+    //if(debugLogging) console.log('gameId: ' + gameId);
     try {
         const [rows] = await db.query('CALL GetSectionGroupById(?)', [sectionGroupId]);
         const result = rows[0];
@@ -517,7 +517,7 @@ router.get('/db/sectionGroup/:sectionGroupId', async (req, res) => {
 
 //************************************ GET ALL SECTIONS FOR A GAME BY SECTION GROUP ID ************************************//
 router.get('/db/sections/sectionGroupId/:sectionGroupId/:hiddenFilter', async (req, res) => {
-    //console.log('made it here sectionGroups/sectionGroupId');
+    //if(debugLogging) console.log('made it here sectionGroups/sectionGroupId');
     const sectionGroupId = req.params.sectionGroupId;
     let hiddenFilter = req.params.hiddenFilter;
 
@@ -530,7 +530,7 @@ router.get('/db/sections/sectionGroupId/:sectionGroupId/:hiddenFilter', async (r
         hiddenFilter = null; // Let SQL default it if invalid or missing
     }
 
-    //console.log('gameId: ' + gameId + ' hiddenFilter: ' + hiddenFilter);
+    //if(debugLogging) console.log('gameId: ' + gameId + ' hiddenFilter: ' + hiddenFilter);
     try {
         const [rows] = await db.query('CALL GetGameSectionsBySectionGroupID(?, ?)', [sectionGroupId, hiddenFilter]);
         const result = rows[0];

@@ -6,7 +6,9 @@ body {
   line-height: 1.5;
   margin: 0;
   display: flex;
-  justify-content: center;
+  flex-direction: column;
+  align-items: center;
+  min-height: 100vh;
   padding: 24px 16px;
 }
 
@@ -179,6 +181,30 @@ h3 .record-count {
 .nav-link:hover {
   background-color: #eae7e2;
   color: #175f63;
+}
+
+.site-footer {
+  margin-top: 48px;
+  padding: 24px 16px;
+  text-align: center;
+  font-size: 12px;
+  color: #8a9696;
+  width: 100%;
+  max-width: 700px;
+  border-top: 1px solid #e8e5e0;
+}
+.site-footer p {
+  margin: 4px 0;
+}
+.site-footer a {
+  color: #8a9696;
+  text-decoration: underline;
+  text-decoration-style: dotted;
+  text-underline-offset: 2px;
+}
+.site-footer a:hover {
+  color: #1f7f84;
+  text-decoration-style: solid;
 }
 
 .link-container {
@@ -586,6 +612,7 @@ th:hover {
 
 .section-table {
   background-color: #f2efeb;
+  display: block;
 }
 
 tr:nth-child(even) {
