@@ -134,8 +134,18 @@ h3 {
 
 .section-header-icon {
   font-size: 14px;
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
   opacity: 0.8;
+  transition: transform 0.3s ease;
+}
+.section-header-icon i {
+  display: inline-block;
+  transition: transform 0.3s ease;
+}
+
+.section-header.open .section-header-icon i {
+  transform: rotate(180deg);
 }
 
 .section, .section-table {
@@ -147,6 +157,7 @@ h3 {
   margin-bottom: 12px;
   display: none;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
 }
 
 .grid-item-2-row {
@@ -200,6 +211,25 @@ h3 {
   font-style: italic;
 }
 
+@keyframes checkbox-pop {
+  0% {
+    transform: scale(1);
+  }
+  40% {
+    transform: scale(1.25);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+@keyframes checkmark-draw {
+  0% {
+    clip-path: inset(0 100% 0 0);
+  }
+  100% {
+    clip-path: inset(0 0 0 0);
+  }
+}
 input[type=checkbox] {
   appearance: none;
   -webkit-appearance: none;
@@ -212,12 +242,13 @@ input[type=checkbox] {
   background: #f2efeb;
   cursor: pointer;
   position: relative;
-  transition: all 0.15s ease;
+  transition: background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease, transform 0.15s ease;
   margin: auto 5px auto auto;
 }
 input[type=checkbox]:checked {
   background: #1f7f84;
   border-color: #1f7f84;
+  animation: checkbox-pop 0.3s ease;
 }
 input[type=checkbox]:checked::after {
   content: "";
@@ -229,10 +260,14 @@ input[type=checkbox]:checked::after {
   transform: rotate(45deg);
   top: 3px;
   left: 6px;
+  animation: checkmark-draw 0.2s ease 0.05s both;
 }
 input[type=checkbox]:hover {
   border-color: #2fbfc6;
   box-shadow: 0 0 0 3px rgba(47, 191, 198, 0.15);
+}
+input[type=checkbox]:active {
+  transform: scale(0.9);
 }
 input[type=checkbox]:focus-visible {
   outline: 2px solid #2fbfc6;

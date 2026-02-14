@@ -200,8 +200,20 @@ h3 {
 
 .section-header-icon {
 	font-size: 14px;
-	display: inline-block;
+	display: inline-flex;
+	align-items: center;
 	opacity: 0.8;
+	transition: transform 0.3s ease;
+
+	i {
+		display: inline-block;
+		transition: transform 0.3s ease;
+	}
+}
+
+// Rotate chevron when section is open
+.section-header.open .section-header-icon i {
+	transform: rotate(180deg);
 }
 
 
@@ -216,6 +228,7 @@ h3 {
 	margin-bottom: 12px;
 	display: none;
 	box-shadow: $shadow-sm;
+	overflow: hidden;
 }
 
 
@@ -275,6 +288,17 @@ h3 {
 
 // ==================== CHECKBOXES (styled native) ====================
 
+@keyframes checkbox-pop {
+	0%   { transform: scale(1); }
+	40%  { transform: scale(1.25); }
+	100% { transform: scale(1); }
+}
+
+@keyframes checkmark-draw {
+	0%   { clip-path: inset(0 100% 0 0); }
+	100% { clip-path: inset(0 0 0 0); }
+}
+
 input[type="checkbox"] {
 	appearance: none;
 	-webkit-appearance: none;
@@ -287,12 +311,13 @@ input[type="checkbox"] {
 	background: $bg-surface;
 	cursor: pointer;
 	position: relative;
-	transition: all $transition-fast;
+	transition: background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease, transform 0.15s ease;
 	margin: auto 5px auto auto;
 
 	&:checked {
 		background: $accent-500;
 		border-color: $accent-500;
+		animation: checkbox-pop 0.3s ease;
 	}
 
 	&:checked::after {
@@ -305,11 +330,16 @@ input[type="checkbox"] {
 		transform: rotate(45deg);
 		top: 3px;
 		left: 6px;
+		animation: checkmark-draw 0.2s ease 0.05s both;
 	}
 
 	&:hover {
 		border-color: $accent-400;
 		box-shadow: 0 0 0 3px rgba($accent-400, 0.15);
+	}
+
+	&:active {
+		transform: scale(0.9);
 	}
 
 	&:focus-visible {

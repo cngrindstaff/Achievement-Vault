@@ -50,10 +50,8 @@ $(document).ready(async function () {
         if (!header) return;
         const sectionBody = header.nextElementSibling;
         if (!sectionBody) return;
-        const isVisible = sectionBody.style.display === 'block';
-        sectionBody.style.display = isVisible ? 'none' : 'block';
-        header.querySelector('i').classList.toggle('fa-chevron-down', isVisible);
-        header.querySelector('i').classList.toggle('fa-chevron-up', !isVisible);
+        $(sectionBody).slideToggle(250);
+        header.classList.toggle('open');
     });
 });
 

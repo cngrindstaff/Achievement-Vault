@@ -56,8 +56,8 @@ $(document).ready(async function () {
 
     // Event delegation for section header clicks (toggle collapse)
     $('#grid-checklist-container').on('click', '.section-header', function () {
-        $(this).next('.section').toggle();
-        $(this).find('i').toggleClass('fa-chevron-down fa-chevron-up');
+        $(this).next('.section').slideToggle(250);
+        $(this).toggleClass('open');
     });
 
     // --- FILTER AND TOGGLE LOGIC ---
@@ -120,11 +120,11 @@ $(document).ready(async function () {
         const expandAll = $('#expand-all-toggle').is(':checked');
         $('.section').each(function () {
             if (expandAll) {
-                $(this).show();
-                $(this).prev('.section-header').find('i').removeClass('fa-chevron-down').addClass('fa-chevron-up');
+                $(this).slideDown(250);
+                $(this).prev('.section-header').addClass('open');
             } else {
-                $(this).hide();
-                $(this).prev('.section-header').find('i').removeClass('fa-chevron-up').addClass('fa-chevron-down');
+                $(this).slideUp(250);
+                $(this).prev('.section-header').removeClass('open');
             }
         });
     }
@@ -171,11 +171,9 @@ function renderChecklist(sections, allRecordsBySection, options) {
         headerText.dataset.sectionTitleClean = sectionTitleClean;
         headerText.textContent = sectionTitle + ' (0%)';
 
-        // Set chevron direction based on whether sections start expanded
+        // Set open state based on whether sections start expanded
         if (startExpanded) {
-            const chevron = headerClone.querySelector('i');
-            chevron.classList.remove('fa-chevron-down');
-            chevron.classList.add('fa-chevron-up');
+            headerDiv.classList.add('open');
         }
 
         // Clone and populate section body template
