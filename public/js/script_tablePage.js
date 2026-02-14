@@ -1,5 +1,6 @@
 import * as utils from './script_utilities.js';
 import * as dbUtils from './script_db_helper.js';
+import { initNav } from './script_nav.js';
 
 var debugLogging = false;
 
@@ -25,7 +26,9 @@ $(document).ready(async function () {
     // Populate static page elements
     document.title = gameNameFriendly + ': Other Tables';
     document.getElementById('game-name').textContent = gameNameFriendly;
-    document.getElementById('back-link').href = linkToGamePage;
+
+    // Initialize slide-out nav
+    initNav({ currentPage: 'table', gameId, gameNameFriendly });
 
     const gridContainer = document.getElementById('grid-tables-container');
 

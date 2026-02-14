@@ -1,4 +1,9 @@
+import { initNav } from './script_nav.js';
+
 const gameListItemTemplate = document.getElementById('game-list-item-template');
+
+// Home page — no back button, no game context
+initNav({ currentPage: 'home' });
 
 async function loadGames() {
     try {

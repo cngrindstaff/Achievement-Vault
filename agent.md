@@ -361,3 +361,44 @@ Use this file to reference work you've done previously and post patch notes. Als
 - "Number of Checkboxes" and "Number Already Completed" placed side-by-side using `.add-record-row` flex container
 
 **Bug fix:** `openForEdit` used `recordData.SectionId` but the DB column is `SectionID` (capital D) — casing mismatch caused `sectionId` to be `NULL` in the update call. Fixed in `script_recordModal.js`.
+
+**Delete record from edit modal:**
+- Added a red "Delete Record" button to the shared modal in `script_recordModal.js`
+- Only visible when editing (hidden during add via `restoreDefaults`)
+- Confirms with the user, calls `dbUtils.deleteGameRecord()`, closes modal, triggers `onSave` callback
+- Styled with `$danger` / `$danger-hover` colors in `.button-container .delete-button`
+
+---
+
+### Patch 9 — Slide-Out Navigation
+
+**Problem:** Navigation was scattered — static `link-container` divs in HTML files, jQuery-built link divs in admin JS files, inconsistent across pages.
+
+**Solution:** Created a shared slide-out hamburger nav module `public/js/script_nav.js`.
+
+**How it works:**
+- `initNav({ currentPage, gameId, gameNameFriendly })` — called by each page after loading its data
+- Injects a fixed hamburger button (top-left), an overlay, and a slide-out `<nav>` panel into the DOM
+- Opens/closes with smooth CSS `transform: translateX` transition
+- Closes on overlay click, X button, or Escape key
+
+**Nav item rules:**
+- **Home** — always shown, unless `currentPage === 'home'`
+- **Back** — always shown (navigates to game page, or home if on game page); hidden on home
+- **Game Page** (shows game name) — shown when deeper than game page (not on home or game)
+- **Checklist Groups** — shown when not on home, game, or checklistGroups
+
+**Pages updated (all had old nav removed, `initNav()` added):**
+- `index.html` / `script_home.js` — `currentPage: 'home'` (no nav items shown, but hamburger hidden since no items)
+- `game.html` / `script_gamePage.js` — `currentPage: 'game'`; removed old home icon div
+- `checklist.html` / `script_checklist.js` — `currentPage: 'checklist'`; removed old link-container
+- `checklistGroups.html` / `script_checklistGroups.js` — `currentPage: 'checklistGroups'`; removed old link-container
+- `table.html` / `script_tablePage.js` — `currentPage: 'table'`; removed old link-container
+- `script_manage_sections.js` — `currentPage: 'manage_sections'`; removed jQuery-built link-container
+- `script_manage_sectionRecords.js` — `currentPage: 'manage_sectionRecords'`; removed jQuery-built link-container
+- `index.html` — added Font Awesome CDN link (was missing)
+
+**CSS changes (`styles.scss`):**
+- New styles: `.nav-hamburger`, `.nav-overlay`, `.nav-slideout`, `.nav-header`, `.nav-title`, `.nav-close`, `.nav-links`, `.nav-link`
+- Old `.link-container` set to `display: none`
+- `.container` / `.game-list-container` given `padding-top: 56px` for the fixed hamburger button

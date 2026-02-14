@@ -1,6 +1,7 @@
 import * as utils from './script_utilities.js';
 import * as dbUtils from './script_db_helper.js';
 import { initRecordModal } from './script_recordModal.js';
+import { initNav } from './script_nav.js';
 
 var debugLogging = false;
 
@@ -43,7 +44,9 @@ $(document).ready(async function () {
     document.title = gameNameFriendly + ' 100% Completion Checklist';
     document.getElementById('game-name').textContent = gameNameFriendly;
     document.getElementById('section-group-name').textContent = sectionGroupFriendlyName;
-    document.getElementById('back-link').href = linkToGamePage;
+
+    // Initialize slide-out nav
+    initNav({ currentPage: 'checklist', gameId, gameNameFriendly });
 
     // Fetch all section records in parallel
     const allRecordsBySection = await fetchAllRecords(sections);

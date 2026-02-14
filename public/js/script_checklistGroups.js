@@ -1,5 +1,6 @@
 import * as dbUtils from './script_db_helper.js';
 import * as utils from './script_utilities.js';
+import { initNav } from './script_nav.js';
 
 var debugLogging = false;
 
@@ -25,7 +26,9 @@ $(document).ready(async function () {
     // Populate static page elements
     document.title = gameNameFriendly + ': Checklist Groups';
     document.getElementById('game-name').textContent = gameNameFriendly;
-    document.getElementById('back-link').href = linkToGamePage;
+
+    // Initialize slide-out nav
+    initNav({ currentPage: 'checklistGroups', gameId, gameNameFriendly });
 
     // Render section groups
     renderSectionGroups(sectionGroups);

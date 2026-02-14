@@ -1,6 +1,7 @@
 import * as utils from './script_utilities.js';
 import * as dbUtils from './script_db_helper.js';
 import { initRecordModal } from './script_recordModal.js';
+import { initNav } from './script_nav.js';
 
 const linkToHomePage = './';
 
@@ -38,13 +39,10 @@ $(document).ready(async function () {
 
     $("title").text(htmlTitle);
 
+    // Initialize slide-out nav
+    initNav({ currentPage: 'manage_sectionRecords', gameId, gameNameFriendly });
+
     const mainContainer = $('#container');
-    mainContainer.append(`<div class="link-container"> </div>`);
-
-    const linkContainerDiv = $('.link-container');
-    linkContainerDiv.append('<div class="link-icon"><a href="' + linkToHomePage + '" class="link-icon-text"><i class="fa fa-solid fa-house fa-lg fa-border" ></i></a></div>');
-    linkContainerDiv.append('<div class="link-icon"><a href="' + linkToGamePage + '" class="link-icon-text" title="Return to Game Page"><i class="fa fa-arrow-left fa-lg fa-border" ></i></a></div>');
-
     mainContainer.append('<h1>' + gameNameFriendly + '</h1>');
     mainContainer.append('<h2>Section: ' + sectionName + '</h2>');
     mainContainer.append('<h3>Records <span id="record-count" class="record-count"></span></h3>');
