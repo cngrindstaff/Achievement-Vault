@@ -1,5 +1,6 @@
 import { getGameDataV2 } from "./script_db_helper.js";
 import { getQueryParam } from "./script_utilities.js";
+import { initNav } from './script_nav.js';
 
 let gameId = null;
 let gameNameFriendly = null;
@@ -22,6 +23,9 @@ $(document).ready(async function () {
     // Populate static page elements
     document.title = gameNameFriendly;
     document.getElementById('game-name').textContent = gameNameFriendly;
+
+    // Initialize nav — game page shows Home and Back (to Home)
+    initNav({ currentPage: 'game', gameId, gameNameFriendly });
 
     // Build navigation links from template
     const linkContainer = document.getElementById('grid-link-container');
