@@ -1,310 +1,467 @@
-@mixin createCorners($gradientColor){
-	background: 
-		linear-gradient(to right, $gradientColor 4px, transparent 4px) 0 0, 
-		linear-gradient(to right, $gradientColor 4px, transparent 4px) 0 100%,
-		linear-gradient(to left, $gradientColor 4px, transparent 4px) 100% 0,
-		linear-gradient(to left, $gradientColor 4px, transparent 4px) 100% 100%,
-		linear-gradient(to bottom, $gradientColor 4px, transparent 4px) 0 0,
-		linear-gradient(to bottom, $gradientColor 4px, transparent 4px) 100% 0,
-		linear-gradient(to top, $gradientColor 4px, transparent 4px) 0 100%,
-		linear-gradient(to top, $gradientColor 4px, transparent 4px) 100% 100%;
-	background-repeat: no-repeat;
-	background-size: 20px 20px;
-}
+// ==================== DESIGN TOKENS ====================
+
+// Fonts
+$font-heading: 'Merriweather', Georgia, serif;
+$font-body: 'Roboto', -apple-system, BlinkMacSystemFont, sans-serif;
+
+// Surfaces (warm neutrals — soft on the eyes, between light and dark)
+$bg-body: #dfdbd5;
+$bg-surface: #f2efeb;
+$bg-surface-alt: #e8e5e0;
+$bg-hover: #eae7e2;
+
+// Accent (teal — refined from original palette)
+$accent-50:  #edf9f9;
+$accent-100: #d0f0f2;
+$accent-200: #9ce4e8;
+$accent-300: #6ad6dc;
+$accent-400: #2fbfc6;
+$accent-500: #1f7f84;
+$accent-600: #175f63;
+$accent-700: #104042;
+
+// Text
+$text-primary: #1c2b2d;
+$text-secondary: #556565;
+$text-on-accent: #edf9f9;
+$text-muted: #8a9696;
+
+// Status
+$success: #2d9d5c;
+$danger: #d94452;
+$danger-hover: #c13340;
+$highlight: #ffe066;
+
+// Depth
+$shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.08);
+$shadow-md: 0 3px 10px rgba(0, 0, 0, 0.10);
+$shadow-lg: 0 6px 20px rgba(0, 0, 0, 0.14);
+
+// Radii
+$radius-sm: 6px;
+$radius-md: 10px;
+$radius-lg: 14px;
+
+// Transitions
+$transition-fast: 0.15s ease;
+$transition-normal: 0.2s ease;
 
 
-@mixin createLinearGradient($direction, $start_color, $end_color) {
-	//background: $start_color;
-	background: linear-gradient($direction, $start_color 40%, $end_color 100%);
-}
-
-/******************************************* COLORS **********************************/
-$light_gray: #97a1aa;
-$dark_gray: #5e6870;
-
-.light-gray {
-  color: $light_gray;
-}
-
-.dark-gray {
-  color: $dark_gray;
-}
-
-/* https://coolors.co/9ce4e8-6ad6dc-2fbfc6-28a2a8-1f7f84 */
-/* Teal color scheme, light to dark */
-
-$teal_bck_color_1: #9CE4E8;
-$teal_bck_color_2: #6AD6DC;
-$teal_bck_color_3: #2FBFC6;
-$teal_bck_color_4: #28A2A8;
-$teal_bck_color_5: #1F7F84;
-$teal_bck_color_6: #175F63;
-$teal_font_light: #CEF2F3;
-$teal_font_medium: #238F95;
-$teal_font_dark: #104042;
-
-.teal-background-gradient{
-	@include createCorners($teal_bck_color_6);
-	@include createLinearGradient(45deg, $teal_bck_color_1, $teal_bck_color_3);
-
-}
-/******************************************* END COLORS **********************************/
-
-/*******************************************  ELEMENTS **********************************/
-
-
+// ==================== BASE ====================
 
 body {
-	background-color: $light-gray;
-	color: $teal_font_dark;
-	font-family: 'Roboto', serif;
+	background-color: $bg-body;
+	color: $text-primary;
+	font-family: $font-body;
+	font-size: 15px;
+	line-height: 1.5;
 	margin: 0;
 	display: flex;
 	justify-content: center;
-	padding: 20px;
+	padding: 24px 16px;
 }
+
+*, *::before, *::after {
+	box-sizing: border-box;
+}
+
+a {
+	color: $accent-500;
+	text-decoration: none;
+	transition: color $transition-fast;
+
+	&:hover {
+		color: $accent-400;
+	}
+}
+
+
+// ==================== LAYOUT ====================
+
 .container, .game-list-container {
 	max-width: 700px;
 	width: 100%;
 }
+
+
+// ==================== TYPOGRAPHY ====================
+
 h1 {
-	color: $teal_font_dark;
+	font-family: $font-heading;
+	color: $text-primary;
 	text-align: center;
-	margin-bottom: 20px;
+	font-size: 1.75rem;
+	font-weight: 700;
+	margin: 0 0 8px 0;
 }
-.section-header, .game-list-item, .game-section-item
- {
-/*	background-color: $teal_bck_color-2;
-	color: $teal_font_dark;*/
-	color: $teal_font_light;
-	background-color: $teal_bck_color-5;
-	padding: 15px;
+
+h2 {
+	font-family: $font-heading;
+	color: $text-secondary;
+	text-align: center;
+	font-size: 1.15rem;
+	font-weight: 400;
+	margin: 0 0 6px 0;
+}
+
+h3 {
+	font-family: $font-heading;
+	color: $text-secondary;
+	text-align: center;
+	font-size: 1rem;
+	font-weight: 400;
+	margin: 0 0 20px 0;
+}
+
+
+// ==================== NAVIGATION ====================
+
+.link-container {
+	display: flex;
+	gap: 10px;
+	align-items: center;
+	margin-bottom: 16px;
+}
+
+.home-link {
+	padding: 8px;
 	border: none;
-	border-radius: 5px; 
+	border-radius: $radius-sm;
+	outline: none;
+	cursor: pointer;
+	width: fit-content;
+	margin-bottom: 16px;
+	height: 15px;
+	display: flex;
+	align-items: center;
+	transition: background-color $transition-fast;
+
+	&:hover {
+		background-color: $bg-hover;
+	}
+}
+
+.fa {
+	color: $accent-500;
+}
+
+.fa-border {
+	border-color: $accent-400 !important;
+	border-radius: $radius-sm !important;
+	border-width: 2px !important;
+	padding: 10px 7px !important;
+	transition: background-color $transition-fast, border-color $transition-fast;
+
+	&:hover {
+		background-color: $accent-50;
+		border-color: $accent-500 !important;
+	}
+}
+
+
+// ==================== INTERACTIVE ITEMS (game list, section headers) ====================
+
+.section-header, .game-list-item, .game-section-item {
+	color: $text-on-accent;
+	background-color: $accent-500;
+	padding: 16px 18px;
+	border: none;
+	border-radius: $radius-md;
 	text-align: left;
 	outline: none;
+	font-family: $font-body;
 	font-size: 15px;
+	font-weight: 500;
 	cursor: pointer;
-	/*width: 100%;*/ /*I don't know why, but if this is set to 100%, then the dropdown icon on the section headers ends up going past the 100% width area*/
-	margin-bottom: 5px; 
+	margin-bottom: 8px;
+	box-shadow: $shadow-sm;
+	transition: background-color $transition-normal, box-shadow $transition-normal, transform $transition-fast;
 }
+
 .section-header {
 	justify-content: space-between;
 	display: flex;
-} 
-.game-list-item:hover, .section-header:hover, .game-section-item:hover{
-	background-color: $teal_bck_color-3;
-} 
+}
+
+.game-list-item:hover, .section-header:hover, .game-section-item:hover {
+	background-color: $accent-400;
+	color: #fff;
+	box-shadow: $shadow-md;
+	transform: translateY(-1px);
+}
+
+.game-list-item:active, .section-header:active, .game-section-item:active {
+	transform: translateY(0);
+}
+
 .section-header-text {
 	flex-grow: 1;
-}  
-.section {
-/*	color: $teal_font_light;
-	background-color: $teal_bck_color-5;*/
-	background-color: $teal_bck_color-2;
-	color: $teal_font_dark;
-	padding: 10px;
-	border: 1px solid $teal_font_dark; 
-	border-radius: 5px;
-	margin-bottom: 10px;
-	display: none; /* Hidden by default */
 }
+
+.section-header-icon {
+	font-size: 14px;
+	display: inline-flex;
+	align-items: center;
+	opacity: 0.8;
+	transition: transform 0.3s ease;
+
+	i {
+		display: inline-block;
+		transition: transform 0.3s ease;
+	}
+}
+
+// Rotate chevron when section is open
+.section-header.open .section-header-icon i {
+	transform: rotate(180deg);
+}
+
+
+// ==================== COLLAPSIBLE SECTIONS ====================
+
+.section {
+	background-color: $bg-surface;
+	color: $text-primary;
+	padding: 12px;
+	border: 1px solid $bg-surface-alt;
+	border-radius: $radius-md;
+	margin-bottom: 12px;
+	display: none;
+	box-shadow: $shadow-sm;
+	overflow: hidden;
+}
+
+
+// ==================== CHECKLIST ITEMS ====================
+
 .grid-item-2-row {
 	display: grid;
-	grid-template-columns: 1fr auto; /* Two columns, second one adjusts automatically*/
-	grid-template-rows: auto auto; /* Adjust rows automatically */
-	margin-bottom: 5px;
-	gap: 15px;
+	grid-template-columns: 1fr auto;
+	grid-template-rows: auto auto;
+	padding: 4px 10px;
+	margin-bottom: 1px;
+	gap: 10px;
+	border-radius: $radius-sm;
+	transition: background-color $transition-fast;
 }
+
 .grid-item-1-row {
 	display: grid;
-	grid-template-columns: 1fr auto; /* Two columns, second one adjusts automatically*/
-	margin-bottom: 5px;
+	grid-template-columns: 1fr auto;
+	padding: 8px 10px;
+	margin-bottom: 2px;
 	gap: 15px;
+	border-radius: $radius-sm;
+	transition: background-color $transition-fast;
 }
 
 .grid-item-1-row:hover,
 .grid-item-2-row:hover {
-	background-color: $teal_bck_color-3;
-	color: $teal_font_dark;
-	transition: background-color 0.2s ease-in-out;
+	background-color: $bg-hover;
 	cursor: pointer;
-	
 }
-/*.grid-checkbox-container {
-	display: flex;
-	align-items: center;
-	gap: 5px;
-}*/
-input[type="checkbox"] {
-	margin: auto 5px auto auto;
+
+.column1 {
+	display: grid;
+	gap: 0.3rem;
 }
+
 .label {
-	font-size: 16px;
-	//color: $teal_font_light;
-	color: $teal_font_dark;
+	font-size: 15px;
+	color: $text-primary;
+	font-weight: 500;
 }
+
+.description {
+	font-size: 13px;
+	color: $text-secondary;
+	line-height: 1.4;
+}
+
+.no-records, .no-tables {
+	color: $text-muted;
+	text-align: center;
+	padding: 20px;
+	font-style: italic;
+}
+
+
+// ==================== CHECKBOXES (styled native) ====================
+
+@keyframes checkbox-pop {
+	0%   { transform: scale(1); }
+	40%  { transform: scale(1.25); }
+	100% { transform: scale(1); }
+}
+
+@keyframes checkmark-draw {
+	0%   { clip-path: inset(0 100% 0 0); }
+	100% { clip-path: inset(0 0 0 0); }
+}
+
+input[type="checkbox"] {
+	appearance: none;
+	-webkit-appearance: none;
+	-moz-appearance: none;
+	width: 22px;
+	height: 22px;
+	min-width: 22px;
+	border: 2px solid $text-muted;
+	border-radius: 5px;
+	background: $bg-surface;
+	cursor: pointer;
+	position: relative;
+	transition: background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease, transform 0.15s ease;
+	margin: auto 5px auto auto;
+
+	&:checked {
+		background: $accent-500;
+		border-color: $accent-500;
+		animation: checkbox-pop 0.3s ease;
+	}
+
+	&:checked::after {
+		content: '';
+		position: absolute;
+		width: 5px;
+		height: 10px;
+		border: solid white;
+		border-width: 0 2.5px 2.5px 0;
+		transform: rotate(45deg);
+		top: 3px;
+		left: 6px;
+		animation: checkmark-draw 0.2s ease 0.05s both;
+	}
+
+	&:hover {
+		border-color: $accent-400;
+		box-shadow: 0 0 0 3px rgba($accent-400, 0.15);
+	}
+
+	&:active {
+		transform: scale(0.9);
+	}
+
+	&:focus-visible {
+		outline: 2px solid $accent-400;
+		outline-offset: 2px;
+	}
+}
+
 #checklist-container {
 	display: flex;
 	flex-direction: column;
 	gap: 10px;
 }
+
 #total-completion {
-	margin-bottom: 20px;
+	font-family: $font-heading;
+	font-size: 1rem;
+	margin: 20px 0;
 	text-align: center;
-	color: $teal_font_dark;
-}
-.description {
-	font-size: 12px;
-}
-.column1 {
-	display: grid;
-	//grid-template-rows: 1fr 1fr; /* Two rows inside the first column */
-	gap: 0.5rem;
+	color: $text-primary;
+	font-weight: 700;
 }
 
-.home-link {
-	//background-color: $teal_bck_color-2;
-	padding: 8px;
-	border: none;
-	border-radius: 5px;
-	outline: none;
-	cursor: pointer;
-	width: fit-content;
-	margin-bottom: 15px;
-	height: 15px;
-	display: flex; /* Supports vertical centering */
-	align-items: center;/* Supports vertical centering */
-}
-.home-link:hover {
-	background-color: $teal_bck_color-3;
-}
 
-.link-container {
-	display: flex;
-	gap: 10px; /* Space between icons */
-	align-items: center; /* Align vertically */
-}
+// ==================== MODERN CHECKBOX (admin modal) ====================
 
-a {
-	color: $teal_font_dark;
-	text-decoration: none;
-}
-/*************************************** NEW CHECKBOX *******************************/
 .modern-checkbox {
 	display: flex;
 	align-items: center;
 	cursor: pointer;
 	user-select: none;
-	/*font-size: 15px;*/
 	margin: 8px 0;
+
+	input {
+		// Hide native checkbox, use custom .checkmark instead
+		display: none;
+	}
+
+	.checkmark {
+		width: 22px;
+		height: 22px;
+		background-color: $bg-surface;
+		border: 2px solid $text-muted;
+		border-radius: 5px;
+		margin-right: 10px;
+		position: relative;
+		transition: all $transition-normal;
+
+		&::after {
+			content: '';
+			position: absolute;
+			width: 6px;
+			height: 12px;
+			border: solid white;
+			border-width: 0 2.5px 2.5px 0;
+			transform: rotate(45deg);
+			top: 2px;
+			left: 6px;
+			opacity: 0;
+			transition: opacity $transition-normal;
+		}
+	}
+
+	&:hover .checkmark {
+		border-color: $accent-400;
+	}
+
+	input:checked + .checkmark {
+		background-color: $accent-500;
+		border-color: $accent-500;
+
+		&::after {
+			opacity: 1;
+		}
+	}
 }
 
-/* Hide the native checkbox */
-.modern-checkbox input {
-	display: none;
-}
-.modern-checkbox .checkmark {
-	width: 20px;
-	height: 20px;
-	background-color: #f0f0f0;
-	border: 2px solid #ccc;
-	border-radius: 4px; /* Rounded corners for a modern look */
-	margin-right: 10px;
-	position: relative;
-	transition: all 0.3s ease;
-}
 
-/* Hover effect */
-.modern-checkbox:hover .checkmark {
-	background-color: #e0e0e0;
-	border-color: #888;
-}
-
-/* Checked state */
-.modern-checkbox input:checked + .checkmark {
-	background-color: $teal_bck_color_2;
-	border-color: $teal_bck_color_3;
-}
-
-/* Checkmark icon */
-.modern-checkbox .checkmark::after {
-	content: '';
-	position: absolute;
-	width: 6px;
-	height: 12px;
-	border: solid white;
-	border-width: 0 2px 2px 0;
-	transform: rotate(45deg);
-	top: 2px;
-	left: 7px;
-	opacity: 0;
-	transition: opacity 0.3s ease;
-}
-
-/* Show checkmark when checked */
-.modern-checkbox input:checked + .checkmark::after {
-	opacity: 1;
-}
-/*************************************** END NEW CHECKBOX *******************************/
-
-.section-header-icon { 
-	font-size: 14px;
-	display: inline-block; 
-} 
- 
-.fa {
-	color: $teal_bck_color_2;
-}
-
-.fa-border {
-	border-color: $teal_bck_color_2 !important;
-	border-radius: 5px  !important; /* Optional: Rounds the edges */
-	border-width: 2px !important;/* Optional: thickness of the lines */
-	
-	/* Adjust padding for size */
-	padding-left: 7px !important;
-	padding-right: 7px !important;
-	padding-top: 14px !important;
-	padding-bottom: 14px !important;
-
-
-}
-
-/*************************************** TABLES *******************************/
+// ==================== TABLES ====================
 
 table {
 	width: 100%;
 	border-collapse: collapse;
 	margin-top: 10px;
-} 
+	font-size: 14px;
+}
+
 th, td {
-	border: 1px solid $teal_font_dark;
-	padding: 8px;
+	border: 1px solid $bg-surface-alt;
+	padding: 10px 12px;
 	text-align: left;
 }
+
 th {
 	cursor: pointer;
+	background-color: $accent-600;
+	color: $text-on-accent;
+	font-weight: 600;
+	font-size: 13px;
+	text-transform: uppercase;
+	letter-spacing: 0.03em;
+
+	&:hover {
+		background-color: $accent-500;
+	}
 }
 
 .section-table {
 	@extend .section;
-	background-color: $teal_bck_color-3;
+	background-color: $bg-surface;
 }
 
-/* even rows */
 tr:nth-child(even) {
-	background-color: $teal_bck_color-1; 
+	background-color: $bg-surface;
 }
 
-/* odd rows */
 tr:nth-child(odd) {
-	background-color: $teal_bck_color-2; 
-	//color: $teal_font_light;
+	background-color: $bg-surface-alt;
 }
 
 
-/*************************************** SECTIONS and RECORDS MANAGER *******************************/
+// ==================== ADMIN: SECTION & RECORD CARDS ====================
 
 .section-card-content, .record-card-content {
 	display: flex;
@@ -313,59 +470,54 @@ tr:nth-child(odd) {
 	gap: 10px;
 }
 
-.sections-container .records-container{
+.sections-container .records-container {
 	width: 80%;
 	margin: auto;
 	margin-top: 20px;
 }
 
-.section-card, .record-card{
+.section-card, .record-card {
 	display: flex;
 	justify-content: space-between;
 	align-items: center;
-	padding: 15px;
+	padding: 14px 16px;
 	border: none;
-	border-radius: 5px;
+	border-radius: $radius-md;
 	font-size: 15px;
-	margin-bottom: 5px;
-	color: $teal_font_light;
-	background-color: $teal_bck_color-5;
+	margin-bottom: 8px;
+	color: $text-on-accent;
+	background-color: $accent-500;
 	cursor: grab;
-	//transition: background-color 0.2s, transform 0.2s;
-	transition: transform 150ms ease, box-shadow 150ms ease, background-color 150ms ease;
+	box-shadow: $shadow-sm;
+	transition: transform 150ms ease, box-shadow 150ms ease, background-color $transition-normal;
 
+	&:hover {
+		background-color: $accent-400;
+		box-shadow: $shadow-md;
+	}
+
+	&.dragging {
+		opacity: 0.85;
+		transform: scale(1.02);
+		cursor: grabbing;
+		box-shadow: $shadow-lg;
+	}
+
+	&.dropped {
+		transition: transform 150ms cubic-bezier(0.25, 0.8, 0.25, 1);
+		transform: scale(1);
+	}
+
+	&.changed {
+		background-color: $accent-200;
+		color: $text-primary;
+		border: 2px solid $accent-400;
+	}
 }
 
-.section-card:hover, .record-card:hover {
-	background-color: $teal_bck_color-3;
-}
-
-.section-card.dragging, .record-card.dragging {
-	opacity: 0.8;
-	transform: scale(1.02);
-	cursor: grabbing;
-	box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-}
-
-.section-card.dropped, .record-card.dropped {
-	transition: transform 150ms cubic-bezier(0.25, 0.8, 0.25, 1);
-	transform: scale(1);}
-
-.section-card.changed, .record-card.changed {
-	background-color: $teal_bck_color_1;
-	color: $teal_font_dark;
-}
-.section-name, .record-name{
+.section-name, .record-name {
 	flex-grow: 1;
-}
-
-
-@keyframes shake {
-	0% { transform: translateX(-2px); }
-	25% { transform: translateX(2px); }
-	50% { transform: translateX(-2px); }
-	75% { transform: translateX(2px); }
-	100% { transform: translateX(0); }
+	font-weight: 500;
 }
 
 .list-order {
@@ -373,420 +525,469 @@ tr:nth-child(odd) {
 	text-align: center;
 	flex-shrink: 0;
 	border: none;
-	border-radius: 5px;
+	border-radius: $radius-sm;
+	font-family: $font-body;
+	font-size: 14px;
+	padding: 4px;
+	background: rgba(255, 255, 255, 0.2);
+	color: inherit;
+
+	&::-webkit-outer-spin-button,
+	&::-webkit-inner-spin-button {
+		-webkit-appearance: none;
+		margin: 0;
+	}
+	-moz-appearance: textfield;
 }
+
+
+// ==================== BUTTONS ====================
 
 .save-button, .reset-button, .add-record-button {
 	display: block;
 	width: 30%;
-	margin: 20px auto;
-	padding: 10px;
-	color: $teal_font_light;
-	background-color: $teal_bck_color-5; 
+	margin: 16px auto;
+	padding: 10px 16px;
+	color: $text-on-accent;
+	background-color: $accent-600;
 	border: none;
-	border-radius: 8px;
+	border-radius: $radius-md;
+	font-family: $font-body;
+	font-size: 14px;
+	font-weight: 500;
 	cursor: pointer;
-	transition: background-color 0.2s, transform 0.2s;
-}
+	box-shadow: $shadow-sm;
+	transition: background-color $transition-normal, transform $transition-fast, box-shadow $transition-normal;
 
-.save-button:hover, .reset-button:hover, .add-record-button:hover {
-	background-color: $teal_bck_color-6;
+	&:hover {
+		background-color: $accent-500;
+		box-shadow: $shadow-md;
+		transform: translateY(-1px);
+	}
+
+	&:active {
+		transform: translateY(0);
+	}
 }
 
 .save-button.bounce {
 	animation: bounce 0.5s cubic-bezier(0.25, 1.5, 0.5, 1) forwards;
 }
 
-@keyframes bounce {
-	0% {
-		transform: scale(1);
-	}
-	50% {
-		transform: scale(1.1);
-	}
-	100% {
-		transform: scale(1);
-	}
-}
-
-/* Invalid Input Styles */
-.invalid-input {
-	border-color: #dc3545 !important;
-	background-color: #f8d7da !important;
-}
-
-/* Shake Effect for Error */
-.invalid-input.shake {
-	animation: shake 0.2s ease-in-out;
-}
-
-@keyframes shake {
-	0% { transform: translateX(-5px); }
-	25% { transform: translateX(5px); }
-	50% { transform: translateX(-5px); }
-	75% { transform: translateX(5px); }
-	100% { transform: translateX(0); }
-}
-
-/* Remove up/down arrows on number input - Chrome, Edge, Safari */
-.list-order::-webkit-outer-spin-button,
-.list-order::-webkit-inner-spin-button {
-	-webkit-appearance: none;
-	margin: 0;
-}
-
-.list-order {
-	-moz-appearance: textfield; /* Firefox */
-}
-
 .manage-records-button, .edit-button {
-	background-color: $teal_bck_color-2;
-	color: $teal_font_dark;
+	background-color: $accent-200;
+	color: $text-primary;
+	border: none;
+	padding: 6px 12px;
+	border-radius: $radius-sm;
+	cursor: pointer;
+	font-size: 13px;
+	font-weight: 500;
+	transition: background-color $transition-fast, color $transition-fast;
 
 	&:hover {
-		background-color: $teal_bck_color_5;
-		color: $teal_font_light;
-}
+		background-color: $accent-500;
+		color: $text-on-accent;
+	}
 }
 
 .manage-records-button {
-	//background and font handled elsewhere
 	margin-left: auto;
-	padding: 5px 10px;
-	border: none;
-	border-radius: 5px;
-	cursor: pointer;
-	transition: background-color 0.2s;
-}
-
-
-
-/* Delete Button Styles */
-.delete-button {
-	background-color: #ff6b6b;
-	color: white;
-	border: none;
-	padding: 5px 10px;
-	border-radius: 4px;
-	cursor: pointer;
-	margin-left: 10px;
-	transition: background-color 0.2s;
-
-	&:hover {
-		background-color: #ff5252;
-	}
 }
 
 .edit-button {
-	//background and font handled elsewhere
+	margin-left: 8px;
+}
+
+.delete-button {
+	background-color: $danger;
+	color: white;
 	border: none;
-	padding: 5px 10px;
-	border-radius: 4px;
+	padding: 6px 12px;
+	border-radius: $radius-sm;
 	cursor: pointer;
-	margin-left: 10px;
-	transition: background-color 0.2s;
+	font-size: 13px;
+	font-weight: 500;
+	margin-left: 8px;
+	transition: background-color $transition-fast;
+
+	&:hover {
+		background-color: $danger-hover;
+	}
 }
 
 
-
-
-
-/*************************************** ADD RECORD *******************************/
+// ==================== ADD / EDIT RECORD FORM ====================
 
 #grid-add-record-container {
-	background-color: $teal_bck_color_2;
-	color: $teal_font_dark;
+	background-color: $bg-surface;
+	color: $text-primary;
 	padding: 20px 30px;
-	border-radius: 10px;
-	box-shadow: 0 4px 20px rgba(0,0,0,0.1);
-	//max-width: 500px;
+	border-radius: $radius-lg;
+	box-shadow: $shadow-md;
 	margin: auto;
 }
-
 
 .add-record label {
 	display: block;
 	margin-bottom: 15px;
+	font-weight: 500;
+	color: $text-primary;
 }
 
 .add-record input[type="text"],
 .add-record input[type="number"],
-.add-record textarea  {
+.add-record textarea {
 	width: 100%;
-	//padding: 8px;
-	padding-top: 8px;
-	padding-bottom: 8px;
-
+	padding: 8px;
 	margin-top: 5px;
 	margin-bottom: 10px;
-	border: 1px solid #ccc;
-	border-radius: 5px;
+	border: 1px solid $bg-surface-alt;
+	border-radius: $radius-sm;
+	font-family: $font-body;
+	font-size: 14px;
+	background: white;
+	color: $text-primary;
+	transition: border-color $transition-fast;
+
+	&:focus {
+		outline: none;
+		border-color: $accent-400;
+		box-shadow: 0 0 0 3px rgba($accent-400, 0.12);
+	}
 }
 
-/* Spinner Styles */
+
+// ==================== MODAL ====================
+
+.modal {
+	display: none;
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	background-color: rgba(0, 0, 0, 0.45);
+	z-index: 1000;
+	justify-content: center;
+	align-items: center;
+
+	&:not(.hidden) {
+		display: flex;
+	}
+
+	&.hidden {
+		display: none;
+	}
+
+	.modal-content {
+		background-color: $bg-surface;
+		padding: 28px 30px;
+		border-radius: $radius-lg;
+		position: relative;
+		width: 90%;
+		max-width: 500px;
+		max-height: 90vh;
+		overflow-y: auto;
+		box-shadow: $shadow-lg;
+	}
+
+	.close-modal {
+		position: absolute;
+		right: 14px;
+		top: 12px;
+		font-size: 22px;
+		cursor: pointer;
+		color: $text-muted;
+		background: none;
+		border: none;
+		padding: 0;
+		line-height: 1;
+		transition: color $transition-fast;
+
+		&:hover {
+			color: $text-primary;
+		}
+	}
+
+	.add-record-container {
+		padding-right: 10px;
+	}
+
+	.add-record {
+		display: flex;
+		flex-direction: column;
+	}
+
+	.modern-checkbox.add-record {
+		flex-direction: row;
+		justify-content: flex-start;
+		width: 100%;
+	}
+
+	input[type="text"],
+	input[type="number"],
+	textarea {
+		padding: 10px;
+		margin: 5px 0;
+		border: 1px solid #d4d1cb;
+		border-radius: $radius-sm;
+		font-family: $font-body;
+		font-size: 14px;
+		width: 100%;
+		box-sizing: border-box;
+		background: white;
+		color: $text-primary;
+
+		&:focus {
+			outline: none;
+			border-color: $accent-400;
+			box-shadow: 0 0 0 3px rgba($accent-400, 0.12);
+		}
+	}
+
+	.save-button,
+	.reset-button {
+		padding: 8px 15px;
+		margin: 5px;
+		width: auto;
+		display: inline-block;
+	}
+
+	#hidden {
+		margin-top: 5px;
+	}
+
+	.button-container {
+		margin-top: 24px;
+		text-align: center;
+	}
+
+	.modern-checkbox {
+		display: flex;
+		align-items: center;
+		cursor: pointer;
+		user-select: none;
+		margin: 15px 0;
+		color: $text-primary;
+		justify-content: flex-start;
+
+		.checkmark {
+			width: 22px;
+			height: 22px;
+			background-color: white;
+			border: 2px solid $text-muted;
+			border-radius: 5px;
+			margin-right: 10px;
+			position: relative;
+			transition: all $transition-normal;
+
+			&::after {
+				content: '';
+				position: absolute;
+				width: 6px;
+				height: 12px;
+				border: solid white;
+				border-width: 0 2.5px 2.5px 0;
+				transform: rotate(45deg);
+				top: 2px;
+				left: 6px;
+				opacity: 0;
+				transition: opacity $transition-normal;
+			}
+		}
+
+		&:hover .checkmark {
+			border-color: $accent-400;
+		}
+
+		input:checked + .checkmark {
+			background-color: $accent-500;
+			border-color: $accent-500;
+
+			&::after {
+				opacity: 1;
+			}
+		}
+	}
+}
+
+
+// ==================== CONTROLS PANEL (filter, toggles) ====================
+
+.controls-panel {
+	background: $bg-surface;
+	border: 1px solid $bg-surface-alt;
+	border-radius: $radius-md;
+	padding: 16px 20px 12px 20px;
+	margin-bottom: 20px;
+	margin-left: auto;
+	display: flex;
+	flex-direction: column;
+	align-items: flex-end;
+	gap: 10px;
+	box-shadow: $shadow-sm;
+	max-width: 400px;
+	width: 100%;
+}
+
+.filter-input {
+	width: 100%;
+	min-width: 180px;
+	max-width: 400px;
+	margin-bottom: 8px;
+	padding: 8px 12px;
+	font-family: $font-body;
+	font-size: 14px;
+	border-radius: $radius-sm;
+	border: 1px solid #d4d1cb;
+	box-sizing: border-box;
+	align-self: flex-end;
+	background-color: white;
+	color: $text-primary;
+	transition: border-color $transition-fast, box-shadow $transition-fast;
+
+	&::placeholder { color: $text-muted; }
+
+	&:focus {
+		outline: none;
+		box-shadow: 0 0 0 3px rgba($accent-400, 0.15);
+		border-color: $accent-400;
+	}
+}
+
+mark {
+	background-color: $highlight;
+	color: $text-primary;
+	padding: 0 2px;
+	border-radius: 2px;
+}
+
+.switch {
+	display: inline-flex;
+	align-items: center;
+	cursor: pointer;
+	font-size: 14px;
+	user-select: none;
+	color: $text-secondary;
+
+	input {
+		display: none;
+	}
+
+	.slider {
+		width: 40px;
+		height: 22px;
+		background: $text-muted;
+		border-radius: 22px;
+		position: relative;
+		margin-right: 10px;
+		transition: background $transition-normal;
+		display: inline-block;
+		box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.12);
+
+		&:before {
+			content: "";
+			position: absolute;
+			top: 3px;
+			left: 3px;
+			width: 16px;
+			height: 16px;
+			background: #fff;
+			border-radius: 50%;
+			transition: transform $transition-normal;
+			box-shadow: 0 1px 4px rgba(0, 0, 0, 0.15);
+		}
+	}
+
+	input:checked + .slider {
+		background: $accent-500;
+
+		&:before {
+			transform: translateX(18px);
+		}
+	}
+}
+
+@media (max-width: 600px) {
+	.controls-panel {
+		padding: 10px 8px;
+		max-width: 100%;
+	}
+	.filter-input {
+		width: 100%;
+		min-width: 0;
+	}
+}
+
+.controls-panel + #checklist-container {
+	margin-top: 12px;
+}
+
+
+// ==================== SPINNER & FEEDBACK ====================
+
 .spinner {
-	width: 40px;
-	height: 40px;
-	border: 4px solid #ccc;
-	border-top-color: #007bff;
+	width: 36px;
+	height: 36px;
+	border: 3px solid $bg-surface-alt;
+	border-top-color: $accent-500;
 	border-radius: 50%;
-	animation: spin 1s linear infinite;
+	animation: spin 0.8s linear infinite;
 	margin: 20px auto;
 }
 
-@keyframes spin {
-	0% { transform: rotate(0deg); }
-	100% { transform: rotate(360deg); }
-}
-
-/* Success Message Styles */
 .success-message {
 	margin: 20px 0;
-	padding: 10px;
-	background-color: #28a745;
+	padding: 12px;
+	background-color: $success;
 	color: #fff;
 	text-align: center;
-	border-radius: 5px;
-	font-weight: bold;
+	border-radius: $radius-sm;
+	font-weight: 600;
+	font-size: 14px;
 	opacity: 1;
 	transition: opacity 0.5s ease-out;
+
+	&.fade-out {
+		opacity: 0;
+	}
 }
 
-/* Fade-out Effect */
-.success-message.fade-out {
-	opacity: 0;
+.invalid-input {
+	border-color: $danger !important;
+	background-color: rgba($danger, 0.08) !important;
+
+	&.shake {
+		animation: shake 0.25s ease-in-out;
+	}
 }
 
-/* Hidden Element Class */
+
+// ==================== UTILITIES ====================
+
 .hidden {
 	display: none;
 }
 
 
-/*************************************** XXXXXXXXXXXXXXXXXXX *******************************/
+// ==================== ANIMATIONS ====================
 
-/*************************************** MODAL STYLES *******************************/
-.modal {
-    display: none;
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.5);
-    z-index: 1000;
-    justify-content: center;
-    align-items: center;
-
-    &:not(.hidden) {
-        display: flex;
-    }
-
-    &.hidden {
-        display: none;
-    }
-
-    .modal-content {
-        background-color: $teal_bck_color_2;
-        padding: 20px 30px;
-        border-radius: 5px;
-        position: relative;
-        width: 90%;
-        max-width: 500px;
-        max-height: 90vh;
-        overflow-y: auto;
-    }
-
-    .close-modal {
-        position: absolute;
-        right: 10px;
-        top: 10px;
-        font-size: 24px;
-        cursor: pointer;
-        color: $teal_font_dark;
-        background: none;
-        border: none;
-        padding: 0;
-        line-height: 1;
-
-        &:hover {
-            color: $teal_bck_color_3;
-        }
-    }
-
-    .add-record-container {
-        padding-right: 10px;
-    }
-
-    .add-record {
-        display: flex;
-        flex-direction: column;
-    }
-
-    .modern-checkbox.add-record {
-        flex-direction: row;
-        justify-content: flex-start;
-        width: 100%;
-    }
-
-    input[type="text"],
-    input[type="number"],
-    textarea {
-        padding: 8px;
-        margin: 5px 0;
-        border: 1px solid #ccc;
-        border-radius: 4px;
-        font-size: 14px;
-        width: 100%;
-        box-sizing: border-box;
-
-        &:focus {
-            outline: none;
-            border-color: $teal_bck_color_3;
-        }
-    }
-
-    .save-button,
-    .reset-button {
-        padding: 8px 15px;
-        margin: 5px;
-    }
-
-    #hidden {
-        margin-top: 5px;
-    }
-
-    .button-container {
-        margin-top: 20px;
-        text-align: center;
-    }
-
-    .modern-checkbox { 
-        display: flex;
-        align-items: center;
-        cursor: pointer;
-        user-select: none;
-        margin: 15px 0;
-        color: $teal_font_dark;
-        justify-content: flex-start;
-
-        .checkmark {
-            width: 20px;
-            height: 20px;
-            background-color: #f0f0f0;
-            border: 2px solid #ccc;
-            border-radius: 4px;
-            margin-right: 10px;
-            position: relative;
-            transition: all 0.3s ease;
-        }
-
-        &:hover .checkmark {
-            background-color: #e0e0e0;
-            border-color: #888;
-        }
-
-        input:checked + .checkmark {
-            background-color: $teal_bck_color_3;
-            border-color: $teal_bck_color_4;
-        }
-
-        .checkmark::after {
-            content: ''; 
-            position: absolute;
-            width: 6px;
-            height: 12px;
-            border: solid white;
-            border-width: 0 2px 2px 0;
-            transform: rotate(45deg);
-            top: 2px; 
-            left: 7px;
-            opacity: 0;
-            transition: opacity 0.3s ease;
-        }
-
-        input:checked + .checkmark::after {
-            opacity: 1;
-        }
-    }
-}
-/*************************************** END MODAL STYLES *******************************/
-
-
-.filter-input {
-	width: 33%;
-	min-width: 180px;
-	max-width: 300px;
-	margin-bottom: 12px;
-	padding: 8px 12px;
-	font-size: 16px; 
-	border-radius: 5px;
-	border: 1px solid $teal_font_dark;
-	box-sizing: border-box;
-	align-self: flex-end;
-	background-color: $teal_bck_color_1;
-	color: $teal_font_dark;
+@keyframes shake {
+	0%   { transform: translateX(-4px); }
+	25%  { transform: translateX(4px); }
+	50%  { transform: translateX(-4px); }
+	75%  { transform: translateX(4px); }
+	100% { transform: translateX(0); }
 }
 
-//Change background color of the input when it's selected
-.filter-input::placeholder { color: $teal_font_dark; opacity: 0.7; }
-.filter-input::-webkit-input-placeholder { color: $teal_font_dark; opacity: 0.7; }
-.filter-input:-ms-input-placeholder { color: $teal_font_dark; opacity: 0.7; }
-.filter-input::-ms-input-placeholder { color: $teal_font_dark; opacity: 0.7; }
-
-//default focus has a white outline. Gross. Remove that, add a custom one
-.filter-input:focus {
-	outline: none;
-	box-shadow: 0 0 0 2px $teal_bck_color_3; /* Optional: custom focus style */
-	border-color: $teal_bck_color_3;          /* Optional: highlight border */
+@keyframes bounce {
+	0%   { transform: scale(1); }
+	50%  { transform: scale(1.08); }
+	100% { transform: scale(1); }
 }
 
-mark { //this is what highlights the search terms
-	background-color: #ffe066;
-	color: $teal_font_dark;
-	padding: 0 2px;
-	border-radius: 2px;
-} 
-
-.switch {
-  display: inline-flex;
-  align-items: center;
-  cursor: pointer;
-  font-size: 15px;
-  user-select: none;
+@keyframes spin {
+	0%   { transform: rotate(0deg); }
+	100% { transform: rotate(360deg); }
 }
-.switch input {
-  display: none;
-}
-.switch .slider {
-  width: 40px;
-  height: 22px;
-  background: #ccc;
-  border-radius: 22px;
-  position: relative;
-  margin-right: 10px;
-  transition: background 0.2s;
-  display: inline-block;
-}
-.switch .slider:before {
-  content: "";
-  position: absolute;
-  top: 3px;
-  left: 3px;
-  width: 16px;
-  height: 16px;
-  background: #fff;
-  border-radius: 50%;
-  transition: transform 0.2s;
-  box-shadow: 0 1px 4px rgba(0,0,0,0.15);
-}
-.switch input:checked + .slider {
-  background: $teal_bck_color_3;
-}
-.switch input:checked + .slider:before {
-  transform: translateX(18px);
-}
-.switch .slider {
-  box-shadow: 0 1px 3px rgba(0,0,0,0.10);
-}
-
