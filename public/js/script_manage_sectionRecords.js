@@ -209,6 +209,26 @@ $(document).ready(async function () {
         }
     });
 
+    // Title-case the name field value when user leaves the field
+    const lowercaseWords = new Set([
+        'a', 'an', 'the',                          // articles
+        'and', 'but', 'or', 'nor', 'for', 'yet', 'so',  // conjunctions
+        'in', 'on', 'at', 'to', 'by', 'of', 'up', 'as', 'if',  // prepositions
+        'from', 'into', 'with', 'over', 'than'
+    ]);
+
+    document.getElementById('recordName').addEventListener('blur', function () {
+        this.value = this.value
+            .split(' ')
+            .map((word, i) => {
+                if (!word) return word;
+                const lower = word.toLowerCase();
+                if (i > 0 && lowercaseWords.has(lower)) return lower;
+                return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
+            })
+            .join(' ');
+    });
+
     // Remove default-value styling when user interacts with a field
     const defaultFields = newRecordForm.querySelectorAll('.default-value');
     defaultFields.forEach(field => {
