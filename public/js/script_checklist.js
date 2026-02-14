@@ -26,14 +26,17 @@ $(document).ready(async function () {
     sectionGroupId = utils.getQueryParam('sectionGroupId');
     if (debugLogging) console.log('sectionGroupId: ' + sectionGroupId);
 
-    // Fetch game and section group data
-    const gameData = await dbUtils.getGameData(gameId);
+    // Fetch game data, section group data, and sections in parallel
+    const [gameData, sectionGroupData, sections] = await Promise.all([
+        dbUtils.getGameData(gameId),
+        dbUtils.getSectionGroupById(sectionGroupId),
+        dbUtils.getSectionsBySectionGroupId(sectionGroupId, false)
+    ]);
+
     gameNameFriendly = gameData.FriendlyName;
     linkToGamePage = '/game?id=' + gameId;
-
-    const sectionGroupData = await dbUtils.getSectionGroupById(sectionGroupId);
     if (debugLogging) console.log('sectionGroupData:', sectionGroupData);
-    sectionGroupFriendlyName = sectionGroupData.FriendlyName; 
+    sectionGroupFriendlyName = sectionGroupData.FriendlyName;
 
     // Populate static page elements (these already exist in the HTML)
     document.title = gameNameFriendly + ' 100% Completion Checklist';
@@ -41,8 +44,7 @@ $(document).ready(async function () {
     document.getElementById('section-group-name').textContent = sectionGroupFriendlyName;
     document.getElementById('back-link').href = linkToGamePage;
 
-    // Fetch sections and render
-    const sections = await dbUtils.getSectionsBySectionGroupId(sectionGroupId, false);
+    // Fetch all section records in parallel
     const allRecordsBySection = await fetchAllRecords(sections);
     renderChecklist(sections, allRecordsBySection, { startExpanded: false, filterValue: null });
     updateAllSectionsCompletion();

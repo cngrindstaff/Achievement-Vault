@@ -180,3 +180,50 @@ Use this file to reference work you've done previously and post patch notes. Als
 - Used modern Sass syntax (no deprecated `darken()` calls)
 - Added `box-sizing: border-box` global reset
 - Added `$transition-fast` / `$transition-normal` tokens for consistent animation timing
+
+### Feb 7, 2026 — CSS polish tweaks
+
+**Files changed:** `css/styles.scss` (compiled to `css/styles.css`), `checklist.html`
+
+**Small adjustments based on live testing:**
+- Lightened teal headers from `$accent-600` to `$accent-500` (hover to `$accent-400`) — less "serious" feel
+- Added `color: #fff` on hover for headers/game-list-items to maintain contrast against the lighter hover background
+- Right-aligned the controls panel with `margin-left: auto`
+- Widened filter input (`width: 100%`, `max-width: 400px`) and removed an inline `style="width:33%"` from `checklist.html` that was overriding the CSS
+- Tightened `.grid-item-2-row` padding (`8px → 4px` top/bottom), margin (`2px → 1px`), gap (`15px → 10px`) to fit more rows on mobile
+
+### Feb 7, 2026 — Subtle UI transitions and animations
+
+**Files changed:** `css/styles.scss`, `js/script_checklist.js`, `js/script_tablePage.js`
+
+**Section expand/collapse:**
+- Replaced instant jQuery `.toggle()` / `.show()` / `.hide()` with smooth `.slideToggle(250)` / `.slideDown(250)` / `.slideUp(250)` on both the checklist and table pages
+- Sections have `overflow: hidden` for clean clipping during slide
+
+**Chevron rotation:**
+- Instead of swapping between `fa-chevron-down` and `fa-chevron-up` icon classes (instant jump), the chevron stays as `fa-chevron-down` and gets rotated 180° via CSS `transform: rotate(180deg)` with `0.3s ease` transition
+- Controlled by toggling an `.open` class on the `.section-header`
+
+**Checkbox animations:**
+- `checkbox-pop` keyframe: scales checkbox to 125% and back on check
+- `checkmark-draw` keyframe: clips the checkmark in from left to right
+- `:active` press-down effect (`scale(0.9)`) for tactile feedback
+- Smooth transitions on background-color, border-color, box-shadow, and transform
+
+### Feb 7, 2026 — Performance optimization (DOM batching + parallel fetches)
+
+**Files changed:** `js/script_home.js`, `js/script_checklistGroups.js`, `js/script_tablePage.js`, `js/script_checklist.js`
+
+**Problem:** Pages felt slower after the template refactor. The templates themselves are fast (`cloneNode` is efficient), but the rendering patterns exposed two existing bottlenecks.
+
+**Fix 1 — DOM batching with `DocumentFragment`:**
+- `script_home.js` and `script_checklistGroups.js` were appending each cloned item directly to the live DOM inside the loop, triggering a browser layout reflow on every append.
+- Now all items are built into an off-screen `DocumentFragment`, then appended in one operation — one reflow instead of N.
+- (`script_checklist.js` already used a fragment — no change needed there.)
+
+**Fix 2 — Parallel network requests with `Promise.all`:**
+- `script_checklist.js`: Was fetching game data, section group data, and sections sequentially (3 round trips). Now fires all 3 in parallel. Time goes from `A + B + C` to `max(A, B, C)`.
+- `script_checklistGroups.js`: Was fetching game data then section groups sequentially. Now parallel via `Promise.all`, and the separate `loadSectionGroups()` async function was replaced by a synchronous `renderSectionGroups()` that receives already-fetched data.
+- `script_tablePage.js` (biggest win): Had a `for...of await` loop that fetched each table's records one-by-one sequentially. With 5 tables, that's 5 sequential HTTP round trips. Now all table records are fetched in parallel with `Promise.all`, then the DOM is built in one synchronous pass with a fragment. `createTableSection()` changed from `async` to synchronous since it no longer fetches data itself.
+
+**Lesson:** When refactoring rendering patterns, also audit the data-fetching layer. Sequential `await` in loops is a common hidden bottleneck — always check if independent fetches can be parallelized.

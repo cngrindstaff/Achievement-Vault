@@ -12,8 +12,12 @@ const tableSectionBodyTemplate = document.getElementById('table-section-body-tem
 $(document).ready(async function () {
     gameId = utils.getQueryParam('id');
 
-    // Fetch game data
-    const gameData = await dbUtils.getGameData(gameId);
+    // Fetch game data and game tables in parallel
+    const [gameData, gameTables] = await Promise.all([
+        dbUtils.getGameData(gameId),
+        dbUtils.getGameTablesByGameId(gameId)
+    ]);
+
     gameId = gameData.ID;
     gameNameFriendly = gameData.FriendlyName;
     const linkToGamePage = `/game?id=${gameId}`;
@@ -23,9 +27,7 @@ $(document).ready(async function () {
     document.getElementById('game-name').textContent = gameNameFriendly;
     document.getElementById('back-link').href = linkToGamePage;
 
-    // Fetch and render game tables
     const gridContainer = document.getElementById('grid-tables-container');
-    const gameTables = await dbUtils.getGameTablesByGameId(gameId);
 
     if (!gameTables || gameTables.length === 0) {
         console.log('No game tables found for this game ID.');
@@ -33,10 +35,24 @@ $(document).ready(async function () {
         return;
     }
 
-    for (const gameTable of gameTables) {
-        const index = gameTables.indexOf(gameTable);
-        await createTableSection(gridContainer, gameTable, index);
-    }
+    // Fetch all table records in parallel
+    const allTableRecords = await Promise.all(
+        gameTables.map(gameTable =>
+            dbUtils.getTableRecordsByTableId(gameTable.ID).catch(err => {
+                console.error(`Failed to load records for table ${gameTable.Name}`, err);
+                return null;
+            })
+        )
+    );
+
+    // Build all sections into a fragment, then append once
+    const fragment = document.createDocumentFragment();
+    gameTables.forEach((gameTable, index) => {
+        const tableRecords = allTableRecords[index];
+        if (tableRecords === null) return;
+        createTableSection(fragment, gameTable, index, tableRecords);
+    });
+    gridContainer.appendChild(fragment);
 
     // If no valid tables were created, show the "No tables available" message
     if (gridContainer.innerHTML.trim() === '') {
@@ -64,7 +80,7 @@ function showNoTablesMessage(container) {
 }
 
 
-async function createTableSection(gridContainer, gameTable, tableIndex) {
+function createTableSection(container, gameTable, tableIndex, tableRecords) {
     const tableName = gameTable.Name;
     const tableNameClean = utils.createSlug(tableName);
 
@@ -84,16 +100,11 @@ async function createTableSection(gridContainer, gameTable, tableIndex) {
     const sectionDiv = bodyClone.querySelector('.section-table');
     sectionDiv.dataset.section = tableIndex;
 
-    // Fetch table records and populate the table
-    const tableRecords = await dbUtils.getTableRecordsByTableId(gameTable.ID);
-    if (tableRecords === null) {
-        return;
-    }
     displayTable(sectionDiv, gameTable, tableRecords);
 
-    // Append to container
-    gridContainer.appendChild(headerClone);
-    gridContainer.appendChild(bodyClone);
+    // Append to container (or fragment)
+    container.appendChild(headerClone);
+    container.appendChild(bodyClone);
 }
 
 

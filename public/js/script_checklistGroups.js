@@ -11,8 +11,12 @@ const sectionGroupItemTemplate = document.getElementById('section-group-item-tem
 $(document).ready(async function () {
     gameId = utils.getQueryParam('gameId');
 
-    // Fetch game data
-    const gameData = await dbUtils.getGameData(gameId);
+    // Fetch game data and section groups in parallel
+    const [gameData, sectionGroups] = await Promise.all([
+        dbUtils.getGameData(gameId),
+        dbUtils.getSectionGroupsByGameId(gameId, false)
+    ]);
+
     gameId = gameData.ID;
     gameNameFriendly = gameData.FriendlyName;
     const linkToGamePage = `/game?id=${gameId}`;
@@ -23,24 +27,22 @@ $(document).ready(async function () {
     document.getElementById('game-name').textContent = gameNameFriendly;
     document.getElementById('back-link').href = linkToGamePage;
 
-    // Load and render section groups
-    await loadSectionGroups();
+    // Render section groups
+    renderSectionGroups(sectionGroups);
 });
 
-async function loadSectionGroups() {
-    try {
-        const sectionGroups = await dbUtils.getSectionGroupsByGameId(gameId, false);
-        if (debugLogging) console.log('SectionGroups:', sectionGroups);
-        const container = document.getElementById('section-group-list-container');
+function renderSectionGroups(sectionGroups) {
+    if (debugLogging) console.log('SectionGroups:', sectionGroups);
+    const container = document.getElementById('section-group-list-container');
+    const fragment = document.createDocumentFragment();
 
-        sectionGroups.forEach(sectionGroup => {
-            const clone = sectionGroupItemTemplate.content.cloneNode(true);
-            const p = clone.querySelector('.game-list-item');
-            p.textContent = sectionGroup.FriendlyName;
-            p.onclick = () => window.location.href = `checklist?gameId=${gameId}&sectionGroupId=${sectionGroup.ID}`;
-            container.appendChild(clone);
-        });
-    } catch (err) {
-        console.error('Failed to load sectionGroups:', err);
-    }
+    sectionGroups.forEach(sectionGroup => {
+        const clone = sectionGroupItemTemplate.content.cloneNode(true);
+        const p = clone.querySelector('.game-list-item');
+        p.textContent = sectionGroup.FriendlyName;
+        p.onclick = () => window.location.href = `checklist?gameId=${gameId}&sectionGroupId=${sectionGroup.ID}`;
+        fragment.appendChild(clone);
+    });
+
+    container.appendChild(fragment);
 }
