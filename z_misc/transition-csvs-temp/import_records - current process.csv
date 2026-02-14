@@ -1,18 +1,20 @@
 ﻿Name,Description,NumberOfCheckboxes,NumberAlreadyCompleted,SectionID,GameID,ListOrder,LongDescription,Hidden
-Lighttime Cap,,1,1,122,4,1,,0
-Lighttime Collared Shirt,,1,1,122,4,1,,0
-Lighttime Glasses,,1,1,122,4,1,,0
-Lighttime Tutu Dress,,1,1,122,4,1,,0
-Lighttime Wings,,1,1,122,4,1,,0
-Lighttime Bed,,1,1,122,4,1,,0
-Lighttime Cube,,1,1,122,4,1,,0
-Lighttime Dining Chair,,1,1,122,4,1,,0
-Lighttime Dining Table,,1,1,122,4,1,,0
-Lighttime Double Bed,,1,1,122,4,1,,0
-Lighttime Mirror,,1,0,122,4,1,,0
-Lighttime Pedestal,,1,0,122,4,1,,0
-Lighttime Sectional Corner,,1,0,122,4,1,,0
-Lighttime Sectional Piece,,1,0,122,4,1,,0
-Lighttime Shelves,,1,0,122,4,1,,0
-Lighttime Stool,,1,0,122,4,1,,0
-Lighttime Wallpaper,,1,0,122,4,1,,0
+Blossom Buzzer Lure Instruction,,1,1,127,4,2,,0
+Brood Bouncer Lure Instruction,,1,1,127,4,2,,0
+Cinnamaroll's Cocoa Instruction,,1,1,127,4,1,,0
+Fizzpop Flinger Lure Instruction,,1,1,127,4,2,,0
+Fruity Flinger Lure Instruction,,1,1,127,4,2,,0
+Glimmer Glider Lure Instruction,,1,1,127,4,2,,0
+Gourd Grabber Lure Instruction,,1,1,127,4,2,,0
+Marsh Muddler Lure Instruction,,1,1,127,4,2,,0
+Metal Magnet Lure Instruction,,1,1,127,4,2,,0
+Petal Plucker Lure Instruction,,1,1,127,4,2,,0
+Prickly Pooler Lure Instruction,,1,0,127,4,2,,0
+Rare Candle Instruction,,1,0,127,4,1,,0
+Shadow Spinner Lure Instruction,,1,0,127,4,2,,0
+Spicy Spinner Lure Instruction,,1,0,127,4,2,,0
+Stellar Snagger Lure Instruction ,,1,0,127,4,2,,0
+Streamer Snagger Lure Instruction,,1,0,127,4,2,,0
+Tropical Twister Lure Instruction,,1,0,127,4,2,,0
+Twig Twirler Lure Instruction,,1,0,127,4,2,,0
+Unicorn Horn Instruction,,1,0,127,4,1,,0
