@@ -535,6 +535,10 @@ tr:nth-child(odd) {
   color: #1c2b2d;
 }
 
+.default-value {
+  color: #8a9696 !important;
+}
+
 .add-record input[type=text],
 .add-record input[type=number],
 .add-record textarea {

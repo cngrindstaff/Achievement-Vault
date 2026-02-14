@@ -61,9 +61,9 @@ $(document).ready(async function () {
                 <form id="new-record-form" class="add-record-container">
                     <label class="add-record">Name:<input type="text" id="recordName" class="add-record" required></label>
                     <label class="add-record">Description:<textarea id="description" class="add-record" rows="3"></textarea></label>
-                    <label class="add-record">Number of Checkboxes:<input type="number" id="numberOfCheckboxes" class="add-record" min="0" value="1" required></label>
-                    <label class="add-record">Number Already Completed:<input type="number" id="numberAlreadyCompleted" class="add-record" min="0" value="0" required></label>
-                    <label class="add-record">List Order:<input type="number" id="listOrder" class="add-record" min="0" required></label>
+                    <label class="add-record">Number of Checkboxes:<input type="number" id="numberOfCheckboxes" class="add-record default-value" min="0" value="1" required></label>
+                    <label class="add-record">Number Already Completed:<input type="number" id="numberAlreadyCompleted" class="add-record default-value" min="0" value="1" required></label>
+                    <label class="add-record">List Order:<input type="number" id="listOrder" class="add-record default-value" min="0" value="100" required></label>
                     <label class="add-record">Long Description:<textarea id="longDescription" class="add-record" rows="5"></textarea></label>
                     <label class="modern-checkbox add-record">
                         <input type="checkbox" id="hidden">
@@ -102,6 +102,7 @@ $(document).ready(async function () {
     closeModal.addEventListener('click', () => {
         modal.classList.add('hidden');
         newRecordForm.reset();
+        restoreDefaultStyling();
     });
 
     // Close modal when clicking outside
@@ -109,6 +110,7 @@ $(document).ready(async function () {
         if (event.target === modal) {
             modal.classList.add('hidden');
             newRecordForm.reset();
+            restoreDefaultStyling();
         }
     });
 
@@ -207,11 +209,25 @@ $(document).ready(async function () {
         }
     });
 
+    // Remove default-value styling when user interacts with a field
+    const defaultFields = newRecordForm.querySelectorAll('.default-value');
+    defaultFields.forEach(field => {
+        field.addEventListener('focus', () => field.classList.remove('default-value'));
+    });
+
+    // Re-add default-value styling when form is reset
+    function restoreDefaultStyling() {
+        document.getElementById('numberOfCheckboxes').classList.add('default-value');
+        document.getElementById('numberAlreadyCompleted').classList.add('default-value');
+        document.getElementById('listOrder').classList.add('default-value');
+    }
+
     // Handle reset button
     document.getElementById('reset-record-button').addEventListener('click', () => {
         newRecordForm.reset();
         // Clear the edit ID when resetting
         delete newRecordForm.dataset.editId;
+        restoreDefaultStyling();
     });
 
     document.getElementById('save-button').addEventListener('click', async () => {
@@ -265,6 +281,11 @@ function createRecordCard(record, gameId, container) {
             document.getElementById("listOrder").value = recordData.ListOrder;
             document.getElementById("longDescription").value = recordData.LongDescription || '';
             document.getElementById("hidden").checked = recordData.Hidden === 1;
+
+            // Remove default styling since these are real values
+            document.getElementById("numberOfCheckboxes").classList.remove('default-value');
+            document.getElementById("numberAlreadyCompleted").classList.remove('default-value');
+            document.getElementById("listOrder").classList.remove('default-value');
 
             // Show the modal
             const modal = document.getElementById('add-record-modal');
