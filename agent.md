@@ -311,3 +311,31 @@ Use this file to reference work you've done previously and post patch notes. Als
 - Duplicate save-button event listener removed from `$(document).ready()` — it referenced an undefined `container` variable, causing all save data to be `null`. The correct handler inside `initializeGameRecordsReorder()` was kept.
 - Fixed `container` reference in add-record button's unsaved-changes check (same undefined variable issue)
 - CSS specificity fix: `.modal .add-record` was overriding `.hidden` — added `.add-record.hidden { display: none }` inside modal scope
+
+---
+
+### Patch 8 — Shared Record Modal Module
+
+**Problem:** The Add/Edit Record modal was duplicated in two places — `script_checklist.js` (add-only) and `script_manage_sectionRecords.js` (add + edit). Same HTML, same title-case logic, same multi-mode toggle, same validation, same form submission.
+
+**Solution:** Extracted into a single shared module `public/js/script_recordModal.js`.
+
+**How it works:**
+- `initRecordModal({ gameId, defaultAlreadyCompleted, onSave })` — factory function
+  - Injects the modal HTML into the DOM via `insertAdjacentHTML`
+  - Sets up all event listeners (title case, multi-toggle, default-value styling, close/reset, submit)
+  - Returns `{ openForAdd(sectionId, sectionName), openForEdit(recordId), closeModal() }`
+- Each consuming page calls `initRecordModal` with its own config:
+  - **Checklist page** (`script_checklist.js`): `defaultAlreadyCompleted: 0`, `onSave` re-fetches sections & re-renders with `expandSectionId`
+  - **Admin manage records page** (`script_manage_sectionRecords.js`): `defaultAlreadyCompleted: 1`, `onSave` re-fetches records & re-renders the grid
+- `openForEdit(recordId)` fetches the record data, populates the form, hides multi-toggle, stores `editId` in `form.dataset`
+- The `+` buttons in checklist section headers use `window._recordModal.openForAdd()`
+- Edit buttons on admin record cards use `window._recordModal.openForEdit()`
+- Modal HTML was removed from `checklist.html` (no longer hardcoded)
+- Modal HTML was removed from the jQuery `.append()` in `script_manage_sectionRecords.js`
+
+**Files changed:**
+- `public/js/script_recordModal.js` — **new** shared module
+- `public/js/script_checklist.js` — replaced ~160 lines of modal code with `initRecordModal()` call
+- `public/js/script_manage_sectionRecords.js` — replaced ~200 lines of modal code with `initRecordModal()` call; edit button now calls `window._recordModal.openForEdit(recordId)`
+- `public/checklist.html` — removed hardcoded modal HTML (30 lines)
