@@ -22,12 +22,13 @@ app.use(express.json());
 app.use(cors());
 
 // Session middleware — keeps users logged in after Basic Auth succeeds once
+const sessionDays = parseInt(process.env.AV_SESSION_DAYS) || 7;
 app.use(session({
     secret: process.env.AV_SESSION_SECRET || 'fallback-dev-secret',
     resave: false,
     saveUninitialized: false,
     cookie: {
-        maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+        maxAge: sessionDays * 24 * 60 * 60 * 1000,
         httpOnly: true,
         sameSite: 'lax'
     }
