@@ -694,33 +694,28 @@ tr:nth-child(odd) {
 }
 
 .controls-panel {
-  background: #f2efeb;
-  border: 1px solid #e8e5e0;
-  border-radius: 10px;
-  padding: 16px 20px 12px 20px;
-  margin-bottom: 20px;
-  margin-left: auto;
   display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: 10px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
-  max-width: 400px;
-  width: 100%;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 16px;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+}
+
+.controls-toggles {
+  display: flex;
+  align-items: center;
+  gap: 16px;
 }
 
 .filter-input {
-  width: 100%;
-  min-width: 180px;
-  max-width: 400px;
-  margin-bottom: 8px;
-  padding: 8px 12px;
+  width: 240px;
+  padding: 6px 12px;
   font-family: "Roboto", -apple-system, BlinkMacSystemFont, sans-serif;
-  font-size: 14px;
+  font-size: 13px;
   border-radius: 6px;
   border: 1px solid #d4d1cb;
   box-sizing: border-box;
-  align-self: flex-end;
   background-color: white;
   color: #1c2b2d;
   transition: border-color 0.15s ease, box-shadow 0.15s ease;
@@ -745,9 +740,10 @@ mark {
   display: inline-flex;
   align-items: center;
   cursor: pointer;
-  font-size: 14px;
+  font-size: 13px;
   user-select: none;
   color: #556565;
+  white-space: nowrap;
 }
 .switch input {
   display: none;
@@ -784,18 +780,14 @@ mark {
 
 @media (max-width: 600px) {
   .controls-panel {
-    padding: 10px 8px;
-    max-width: 100%;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 10px;
   }
   .filter-input {
     width: 100%;
-    min-width: 0;
   }
 }
-.controls-panel + #checklist-container {
-  margin-top: 12px;
-}
-
 .spinner {
   width: 36px;
   height: 36px;
