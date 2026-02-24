@@ -7,8 +7,6 @@ import { fileURLToPath } from "url";  // Needed for __dirname in ES6
 
 // Import middleware & routes
 import basicAuthMiddleware from "./middleware/authMiddleware.js";
-//import googleSheetsRouter from "./routes/googleSheets.js";
-//import sendGridRouter from "./routes/sendGrid.js";
 import dbRouter from "./routes/db.js";
 
 // Define __dirname manually in ES6 modules
