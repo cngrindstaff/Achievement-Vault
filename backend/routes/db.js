@@ -8,7 +8,7 @@ var debugLogging = process.env.DEBUG_LOGGING === 'true';
 
 //#region Games
 //************************************ GET ALL GAMES ************************************//
-router.get('/db/games/all', async (req, res) => {
+router.get('/db/games', async (req, res) => {
     //if(debugLogging) console.log('made it here');
     try {
         const [rows] = await db.query('CALL GetAllGames()');
@@ -21,7 +21,7 @@ router.get('/db/games/all', async (req, res) => {
 });
 
 //************************************ GET GAME BY ID - includes # of tables, sectionGroups ************************************//
-router.get('/db/games/:gameId', async (req, res) => {
+router.get('/db/game/:gameId', async (req, res) => {
     const gameId = req.params.gameId;
     //if(debugLogging) console.log('gameId: ' + gameId);
     try {

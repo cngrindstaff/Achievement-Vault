@@ -11,7 +11,7 @@ export async function getGameData(passed_gameId) {
     }
 
     try {
-        const res = await fetch(`/api/db/games/${passed_gameId}`);
+        const res = await fetch(`/api/db/game/${passed_gameId}`);
         if (!res || !res.ok) {
             console.log('No response or response not ok:', res);
             return [];
