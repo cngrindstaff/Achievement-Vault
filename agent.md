@@ -21,7 +21,7 @@ Use this file to reference work you've done previously and post patch notes. Als
 
 ### Page Flow
 1. **`index.html`** + `script_home.js` — Home page. Fetches all games (`/api/db/games/all`), displays them as clickable list items. Clicking navigates to `/game?id=X&name=Y`.
-2. **`game.html`** + `script_gamePage.js` — Game landing page. Uses `getGameDataV2()` which returns game info plus counts of tables/section groups. Shows links to: Checklists, Other Tables (if any), Admin.
+2. **`game.html`** + `script_gamePage.js` — Game landing page. Uses `getGameData()` which returns game info plus counts of tables/section groups. Shows links to: Checklists, Other Tables (if any), Admin.
 3. **`checklistGroups.html`** + `script_checklistGroups.js` — Lists all section groups for a game. Clicking one navigates to `/checklist?gameId=X&sectionGroupId=Y`.
 4. **`checklist.html`** + `script_checklist.js` — The main checklist view. Fetches sections by section group ID, then fetches records for each section in parallel. Builds collapsible sections with checkboxes. Features:
    - Filter input (search by name/description with highlighting via `<mark>`)
@@ -40,7 +40,7 @@ Use this file to reference work you've done previously and post patch notes. Als
    - Fields: Name, Description, NumberOfCheckboxes, NumberAlreadyCompleted, ListOrder, LongDescription, Hidden
 
 ### Shared JS Modules
-- **`script_db_helper.js`** — Central API layer. All fetch calls to the backend live here. Exports functions like `getGameData()`, `getGameDataV2()`, `getSectionsByGameId()`, `getRecordsBySectionIdV2()`, `updateRecordCompletion()`, `getGameTablesByGameId()`, `getTableRecordsByTableId()`, `updateGameRecord()`, `insertGameRecord()`, `deleteGameRecord()`, `getSectionGroupsByGameId()`, `getSectionGroupById()`, `getSectionsBySectionGroupId()`, `updateGameSection()`, `insertGameSection()`, `updateGameSectionsListOrder()`, `updateSectionRecordsListOrder()`.
+- **`script_db_helper.js`** — Central API layer. All fetch calls to the backend live here. Exports functions like `getGameData()`, `getSectionsByGameId()`, `getRecordsBySectionIdV2()`, `updateRecordCompletion()`, `getGameTablesByGameId()`, `getTableRecordsByTableId()`, `updateGameRecord()`, `insertGameRecord()`, `deleteGameRecord()`, `getSectionGroupsByGameId()`, `getSectionGroupById()`, `getSectionsBySectionGroupId()`, `updateGameSection()`, `insertGameSection()`, `updateGameSectionsListOrder()`, `updateSectionRecordsListOrder()`.
 - **`script_utilities.js`** — Helper functions: `getQueryParam()` (reads URL params), `createSlug()` (converts strings to URL-safe slugs), `trimBeforeParenthesis()`, `removeTrailingSpace()`, `logAllAttributes()`.
 
 ### Styling
@@ -63,8 +63,7 @@ Use this file to reference work you've done previously and post patch notes. Als
 | Method | Route | Stored Procedure | Purpose |
 |--------|-------|-------------------|---------|
 | GET | `/games/all` | `GetAllGames()` | List all games |
-| GET | `/games/:gameId` | `GetGameById(?)` | Get single game |
-| GET | `/games/v2/:gameId` | `GetGameByIdV2(?)` | Get game + table/sectionGroup counts |
+| GET | `/games/:gameId` | `GetGameByIdV2(?)` | Get game + table/sectionGroup counts |
 | GET | `/sections/:gameId/:hiddenFilter` | `GetGameSectionsByGameID(?,?)` | Sections by game |
 | GET | `/sections/sectionGroupId/:sectionGroupId/:hiddenFilter` | `GetGameSectionsBySectionGroupID(?,?)` | Sections by section group |
 | GET | `/section/:sectionId` | `GetSectionById(?)` | Single section |

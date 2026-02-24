@@ -20,27 +20,8 @@ router.get('/db/games/all', async (req, res) => {
     }
 });
 
-//************************************ GET GAME BY ID ************************************//
+//************************************ GET GAME BY ID - includes # of tables, sectionGroups ************************************//
 router.get('/db/games/:gameId', async (req, res) => {
-    const gameId = req.params.gameId;
-    //if(debugLogging) console.log('gameId: ' + gameId);
-    try {
-        const [rows] = await db.query('CALL GetGameById(?)', [gameId]);
-        const result = rows[0];
-
-        if (result.length === 0) {
-            return res.status(404).json({ error: 'Game not found' });
-        }
-
-        res.json(result[0]);
-    } catch (err) {
-        console.error(`Error fetching game with ID ${gameId}:`, err);
-        res.status(500).json({ error: 'Internal server error' });
-    }
-});
-
-//************************************ GET GAME BY ID V2 - includes # of tables, sectionGroups ************************************//
-router.get('/db/games/v2/:gameId', async (req, res) => {
     const gameId = req.params.gameId;
     //if(debugLogging) console.log('gameId: ' + gameId);
     try {
@@ -53,7 +34,7 @@ router.get('/db/games/v2/:gameId', async (req, res) => {
 
         res.json(result[0]);
     } catch (err) {
-        console.error(`Error fetching game V2 with ID ${gameId}:`, err);
+        console.error(`Error fetching game with ID ${gameId}:`, err);
         res.status(500).json({ error: 'Internal server error' });
     }
 });
