@@ -1,9 +1,15 @@
-// backend/routes/games.js
+// backend/routes/db.js
 import express from "express";
 const router = express.Router();
 import db from '../config/mysqlConnector.js';
 
-var debugLogging = process.env.DEBUG_LOGGING === 'true';
+const debugLogging = process.env.DEBUG_LOGGING === 'true';
+
+function parseHiddenFilter(value) {
+    if (value === 'true') return 1;
+    if (value === 'false') return 0;
+    return null;
+}
 
 
 //#region Games
@@ -50,18 +56,8 @@ router.get('/db/game/:gameId', async (req, res) => {
 router.get('/db/sections/:gameId/:hiddenFilter', async (req, res) => {
     //if(debugLogging) console.log('made it here sections/gameid');
     const gameId = req.params.gameId;
-    let hiddenFilter = req.params.hiddenFilter;
+    const hiddenFilter = parseHiddenFilter(req.params.hiddenFilter);
 
-    // Convert string 'true'/'false' to boolean 1/0
-    if (hiddenFilter === 'true') {
-        hiddenFilter = 1;
-    } else if (hiddenFilter === 'false') {
-        hiddenFilter = 0;
-    } else {
-        hiddenFilter = null; // Let SQL default it if invalid or missing
-    }
-
-    //if(debugLogging) console.log('gameId: ' + gameId + ' hiddenFilter: ' + hiddenFilter);
     try {
         const [rows] = await db.query('CALL GetGameSectionsByGameID(?, ?)', [gameId, hiddenFilter]);
         const result = rows[0];
@@ -72,7 +68,7 @@ router.get('/db/sections/:gameId/:hiddenFilter', async (req, res) => {
 
         res.json(result);
     } catch (err) {
-        console.error(`Error fetching sections  with game ID ${gameId}:`, err);
+        console.error(`Error fetching sections with game ID ${gameId}:`, err);
         res.status(500).json({ error: 'Internal server error' });
     }
 });
@@ -190,30 +186,17 @@ router.put('/db/sections/updateListOrder', async (req, res) => {
 router.get('/db/records/v2/:sectionId/hiddenFilter/:hiddenFilter', async (req, res) => {
     //if(debugLogging) console.log('made it records/sectionId');
     const sectionId = req.params.sectionId;
+    const hiddenFilter = parseHiddenFilter(req.params.hiddenFilter);
 
-    let hiddenFilter = req.params.hiddenFilter;
-
-    // Convert string 'true'/'false' to boolean 1/0
-    if (hiddenFilter === 'true') { 
-        hiddenFilter = 1;
-    } else if (hiddenFilter === 'false') {
-        hiddenFilter = 0;
-    } else {
-        hiddenFilter = null; // Let SQL default it if invalid or missing
-    }
-
-    // console.log('sectionId: ' + sectionId  + ' hiddenFilter: ' + hiddenFilter);
     try {
         const [rows] = await db.query('CALL GetGameRecordsByGameSectionIDV2(?, ?)', [sectionId, hiddenFilter]);
         const result = rows[0];
 
         if (result.length === 0) {
-            console.error(`Section or records not found ${sectionId}`);
-            res.json();
+            return res.json([]);
         }
-        else {
-            res.json(result);
-        }
+
+        res.json(result);
 
     } catch (err) {
         console.error(`Error fetching section data with section ID ${sectionId}:`, err);
@@ -386,24 +369,16 @@ router.get('/db/gameTables/:gameId', async (req, res) => {
 
 //************************************ GET TABLE RECORDS BY TABLE ID ************************************//
 router.get('/db/tableRecords/:tableId', async (req, res) => {
-    const gameId = req.params.tableId;
+    const tableId = req.params.tableId;
     try {
-        const [rows] = await db.query('CALL GetAllTableRecordsByTableID(?)', [gameId]);
-        //if(debugLogging) console.log('rows:', rows);
+        const [rows] = await db.query('CALL GetAllTableRecordsByTableID(?)', [tableId]);
         if (!rows || rows.length === 0 || (Array.isArray(rows[0]) && rows[0].length === 0)) {
-            if (debugLogging) console.log("No records returned.");
             return res.json([]);
         }
 
-        const result = rows[0];
-
-        if (result.length === 0) {
-            return res.status(404).json({ error: 'Game not found' });
-        }
-
-        res.json(result);
+        res.json(rows[0]);
     } catch (err) {
-        console.error(`Error fetching game tables with game ID ${gameId}:`, err);
+        console.error(`Error fetching table records with table ID ${tableId}:`, err);
         res.status(500).json({ error: 'Internal server error' });
     }
 });
@@ -414,18 +389,8 @@ router.get('/db/tableRecords/:tableId', async (req, res) => {
 router.get('/db/sectionGroups/:gameId/:hiddenFilter', async (req, res) => {
     //if(debugLogging) console.log('made it here sectionGroups/gameid');
     const gameId = req.params.gameId;
-    let hiddenFilter = req.params.hiddenFilter;
+    const hiddenFilter = parseHiddenFilter(req.params.hiddenFilter);
 
-    // Convert string 'true'/'false' to boolean 1/0
-    if (hiddenFilter === 'true') {
-        hiddenFilter = 1;
-    } else if (hiddenFilter === 'false') {
-        hiddenFilter = 0;
-    } else {
-        hiddenFilter = null; // Let SQL default it if invalid or missing
-    }
-
-    //if(debugLogging) console.log('gameId: ' + gameId + ' hiddenFilter: ' + hiddenFilter);
     try {
         const [rows] = await db.query('CALL GetSectionGroupsByGameID(?, ?)', [gameId, hiddenFilter]);
         const result = rows[0];
@@ -436,7 +401,7 @@ router.get('/db/sectionGroups/:gameId/:hiddenFilter', async (req, res) => {
 
         res.json(result);
     } catch (err) {
-        console.error(`Error fetching sectionGroups  with game ID ${gameId}:`, err);
+        console.error(`Error fetching sectionGroups with game ID ${gameId}:`, err);
         res.status(500).json({ error: 'Internal server error' });
     }
 });
@@ -465,18 +430,8 @@ router.get('/db/sectionGroup/:sectionGroupId', async (req, res) => {
 router.get('/db/sections/sectionGroupId/:sectionGroupId/:hiddenFilter', async (req, res) => {
     //if(debugLogging) console.log('made it here sectionGroups/sectionGroupId');
     const sectionGroupId = req.params.sectionGroupId;
-    let hiddenFilter = req.params.hiddenFilter;
+    const hiddenFilter = parseHiddenFilter(req.params.hiddenFilter);
 
-    // Convert string 'true'/'false' to boolean 1/0
-    if (hiddenFilter === 'true') {
-        hiddenFilter = 1;
-    } else if (hiddenFilter === 'false') {
-        hiddenFilter = 0;
-    } else {
-        hiddenFilter = null; // Let SQL default it if invalid or missing
-    }
-
-    //if(debugLogging) console.log('gameId: ' + gameId + ' hiddenFilter: ' + hiddenFilter);
     try {
         const [rows] = await db.query('CALL GetGameSectionsBySectionGroupID(?, ?)', [sectionGroupId, hiddenFilter]);
         const result = rows[0];
@@ -487,17 +442,10 @@ router.get('/db/sections/sectionGroupId/:sectionGroupId/:hiddenFilter', async (r
 
         res.json(result);
     } catch (err) {
-        console.error(`Error fetching sections  with game ID ${gameId}:`, err);
+        console.error(`Error fetching sections with sectionGroup ID ${sectionGroupId}:`, err);
         res.status(500).json({ error: 'Internal server error' });
     }
 });
-
-
-
-//************************************  ************************************//
-
-
-
 
 
 
