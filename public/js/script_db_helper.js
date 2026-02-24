@@ -1,4 +1,4 @@
-﻿import {getQueryParam} from "./script_utilities.js";
+import {getQueryParam} from "./script_utilities.js";
 
 //can't use env var on client-side js file, so make sure this is 'false' when checking in to GitHub
 var debugLogging = false
@@ -11,7 +11,7 @@ export async function getGameData(passed_gameId) {
     }
 
     try {
-        const res = await fetch(`/api/db/games/${passed_gameId}`);
+        const res = await fetch(`/api/db/game/${passed_gameId}`);
         if (!res || !res.ok) {
             console.log('No response or response not ok:', res);
             return [];
@@ -36,33 +36,6 @@ export async function getGameData(passed_gameId) {
     //document.querySelector('.game-name').textContent = passed_gameNameFriendly;
 }
 
-//************************************ GET GAME BY ID V2 - includes # of tables, sectionGroups ************************************//
-export async function getGameDataV2(passed_gameId) {
-    if (!passed_gameId) {
-        alert("Missing game ID in URL.");
-        return;
-    }
-
-    try {
-        const res = await fetch(`/api/db/games/v2/${passed_gameId}`);
-        if (!res || !res.ok) {
-            console.log('No response or response not ok:', res);
-            return [];
-        }
-        const text = await res.text();
-        if (!text) {
-            console.log('Response body empty');
-            return [];
-        }
-        const data = JSON.parse(text);
-        //if(debugLogging) console.log('Game data:', data);
-        return data;
-    } catch (err) {
-        console.error("Error fetching game data:", err);
-    }
-
-    //document.querySelector('.game-name').textContent = passed_gameNameFriendly;
-}
 
 //************************************ GET ALL SECTIONS FOR A GAME BY GAME ID ************************************//
 export async function getSectionsByGameId(gameId, hiddenFilter) {

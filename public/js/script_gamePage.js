@@ -1,4 +1,4 @@
-import { getGameDataV2 } from "./script_db_helper.js";
+import { getGameData } from "./script_db_helper.js";
 import { getQueryParam } from "./script_utilities.js";
 import { initNav } from './script_nav.js';
 
@@ -12,7 +12,7 @@ $(document).ready(async function () {
     gameId = getQueryParam('id');
 
     // Fetch game data
-    const result = await getGameDataV2(gameId);
+    const result = await getGameData(gameId);
     console.log('result:', result);
     gameId = result.ID;
     gameNameFriendly = result.FriendlyName;

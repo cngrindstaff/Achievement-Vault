@@ -7,7 +7,7 @@ initNav({ currentPage: 'home' });
 
 async function loadGames() {
     try {
-        const res = await fetch('/api/db/games/all');
+        const res = await fetch('/api/db/games');
         const games = await res.json();
         console.log('Games:', games);
         const container = document.getElementById('game-list-container');
