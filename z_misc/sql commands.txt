@@ -24,16 +24,7 @@ GRANT EXECUTE ON PROCEDURE achievement_vault.GetGameRecordsByGameSectionID TO 'a
 
 ************************************************
 
-update achievement_vault.GameSections 
-set RecordOrderPreference = 'completed asc'
-where GameID = 4 and RecordOrderPreference is null
-;
 
-
-update achievement_vault.GameSections 
-set RecordOrderPreference = 'completed-order-name'
-where GameID = 4 and RecordOrderPreference = 'completed asc'
-;
 
 update GameRecords
 Set ListOrder = 100
@@ -49,15 +40,6 @@ WHERE sectionID=103 and name like '%#2%'
 update achievement_vault.GameRecords
 set Name = Replace(Name, 'Big Challenge\'s Furniture - Big Challenges ', 'Big Challenge - ')
 where GameID = 4 and SectionID = 105
-
-
-
-updated GetAllSectionsByGameID, GetAllGameSectionsByGameID, `GetAllGameRecordsByGameSectionIDWithOrdering`  to include "WHERE Hidden = false"
-
-
-ALTER TABLE GameRecords
-ADD COLUMN DateCreated DATETIME(3) DEFAULT CURRENT_TIMESTAMP(3),
-ADD COLUMN DateLastUpdated DATETIME(3) DEFAULT CURRENT_TIMESTAMP(3) ON UPDATE CURRENT_TIMESTAMP(3);
 
 
 

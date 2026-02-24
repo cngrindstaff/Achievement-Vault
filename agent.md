@@ -29,7 +29,7 @@ Use this file to reference work you've done previously and post patch notes. Als
    - "Expand All" toggle  
    - Completion tracking (per-section and total percentage)
    - Checkbox changes call `updateRecordCompletion()` to persist to DB
-   - Record ordering handled client-side via `getRecordsBySectionIdV2()` with sort preferences: `order-name`, `completed-order-name`, `completed-name`, `name`
+   - Record ordering handled client-side via `getRecordsBySectionId()` with sort preferences: `order-name`, `completed-order-name`, `completed-name`, `name`
 5. **`table.html`** + `script_tablePage.js` — Displays non-checklist data tables for a game. Fetches game tables by game ID, then table records by table ID. Builds HTML `<table>` elements with sortable columns (click header to sort). Tables are in collapsible sections.
 6. **`manage_sections.html`** + `script_manage_sections.js` — Admin page for reordering sections via drag-and-drop. Each section card has a "Manage Records" button to navigate to record management.
 7. **`manage_sectionRecords.html`** + `script_manage_sectionRecords.js` — Admin page for managing individual records within a section. Supports:
@@ -40,7 +40,7 @@ Use this file to reference work you've done previously and post patch notes. Als
    - Fields: Name, Description, NumberOfCheckboxes, NumberAlreadyCompleted, ListOrder, LongDescription, Hidden
 
 ### Shared JS Modules
-- **`script_db_helper.js`** — Central API layer. All fetch calls to the backend live here. Exports functions like `getGameData()`, `getSectionsByGameId()`, `getRecordsBySectionIdV2()`, `updateRecordCompletion()`, `getGameTablesByGameId()`, `getTableRecordsByTableId()`, `updateGameRecord()`, `insertGameRecord()`, `deleteGameRecord()`, `getSectionGroupsByGameId()`, `getSectionGroupById()`, `getSectionsBySectionGroupId()`, `updateGameSection()`, `insertGameSection()`, `updateGameSectionsListOrder()`, `updateSectionRecordsListOrder()`.
+- **`script_db_helper.js`** — Central API layer. All fetch calls to the backend live here. Exports functions like `getGameData()`, `getSectionsByGameId()`, `getRecordsBySectionId()`, `updateRecordCompletion()`, `getGameTablesByGameId()`, `getTableRecordsByTableId()`, `updateGameRecord()`, `insertGameRecord()`, `deleteGameRecord()`, `getSectionGroupsByGameId()`, `getSectionGroupById()`, `getSectionsBySectionGroupId()`, `updateGameSection()`, `insertGameSection()`, `updateGameSectionsListOrder()`, `updateSectionRecordsListOrder()`.
 - **`script_utilities.js`** — Helper functions: `getQueryParam()` (reads URL params), `createSlug()` (converts strings to URL-safe slugs), `trimBeforeParenthesis()`, `removeTrailingSpace()`, `logAllAttributes()`.
 
 ### Styling
@@ -70,8 +70,7 @@ Use this file to reference work you've done previously and post patch notes. Als
 | POST | `/section/insert` | `InsertGameSection(?,?,?,?,?)` | Create section |
 | PUT | `/section/update/:sectionId/:gameId` | `UpdateGameSection(?,?,?,?,?)` | Update section |
 | PUT | `/sections/updateListOrder` | `UpdateGameSectionsListOrder(?,@rowsUpdated)` | Batch reorder sections |
-| GET | `/records/:sectionId/order/:pref/hiddenFilter/:filter` | `GetGameRecordsByGameSectionID(?,?,?)` | Records with server-side ordering |
-| GET | `/records/v2/:sectionId/hiddenFilter/:filter` | `GetGameRecordsByGameSectionIDV2(?,?)` | Records with client-side ordering |
+| GET | `/records/v2/:sectionId/hiddenFilter/:filter` | `GetGameRecordsByGameSectionIDV2(?,?)` | Records by section (ordering done client-side) |
 | GET | `/record/:recordId` | `GetGameRecordByRecordID(?)` | Single record |
 | POST | `/record/insert` | `InsertGameRecord(?,?,?,?,?,?,?,?,?)` | Create record |
 | PUT | `/record/update/:recordId` | `UpdateGameRecord(?,?,?,?,?,?,?,?,?,?)` | Update record |
