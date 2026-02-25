@@ -8,3 +8,4 @@ credentials.json
 .env.old
 env
 .env-old2
+/Achievement-Vault/node_modules
