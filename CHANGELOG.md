@@ -3,14 +3,15 @@
 ### Added
 
 - Added support for managing Section Groups.
+- Added version numbering.
+- Added Changelog file, with link in left nav.
 
 ### Changed
 
 - Manage Section page now supports manually editing the order number.
 - Drag-and-drop on Manage Section and Manage Section Records pages no longer auto-updates all order numbers. 
-It sets the order number to the previous one + 1
-- Saving a re-order now refreshes the list on success
-- Added version numbering
+It sets the order number to the previous one + 1.
+- Saving a re-order now refreshes the list on success.
 
 ---
 
