@@ -53,11 +53,16 @@ function createSectionCard(section, gameId, container) {
     card.dataset.currentOrder = section.ListOrder;
     card.innerHTML = `
         <div class="section-card-content">
-            <input type="number" class="list-order" value="${section.ListOrder}" readonly />
+            <input type="number" class="list-order" value="${section.ListOrder}" min="0" />
             <span class="section-name">${section.Name}</span>
             <button class="manage-records-button">Manage Records</button>
         </div>
     `;
+
+    card.querySelector('.list-order').addEventListener('change', function () {
+        card.dataset.currentOrder = parseInt(this.value) || 0;
+        highlightChangedSections(container);
+    });
 
     // Handle the Manage Records button click
     card.querySelector('.manage-records-button').addEventListener('click', () => {
