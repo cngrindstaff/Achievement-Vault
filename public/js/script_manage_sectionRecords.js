@@ -167,8 +167,9 @@ function enableDragAndDrop(container) {
                 }
             }, 150);
 
+            const droppedItem = draggedItem;
             draggedItem = null;
-            updateListOrders(container);
+            updateDroppedOrder(droppedItem);
             highlightChangedRecords(container);
         }
     });
@@ -200,15 +201,12 @@ function getDragAfterElement(container, y) {
     }, { offset: Number.NEGATIVE_INFINITY }).element;
 }
 
-function updateListOrders(container) {
-    const recordCards = [...container.children];
-    recordCards.forEach((card, index) => {
-        const orderInput = card.querySelector('.list-order');
-        if (orderInput) {
-            orderInput.value = index + 1;
-            card.dataset.currentOrder = index + 1;
-        }
-    });
+function updateDroppedOrder(droppedCard) {
+    const prev = droppedCard.previousElementSibling;
+    const newOrder = prev ? Number(prev.dataset.currentOrder) + 1 : 1;
+    const orderInput = droppedCard.querySelector('.list-order');
+    orderInput.value = newOrder;
+    droppedCard.dataset.currentOrder = newOrder;
 }
 
 function highlightChangedRecords(container) {
