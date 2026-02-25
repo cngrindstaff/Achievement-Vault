@@ -238,6 +238,11 @@ h3 {
 		margin: 0;
 		padding: 0;
 	}
+
+	.nav-divider {
+		border-top: 1px solid $bg-surface-alt;
+		margin: 8px 16px;
+	}
 }
 
 .nav-link {
@@ -296,6 +301,46 @@ h3 {
 		margin-top: 8px;
 		font-size: 11px;
 		opacity: 0.6;
+	}
+}
+
+// ==================== CHANGELOG ====================
+
+.changelog-content {
+	text-align: left;
+	max-width: 600px;
+	width: 100%;
+	margin: 0 auto;
+
+	h2 {
+		text-align: left;
+		font-size: 1.1rem;
+		margin: 24px 0 8px 0;
+		color: $text-primary;
+	}
+
+	h3 {
+		text-align: left;
+		font-size: 0.95rem;
+		margin: 12px 0 4px 0;
+		color: $accent-600;
+	}
+
+	ul {
+		margin: 4px 0 8px 20px;
+		padding: 0;
+		font-size: 0.9rem;
+		color: $text-secondary;
+	}
+
+	li {
+		margin: 2px 0;
+	}
+
+	hr {
+		border: none;
+		border-top: 1px solid $bg-surface-alt;
+		margin: 20px 0;
 	}
 }
 

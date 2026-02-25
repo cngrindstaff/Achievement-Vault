@@ -47,6 +47,14 @@ export function initNav({ currentPage, gameId, gameNameFriendly }) {
         });
     }
 
+    // Divider before site-wide links
+    items.push({ divider: true });
+
+    // 5. Changelog — always, unless already there
+    if (currentPage !== 'changelog') {
+        items.push({ label: 'Changelog', icon: 'fa-clock-rotate-left', href: '/changelog' });
+    }
+
     // Build the DOM
     const navHTML = `
         <button id="nav-hamburger" class="nav-hamburger" aria-label="Open navigation">
@@ -61,14 +69,15 @@ export function initNav({ currentPage, gameId, gameNameFriendly }) {
                 </button>
             </div>
             <ul class="nav-links">
-                ${items.map(item => `
-                    <li>
+                ${items.map(item => item.divider
+                    ? `<li class="nav-divider"></li>`
+                    : `<li>
                         <a href="${item.href}" class="nav-link">
                             <i class="fa ${item.icon}"></i>
                             <span>${item.label}</span>
                         </a>
-                    </li>
-                `).join('')}
+                    </li>`
+                ).join('')}
             </ul>
         </nav>
     `;
@@ -130,6 +139,8 @@ function getBackHref(currentPage, gameId) {
         case 'manage_sections':
         case 'manage_sectionRecords':
             return gameId ? `/game?id=${gameId}` : './';
+        case 'changelog':
+            return './';
         default:
             return './';
     }
