@@ -58,6 +58,9 @@ app.get('/checklistGroups', (req, res) => {
 app.get('/table', (req, res) => {
     res.sendFile(path.join(__dirname, '../public/table.html'));
 });
+app.get('/manage_sectionGroups', (req, res) => {
+    res.sendFile(path.join(__dirname, '../public/manage_sectionGroups.html'));
+});
 app.get('/manage_sections', (req, res) => {
     res.sendFile(path.join(__dirname, '../public/manage_sections.html'));
 });

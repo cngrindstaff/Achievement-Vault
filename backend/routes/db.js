@@ -407,7 +407,32 @@ router.get('/db/sectionGroups/:gameId/:hiddenFilter', async (req, res) => {
 });
 
 
-//************************************ GET  SECTIONGROUPS SECTIONGROUP ID ************************************//
+//************************************ UPDATE THE ORDER OF SECTION GROUPS ************************************//
+router.put('/db/sectionGroups/updateListOrder', async (req, res) => {
+    const sectionGroupUpdates = req.body;
+
+    if (!Array.isArray(sectionGroupUpdates) || sectionGroupUpdates.length === 0) {
+        return res.status(400).json({ error: 'Invalid input. Expected a non-empty array of section group updates.' });
+    }
+
+    try {
+        const jsonString = JSON.stringify(sectionGroupUpdates);
+        const [result] = await db.query(
+            'CALL UpdateSectionGroupsListOrder(?, @rowsUpdated)',
+            [jsonString]
+        );
+
+        const [rowsUpdatedResult] = await db.query('SELECT @rowsUpdated AS RowsUpdated');
+        const rowsUpdated = rowsUpdatedResult[0].RowsUpdated || 0;
+
+        res.json({ message: 'List orders updated successfully', rowsUpdated });
+    } catch (err) {
+        console.error('Error updating section group list orders:', err);
+        res.status(500).json({ error: 'Database error' });
+    }
+});
+
+//************************************ GET SECTIONGROUP BY SECTIONGROUP ID ************************************//
 router.get('/db/sectionGroup/:sectionGroupId', async (req, res) => {
     const sectionGroupId = req.params.sectionGroupId;
     //if(debugLogging) console.log('gameId: ' + gameId);

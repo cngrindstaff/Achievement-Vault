@@ -471,6 +471,34 @@ export async function insertGameSection(sectionData) {
 }
 
 
+//************************************ UPDATE THE ORDER OF SECTION GROUPS ************************************//
+export async function updateSectionGroupsListOrder(sectionGroupUpdates) {
+    if (!Array.isArray(sectionGroupUpdates) || sectionGroupUpdates.length === 0) {
+        alert("Invalid section group updates. Expected a non-empty array.");
+        return;
+    }
+
+    try {
+        const res = await fetch(`/api/db/sectionGroups/updateListOrder`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(sectionGroupUpdates)
+        });
+
+        if (!res || !res.ok) {
+            console.log('No response or response not ok:', res);
+            return false;
+        }
+        const data = await res.json();
+        return data;
+    } catch (err) {
+        console.error("Error updating section groups list order:", err);
+        return null;
+    }
+}
+
 //************************************ UPDATE THE ORDER OF GAME SECTIONS ************************************//
 export async function updateGameSectionsListOrder(sectionUpdates) {
     if (!Array.isArray(sectionUpdates) || sectionUpdates.length === 0) {
