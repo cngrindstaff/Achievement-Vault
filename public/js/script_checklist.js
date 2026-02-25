@@ -45,6 +45,12 @@ $(document).ready(async function () {
     document.title = gameNameFriendly + ' 100% Completion Checklist';
     document.getElementById('game-name').textContent = gameNameFriendly;
     document.getElementById('section-group-name').textContent = sectionGroupFriendlyName;
+    const descriptionEl = document.getElementById('section-group-description');
+    if (sectionGroupData.Description) {
+        descriptionEl.textContent = sectionGroupData.Description;
+    } else {
+        descriptionEl.style.display = 'none';
+    }
 
     // Initialize slide-out nav
     initNav({ currentPage: 'checklist', gameId, gameNameFriendly });

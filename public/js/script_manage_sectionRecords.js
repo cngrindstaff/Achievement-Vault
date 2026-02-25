@@ -25,7 +25,7 @@ $(document).ready(async function () {
 
     const gameData = await dbUtils.getGameData(passed_gameId);
     const sectionData = await dbUtils.getSectionById(passed_sectionId);
-    //if(debugLogging) console.log('gameData:', gameData);
+    if(debugLogging) console.log('sectionData:', sectionData);
     gameId = gameData.ID;
     gameName = gameData.Name;
     gameNameFriendly = gameData.FriendlyName;
@@ -61,7 +61,7 @@ $(document).ready(async function () {
         onSave: async () => {
             // Refresh the grid container
             const gridContainer = document.getElementById('grid-manage-records-container');
-            const records = await dbUtils.getRecordsBySectionId(sectionId, null);
+            const records = await dbUtils.getRecordsBySectionIdV2(sectionId, null, null);
             renderRecords(records, gridContainer, gameId);
         }
     });
@@ -167,8 +167,9 @@ function enableDragAndDrop(container) {
                 }
             }, 150);
 
+            const droppedItem = draggedItem;
             draggedItem = null;
-            updateListOrders(container);
+            updateDroppedOrder(droppedItem);
             highlightChangedRecords(container);
         }
     });
@@ -200,15 +201,12 @@ function getDragAfterElement(container, y) {
     }, { offset: Number.NEGATIVE_INFINITY }).element;
 }
 
-function updateListOrders(container) {
-    const recordCards = [...container.children];
-    recordCards.forEach((card, index) => {
-        const orderInput = card.querySelector('.list-order');
-        if (orderInput) {
-            orderInput.value = index + 1;
-            card.dataset.currentOrder = index + 1;
-        }
-    });
+function updateDroppedOrder(droppedCard) {
+    const prev = droppedCard.previousElementSibling;
+    const newOrder = prev ? Number(prev.dataset.currentOrder) + 1 : 1;
+    const orderInput = droppedCard.querySelector('.list-order');
+    orderInput.value = newOrder;
+    droppedCard.dataset.currentOrder = newOrder;
 }
 
 function highlightChangedRecords(container) {
@@ -229,7 +227,7 @@ async function initializeGameRecordsReorder(sectionId, containerId, resetButtonI
     const resetButton = document.getElementById(resetButtonId);
     if (!container || !resetButton) return;
 
-    const records = await dbUtils.getRecordsBySectionId(sectionId, null);
+    const records = await dbUtils.getRecordsBySectionIdV2(sectionId, null, null);
     renderRecords(records, container, gameId);
     enableDragAndDrop(container);
 
@@ -252,7 +250,7 @@ async function initializeGameRecordsReorder(sectionId, containerId, resetButtonI
             if (success) {
                 alert('List order updated successfully!');
                 // Re-fetch and re-render with the new order
-                const freshRecords = await dbUtils.getRecordsBySectionId(sectionId, null);
+                const freshRecords = await dbUtils.getRecordsBySectionIdV2(sectionId, null, null);
                 renderRecords(freshRecords, container, gameId);
             } else {
                 alert('Failed to update list order.');
