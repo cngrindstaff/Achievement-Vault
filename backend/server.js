@@ -3,7 +3,8 @@ import express from "express";
 import cors from "cors";
 import session from "express-session";
 import path from "path";
-import { fileURLToPath } from "url";  // Needed for __dirname in ES6
+import { fileURLToPath } from "url";
+import { readFileSync } from "fs";
 
 // Import middleware & routes
 import basicAuthMiddleware from "./middleware/authMiddleware.js";
@@ -34,9 +35,11 @@ app.use(session({
 
 app.use(basicAuthMiddleware); // Apply authentication globally
 
+// Version endpoint
+const pkg = JSON.parse(readFileSync(path.join(__dirname, '..', 'package.json'), 'utf-8'));
+app.get('/api/version', (req, res) => res.json({ version: pkg.version }));
+
 // API Routes
-//app.use("/api", googleSheetsRouter);
-//app.use("/api", sendGridRouter);
 app.use("/api", dbRouter);
 
 // Serve static files

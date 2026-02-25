@@ -195,7 +195,7 @@ h3 .record-count {
   padding: 24px 16px;
   text-align: center;
   font-size: 12px;
-  color: #8a9696;
+  color: #556565;
   width: 100%;
   max-width: 700px;
   border-top: 1px solid #e8e5e0;
@@ -212,6 +212,11 @@ h3 .record-count {
 .site-footer a:hover {
   color: #1f7f84;
   text-decoration-style: solid;
+}
+.site-footer .site-version {
+  margin-top: 8px;
+  font-size: 11px;
+  opacity: 0.6;
 }
 
 .link-container {
