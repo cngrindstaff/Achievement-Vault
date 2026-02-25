@@ -39,6 +39,16 @@ app.use(basicAuthMiddleware); // Apply authentication globally
 const pkg = JSON.parse(readFileSync(path.join(__dirname, '..', 'package.json'), 'utf-8'));
 app.get('/api/version', (req, res) => res.json({ version: pkg.version }));
 
+// Changelog endpoint
+app.get('/api/changelog', (req, res) => {
+    try {
+        const changelog = readFileSync(path.join(__dirname, '..', 'CHANGELOG.md'), 'utf-8');
+        res.type('text/plain').send(changelog);
+    } catch {
+        res.status(404).send('Changelog not found');
+    }
+});
+
 // API Routes
 app.use("/api", dbRouter);
 
@@ -60,6 +70,9 @@ app.get('/checklistGroups', (req, res) => {
 });
 app.get('/table', (req, res) => {
     res.sendFile(path.join(__dirname, '../public/table.html'));
+});
+app.get('/changelog', (req, res) => {
+    res.sendFile(path.join(__dirname, '../public/changelog.html'));
 });
 app.get('/manage_sectionGroups', (req, res) => {
     res.sendFile(path.join(__dirname, '../public/manage_sectionGroups.html'));

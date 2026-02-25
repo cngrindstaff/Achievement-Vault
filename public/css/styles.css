@@ -167,6 +167,10 @@ h3 .record-count {
   margin: 0;
   padding: 0;
 }
+.nav-links .nav-divider {
+  border-top: 1px solid #e8e5e0;
+  margin: 8px 16px;
+}
 
 .nav-link {
   display: flex;
@@ -217,6 +221,39 @@ h3 .record-count {
   margin-top: 8px;
   font-size: 11px;
   opacity: 0.6;
+}
+
+.changelog-content {
+  text-align: left;
+  max-width: 600px;
+  width: 100%;
+  margin: 0 auto;
+}
+.changelog-content h2 {
+  text-align: left;
+  font-size: 1.1rem;
+  margin: 24px 0 8px 0;
+  color: #1c2b2d;
+}
+.changelog-content h3 {
+  text-align: left;
+  font-size: 0.95rem;
+  margin: 12px 0 4px 0;
+  color: #175f63;
+}
+.changelog-content ul {
+  margin: 4px 0 8px 20px;
+  padding: 0;
+  font-size: 0.9rem;
+  color: #556565;
+}
+.changelog-content li {
+  margin: 2px 0;
+}
+.changelog-content hr {
+  border: none;
+  border-top: 1px solid #e8e5e0;
+  margin: 20px 0;
 }
 
 .link-container {
