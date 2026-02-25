@@ -1,0 +1,16 @@
+https://jianjye.medium.com/how-to-upload-a-secret-credential-file-to-digitalocean-app-platform-40dba4462724
+
+https://www.digitalocean.com/community/questions/how-to-upload-a-secret-credential-file
+
+
+powershell
+cd to location 
+convert credentials.json data to base64
+
+$bytes = [System.Text.Encoding]::UTF8.GetBytes((Get-Content -Path "credentials.json" -Raw))
+$base64 = [Convert]::ToBase64String($bytes)
+$base64 | Set-Content -Path "credentials_base64.txt"
+
+store as AV_GOOGLE_SHEETS_CREDENTIALS
+
+AV_GOOGLE_SHEETS_ID
