@@ -25,7 +25,7 @@ $(document).ready(async function () {
 
     const gameData = await dbUtils.getGameData(passed_gameId);
     const sectionData = await dbUtils.getSectionById(passed_sectionId);
-    //if(debugLogging) console.log('gameData:', gameData);
+    if(debugLogging) console.log('sectionData:', sectionData);
     gameId = gameData.ID;
     gameName = gameData.Name;
     gameNameFriendly = gameData.FriendlyName;
@@ -61,7 +61,7 @@ $(document).ready(async function () {
         onSave: async () => {
             // Refresh the grid container
             const gridContainer = document.getElementById('grid-manage-records-container');
-            const records = await dbUtils.getRecordsBySectionId(sectionId, null);
+            const records = await dbUtils.getRecordsBySectionIdV2(sectionId, null, null);
             renderRecords(records, gridContainer, gameId);
         }
     });
@@ -229,7 +229,7 @@ async function initializeGameRecordsReorder(sectionId, containerId, resetButtonI
     const resetButton = document.getElementById(resetButtonId);
     if (!container || !resetButton) return;
 
-    const records = await dbUtils.getRecordsBySectionId(sectionId, null);
+    const records = await dbUtils.getRecordsBySectionIdV2(sectionId, null, null);
     renderRecords(records, container, gameId);
     enableDragAndDrop(container);
 
@@ -252,7 +252,7 @@ async function initializeGameRecordsReorder(sectionId, containerId, resetButtonI
             if (success) {
                 alert('List order updated successfully!');
                 // Re-fetch and re-render with the new order
-                const freshRecords = await dbUtils.getRecordsBySectionId(sectionId, null);
+                const freshRecords = await dbUtils.getRecordsBySectionIdV2(sectionId, null, null);
                 renderRecords(freshRecords, container, gameId);
             } else {
                 alert('Failed to update list order.');
