@@ -64,6 +64,13 @@ h3 .record-count {
   font-size: 0.9rem;
 }
 
+.section-group-description {
+  text-align: center;
+  color: #556565;
+  font-size: 0.95rem;
+  margin: -12px 0 20px 0;
+}
+
 .nav-hamburger {
   position: fixed;
   top: 16px;
@@ -1146,3 +1153,5 @@ mark {
     transform: rotate(360deg);
   }
 }
+
+/*# sourceMappingURL=styles.css.map */

@@ -115,37 +115,6 @@ export async function getSectionById(passed_sectionId) {
     //document.querySelector('.game-name').textContent = passed_gameNameFriendly;
 }
 
-//************************************ GET ALL RECORDS FOR A SECTION BY SECTION ID, ordering done in stored proc ************************************//
-export async function getRecordsBySectionId(sectionId, recordOrderPreference, hiddenFilter) {
-    if (!sectionId) {
-        alert("Missing sectionId in URL.");
-        return;
-    }
-    //if(debugLogging) console.log('sectionId: ' + sectionId + ' recordOrderPreference: ' + recordOrderPreference);
-
-    try {
-        const res = await fetch(`/api/db/records/${sectionId}/order/${recordOrderPreference}/hiddenFilter/${hiddenFilter}`);
-        if (!res || !res.ok) {
-            console.log('No response or response not ok:', res);
-            return [];
-        }
-        const text = await res.text();
-        if (!text) {
-            console.log('Response body empty');
-            return [];
-        }
-        const data = JSON.parse(text);
-        //if(debugLogging) console.log('Records data:', data);
-        /*        return {
-                    gameId: data.ID,
-                    gameNameFriendly: data.FriendlyName || passed_gameName || passed_gameId,
-                    gameName: data.Name || passed_gameId,
-                };*/
-        return data;
-    } catch (err) {
-        console.error("Error fetching game data:", err);
-    }
-}
 
 //************************************ GET ALL RECORDS FOR A SECTION BY SECTION ID, V2, manual ordering ************************************//
 export async function getRecordsBySectionIdV2(sectionId, recordOrderPreference, hiddenFilter) {
