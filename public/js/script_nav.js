@@ -107,9 +107,17 @@ export function initNav({ currentPage, gameId, gameNameFriendly }) {
         <footer class="site-footer">
             <p>Site designed and created by Chelsea Grindstaff</p>
             <p><a href="https://www.flaticon.com/free-icons/gaming" title="gaming icons">Gaming favicon created by Us and Up - Flaticon</a></p>
+            <p class="site-version"></p>
         </footer>
     `;
     document.body.insertAdjacentHTML('beforeend', footerHTML);
+
+    fetch('/api/version')
+        .then(res => res.json())
+        .then(data => {
+            document.querySelector('.site-version').textContent = 'v' + data.version;
+        })
+        .catch(() => {});
 }
 
 function getBackHref(currentPage, gameId) {
