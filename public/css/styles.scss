@@ -860,6 +860,22 @@ tr:nth-child(odd) {
 		color: $text-primary;
 		border: 2px solid $accent-400;
 	}
+
+	&.hidden-card {
+		opacity: 0.55;
+	}
+}
+
+.hidden-badge {
+	display: inline-block;
+	margin-left: 8px;
+	padding: 2px 8px;
+	font-size: 11px;
+	font-weight: 600;
+	border-radius: $radius-sm;
+	background: rgba(0, 0, 0, 0.2);
+	color: rgba(255, 255, 255, 0.9);
+	vertical-align: middle;
 }
 
 .section-name, .record-name {

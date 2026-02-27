@@ -75,7 +75,7 @@ $(document).ready(async function () {
         editModal.classList.add('hidden');
 
         const container = document.getElementById('grid-manage-sections-container');
-        const fresh = await dbUtils.getSectionsBySectionGroupId(sectionGroupId, false);
+        const fresh = await getAllSections(sectionGroupId);
         renderSections(fresh, container, gameId);
     });
 })
@@ -93,15 +93,16 @@ function openEditModal(section) {
 
 function createSectionCard(section, gameId, container) {
     const card = document.createElement('div');
-    card.className = 'section-card';
+    card.className = 'section-card' + (section.Hidden ? ' hidden-card' : '');
     card.draggable = true;
     card.dataset.id = section.ID;
     card.dataset.originalOrder = section.ListOrder;
     card.dataset.currentOrder = section.ListOrder;
+    const hiddenBadge = section.Hidden ? '<span class="hidden-badge">Hidden</span>' : '';
     card.innerHTML = `
         <div class="section-card-content">
             <input type="number" class="list-order" value="${section.ListOrder}" min="0" />
-            <span class="section-name">${section.Name}</span>
+            <span class="section-name">${section.Name}${hiddenBadge}</span>
             <button class="edit-section-btn edit-button">Edit</button>
             <button class="manage-records-button">Manage Records</button>
         </div>
@@ -216,12 +217,22 @@ function highlightChangedSections(container) {
     });
 }
 
+async function getAllSections(sectionGroupId) {
+    const [visible, hidden] = await Promise.all([
+        dbUtils.getSectionsBySectionGroupId(sectionGroupId, false),
+        dbUtils.getSectionsBySectionGroupId(sectionGroupId, true)
+    ]);
+    const all = [...(visible || []), ...(hidden || [])];
+    all.sort((a, b) => (a.ListOrder || 0) - (b.ListOrder || 0));
+    return all;
+}
+
 async function initializeGameSectionsReorder(sectionGroupId, containerId, resetButtonId) {
     const container = document.getElementById(containerId);
     const resetButton = document.getElementById(resetButtonId);
     if (!container || !resetButton) return;
 
-    const sections = await dbUtils.getSectionsBySectionGroupId(sectionGroupId, false);
+    const sections = await getAllSections(sectionGroupId);
     renderSections(sections, container, gameId);
     enableDragAndDrop(container);
 
@@ -243,7 +254,7 @@ async function initializeGameSectionsReorder(sectionGroupId, containerId, resetB
             const success = await dbUtils.updateGameSectionsListOrder(updatedSections);
             if (success) {
                 alert('List order updated successfully!');
-                const fresh = await dbUtils.getSectionsBySectionGroupId(sectionGroupId, false);
+                const fresh = await getAllSections(sectionGroupId);
                 renderSections(fresh, container, gameId);
             } else {
                 alert('Failed to update list order.');
