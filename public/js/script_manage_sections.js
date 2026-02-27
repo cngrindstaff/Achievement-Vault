@@ -30,6 +30,7 @@ $(document).ready(async function () {
     mainContainer.append('<h1>' + gameNameFriendly + '</h1>');
     mainContainer.append('<h2>' + sectionGroupName + ': Sections</h2>');
 
+    mainContainer.append('<button id="add-section-btn" class="add-section-btn">+ Add Section</button>');
     mainContainer.append('<div id="grid-manage-sections-container"></div>');
     mainContainer.append('<button id="save-button" class="save-button">Save Order</button>');
     mainContainer.append('<button id="reset-button" class="reset-button">Reset Changes</button>');
@@ -73,6 +74,28 @@ $(document).ready(async function () {
 
         await dbUtils.updateGameSection(editingSectionId, gameId, updateData);
         editModal.classList.add('hidden');
+
+        const container = document.getElementById('grid-manage-sections-container');
+        const fresh = await getAllSections(sectionGroupId);
+        renderSections(fresh, container, gameId);
+    });
+
+    // --- ADD SECTION ---
+    document.getElementById('add-section-btn').addEventListener('click', async () => {
+        const name = prompt('Enter new section name:');
+        if (!name || !name.trim()) return;
+
+        const sections = await getAllSections(sectionGroupId);
+        const maxOrder = sections.reduce((max, s) => Math.max(max, s.ListOrder || 0), 0);
+
+        await dbUtils.insertGameSection({
+            sectionName: name.trim(),
+            gameId,
+            listOrder: maxOrder + 1,
+            recordOrderPreference: 'completed-order-name',
+            hidden: 0,
+            sectionGroupId
+        });
 
         const container = document.getElementById('grid-manage-sections-container');
         const fresh = await getAllSections(sectionGroupId);
