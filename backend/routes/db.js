@@ -96,7 +96,7 @@ router.get('/db/section/:sectionId', async (req, res) => {
 
 //************************************ INSERT GAME SECTION************************************//
 router.post('/db/section/insert', async (req, res) => {
-    const { sectionName, gameId, listOrder, recordOrderPreference, hidden } = req.body;
+    const { sectionName, gameId, listOrder, recordOrderPreference, hidden, sectionGroupId, description } = req.body;
 
     if (!sectionName || gameId === undefined || listOrder === undefined || hidden === undefined) {
         return res.status(400).json({ error: 'Missing required fields' });
@@ -104,8 +104,8 @@ router.post('/db/section/insert', async (req, res) => {
 
     try {
         await db.query(
-            'CALL InsertGameSection(?, ?, ?, ?, ?)',
-            [sectionName, gameId, listOrder, recordOrderPreference, hidden]
+            'CALL InsertGameSection(?, ?, ?, ?, ?, ?, ?)',
+            [sectionName, gameId, listOrder, recordOrderPreference, hidden, sectionGroupId, description]
         );
         res.json({ message: 'Game section inserted successfully' });
     } catch (err) {
@@ -118,12 +118,12 @@ router.post('/db/section/insert', async (req, res) => {
 // Update Game Section
 router.put('/db/section/update/:sectionId/:gameId', async (req, res) => {
     const { sectionId, gameId } = req.params;
-    const { sectionName, listOrder, recordOrderPreference, hidden } = req.body;
+    const { sectionName, listOrder, recordOrderPreference, hidden, description } = req.body;
 
     try {
         await db.query(
-            'CALL UpdateGameSection(?, ?, ?, ?, ?)',
-            [sectionId, gameId, sectionName, listOrder, recordOrderPreference, hidden]
+            'CALL UpdateGameSection(?, ?, ?, ?, ?, ?, ?)',
+            [sectionId, gameId, sectionName ?? null, listOrder ?? null, recordOrderPreference ?? null, hidden ?? null, description ?? null]
         );
         res.json({ message: 'Game section updated successfully' });
     } catch (err) {

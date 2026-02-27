@@ -7,7 +7,7 @@
     "mysql2": "^3.14.0"
   },
   "name": "achievement-vault",
-  "version": "3.1.0",
+  "version": "3.1.1",
   "description": "This program allows you to track achievements in video games. \r It supports multiple games. Just add a new folder, html file, and excel sheet, then add a link to it on the main page.",
   "main": "backend/server.js",
   "scripts": {

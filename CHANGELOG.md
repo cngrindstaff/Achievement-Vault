@@ -1,3 +1,9 @@
+## v3.1.1 - 2026-02-27
+
+### Added
+
+- Added support for adding and editing Sections.
+
 ## v3.1.0 - 2026-02-24
 
 ### Added

@@ -6,6 +6,8 @@ import { initNav } from './script_nav.js';
 let gameId = null;
 let gameNameFriendly = null;
 let sectionGroupId = null;
+let editingSectionId = null;
+let editingSection = null;
 
 $(document).ready(async function () {
     const passed_gameId = utils.getQueryParam('gameId');
@@ -28,25 +30,103 @@ $(document).ready(async function () {
     mainContainer.append('<h1>' + gameNameFriendly + '</h1>');
     mainContainer.append('<h2>' + sectionGroupName + ': Sections</h2>');
 
+    mainContainer.append('<button id="add-section-btn" class="add-section-btn">+ Add Section</button>');
     mainContainer.append('<div id="grid-manage-sections-container"></div>');
     mainContainer.append('<button id="save-button" class="save-button">Save Order</button>');
     mainContainer.append('<button id="reset-button" class="reset-button">Reset Changes</button>');
 
     await initializeGameSectionsReorder(sectionGroupId, 'grid-manage-sections-container', 'reset-button');
+
+    // --- EDIT SECTION MODAL ---
+    const editModalHTML = `
+        <div id="edit-section-modal" class="modal hidden">
+            <div class="modal-content">
+                <span class="close-modal">&times;</span>
+                <h3 id="edit-section-modal-title">Edit Section</h3>
+                <form id="edit-section-form" class="add-record-container">
+                    <label class="add-record">Name:<input type="text" id="edit-section-name" class="add-record" required></label>
+                    <label class="add-record">Description:<textarea id="edit-section-description" class="add-record" rows="3" maxlength="250"></textarea></label>
+                    <label class="add-record">
+                        <input type="checkbox" id="edit-section-hidden"> Hidden
+                    </label>
+                    <button type="submit" class="save-btn">Save</button>
+                </form>
+            </div>
+        </div>
+    `;
+    document.body.insertAdjacentHTML('beforeend', editModalHTML);
+
+    const editModal = document.getElementById('edit-section-modal');
+    editModal.querySelector('.close-modal').addEventListener('click', () => editModal.classList.add('hidden'));
+    window.addEventListener('click', (e) => { if (e.target === editModal) editModal.classList.add('hidden'); });
+
+    document.getElementById('edit-section-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        if (!editingSectionId) return;
+
+        const updateData = {
+            sectionName: document.getElementById('edit-section-name').value.trim() || null,
+            description: document.getElementById('edit-section-description').value.trim() || null,
+            hidden: document.getElementById('edit-section-hidden').checked ? 1 : 0,
+            listOrder: editingSection.ListOrder,
+            recordOrderPreference: editingSection.RecordOrderPreference
+        };
+
+        await dbUtils.updateGameSection(editingSectionId, gameId, updateData);
+        editModal.classList.add('hidden');
+
+        const container = document.getElementById('grid-manage-sections-container');
+        const fresh = await getAllSections(sectionGroupId);
+        renderSections(fresh, container, gameId);
+    });
+
+    // --- ADD SECTION ---
+    document.getElementById('add-section-btn').addEventListener('click', async () => {
+        const name = prompt('Enter new section name:');
+        if (!name || !name.trim()) return;
+
+        const sections = await getAllSections(sectionGroupId);
+        const maxOrder = sections.reduce((max, s) => Math.max(max, s.ListOrder || 0), 0);
+
+        await dbUtils.insertGameSection({
+            sectionName: name.trim(),
+            gameId,
+            listOrder: maxOrder + 1,
+            recordOrderPreference: 'completed-order-name',
+            hidden: 0,
+            sectionGroupId
+        });
+
+        const container = document.getElementById('grid-manage-sections-container');
+        const fresh = await getAllSections(sectionGroupId);
+        renderSections(fresh, container, gameId);
+    });
 })
 
 
+function openEditModal(section) {
+    editingSectionId = section.ID;
+    editingSection = section;
+    document.getElementById('edit-section-modal-title').textContent = `Edit: ${section.Name}`;
+    document.getElementById('edit-section-name').value = section.Name || '';
+    document.getElementById('edit-section-description').value = section.Description || '';
+    document.getElementById('edit-section-hidden').checked = !!section.Hidden;
+    document.getElementById('edit-section-modal').classList.remove('hidden');
+}
+
 function createSectionCard(section, gameId, container) {
     const card = document.createElement('div');
-    card.className = 'section-card';
+    card.className = 'section-card' + (section.Hidden ? ' hidden-card' : '');
     card.draggable = true;
     card.dataset.id = section.ID;
     card.dataset.originalOrder = section.ListOrder;
     card.dataset.currentOrder = section.ListOrder;
+    const hiddenBadge = section.Hidden ? '<span class="hidden-badge">Hidden</span>' : '';
     card.innerHTML = `
         <div class="section-card-content">
             <input type="number" class="list-order" value="${section.ListOrder}" min="0" />
-            <span class="section-name">${section.Name}</span>
+            <span class="section-name">${section.Name}${hiddenBadge}</span>
+            <button class="edit-section-btn edit-button">Edit</button>
             <button class="manage-records-button">Manage Records</button>
         </div>
     `;
@@ -56,7 +136,10 @@ function createSectionCard(section, gameId, container) {
         highlightChangedSections(container);
     });
 
-    // Handle the Manage Records button click
+    card.querySelector('.edit-section-btn').addEventListener('click', () => {
+        openEditModal(section);
+    });
+
     card.querySelector('.manage-records-button').addEventListener('click', () => {
         const hasUnsavedChanges = [...container.children].some((card) => {
             return card.dataset.currentOrder !== card.dataset.originalOrder;
@@ -157,12 +240,22 @@ function highlightChangedSections(container) {
     });
 }
 
+async function getAllSections(sectionGroupId) {
+    const [visible, hidden] = await Promise.all([
+        dbUtils.getSectionsBySectionGroupId(sectionGroupId, false),
+        dbUtils.getSectionsBySectionGroupId(sectionGroupId, true)
+    ]);
+    const all = [...(visible || []), ...(hidden || [])];
+    all.sort((a, b) => (a.ListOrder || 0) - (b.ListOrder || 0));
+    return all;
+}
+
 async function initializeGameSectionsReorder(sectionGroupId, containerId, resetButtonId) {
     const container = document.getElementById(containerId);
     const resetButton = document.getElementById(resetButtonId);
     if (!container || !resetButton) return;
 
-    const sections = await dbUtils.getSectionsBySectionGroupId(sectionGroupId, false);
+    const sections = await getAllSections(sectionGroupId);
     renderSections(sections, container, gameId);
     enableDragAndDrop(container);
 
@@ -184,7 +277,7 @@ async function initializeGameSectionsReorder(sectionGroupId, containerId, resetB
             const success = await dbUtils.updateGameSectionsListOrder(updatedSections);
             if (success) {
                 alert('List order updated successfully!');
-                const fresh = await dbUtils.getSectionsBySectionGroupId(sectionGroupId, false);
+                const fresh = await getAllSections(sectionGroupId);
                 renderSections(fresh, container, gameId);
             } else {
                 alert('Failed to update list order.');
