@@ -786,6 +786,31 @@ tr:nth-child(odd) {
   animation: bounce 0.5s cubic-bezier(0.25, 1.5, 0.5, 1) forwards;
 }
 
+.save-btn {
+  display: block;
+  width: 100%;
+  margin-top: 16px;
+  padding: 10px 16px;
+  color: #edf9f9;
+  background-color: #175f63;
+  border: none;
+  border-radius: 10px;
+  font-family: "Roboto", -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  transition: background-color 0.2s ease, transform 0.15s ease, box-shadow 0.2s ease;
+}
+.save-btn:hover {
+  background-color: #1f7f84;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+  transform: translateY(-1px);
+}
+.save-btn:active {
+  transform: translateY(0);
+}
+
 .manage-records-button, .edit-button {
   background-color: #9ce4e8;
   color: #1c2b2d;

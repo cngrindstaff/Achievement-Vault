@@ -929,6 +929,33 @@ tr:nth-child(odd) {
 	animation: bounce 0.5s cubic-bezier(0.25, 1.5, 0.5, 1) forwards;
 }
 
+.save-btn {
+	display: block;
+	width: 100%;
+	margin-top: 16px;
+	padding: 10px 16px;
+	color: $text-on-accent;
+	background-color: $accent-600;
+	border: none;
+	border-radius: $radius-md;
+	font-family: $font-body;
+	font-size: 15px;
+	font-weight: 600;
+	cursor: pointer;
+	box-shadow: $shadow-sm;
+	transition: background-color $transition-normal, transform $transition-fast, box-shadow $transition-normal;
+
+	&:hover {
+		background-color: $accent-500;
+		box-shadow: $shadow-md;
+		transform: translateY(-1px);
+	}
+
+	&:active {
+		transform: translateY(0);
+	}
+}
+
 .manage-records-button, .edit-button {
 	background-color: $accent-200;
 	color: $text-primary;

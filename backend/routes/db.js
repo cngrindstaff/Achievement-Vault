@@ -123,7 +123,7 @@ router.put('/db/section/update/:sectionId/:gameId', async (req, res) => {
     try {
         await db.query(
             'CALL UpdateGameSection(?, ?, ?, ?, ?, ?, ?)',
-            [sectionId, gameId, sectionName, listOrder, recordOrderPreference, hidden, description]
+            [sectionId, gameId, sectionName ?? null, listOrder ?? null, recordOrderPreference ?? null, hidden ?? null, description ?? null]
         );
         res.json({ message: 'Game section updated successfully' });
     } catch (err) {

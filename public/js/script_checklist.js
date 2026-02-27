@@ -135,11 +135,13 @@ $(document).ready(async function () {
     window.addEventListener('click', (e) => { if (e.target === sectionDescModal) sectionDescModal.classList.add('hidden'); });
 
     let editingSectionId = null;
+    let editingSectionHeader = null;
 
     $('#grid-checklist-container').on('click', '.section-edit-desc-btn', function (e) {
         e.stopPropagation();
         const header = $(this).closest('.section-header');
         editingSectionId = header.data('sectionId');
+        editingSectionHeader = header;
         const sectionName = header.find('.section-header-text').data('sectionTitle');
         const currentDesc = header.data('sectionDescription') || '';
 
@@ -152,7 +154,13 @@ $(document).ready(async function () {
         e.preventDefault();
         const description = document.getElementById('section-desc-input').value.trim();
 
-        await dbUtils.updateGameSection(editingSectionId, gameId, { description });
+        await dbUtils.updateGameSection(editingSectionId, gameId, {
+            description,
+            sectionName: editingSectionHeader.data('sectionName'),
+            listOrder: editingSectionHeader.data('sectionListOrder'),
+            recordOrderPreference: editingSectionHeader.data('sectionRecordOrderPreference'),
+            hidden: editingSectionHeader.data('sectionHidden')
+        });
 
         sectionDescModal.classList.add('hidden');
 
@@ -345,6 +353,10 @@ function renderChecklist(sections, allRecordsBySection, options) {
         headerDiv.dataset.section = sectionIndex;
         headerDiv.dataset.sectionId = section.ID;
         headerDiv.dataset.sectionDescription = section.Description || '';
+        headerDiv.dataset.sectionListOrder = section.ListOrder;
+        headerDiv.dataset.sectionRecordOrderPreference = section.RecordOrderPreference || '';
+        headerDiv.dataset.sectionHidden = section.Hidden || 0;
+        headerDiv.dataset.sectionName = section.Name || '';
 
         const headerText = headerClone.querySelector('.section-header-text');
         headerText.dataset.section = sectionIndex;
