@@ -2,7 +2,7 @@
 --
 -- Host: db-mysql-nyc3-chelseag-2-do-user-2093339-0.m.db.ondigitalocean.com    Database: achievement_vault
 -- ------------------------------------------------------
--- Server version	8.0.35
+-- Server version	8.0.45
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
@@ -22,14 +22,151 @@ SET @@SESSION.SQL_LOG_BIN= 0;
 --
 
 SET @@GLOBAL.GTID_PURGED=/*!80000 '+'*/ '13f536e6-3221-11f0-89eb-2a1f1f6a88ac:1-483,
-5971d0d9-032a-11f1-8d26-bac02f3269ae:1-915,
+5971d0d9-032a-11f1-8d26-bac02f3269ae:1-2542,
 a82e3d65-4b1c-11f0-89c5-be49b8b782ce:1-7247,
 b86c9be3-0e6f-11f0-a9c0-2228d4c40b56:1-6825,
+bfb149eb-13aa-11f1-9185-3231ccd9b365:1-15,
 e683336f-d1a8-11f0-a04f-32c880f94a50:1-1125';
 
 --
--- Dumping events for database 'achievement_vault'
+-- Table structure for table `GameRecords`
 --
+
+DROP TABLE IF EXISTS `GameRecords`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `GameRecords` (
+  `ID` int NOT NULL AUTO_INCREMENT,
+  `Name` varchar(100) NOT NULL,
+  `Description` varchar(1000) DEFAULT NULL,
+  `SectionID` int NOT NULL,
+  `GameID` int NOT NULL,
+  `NumberOfCheckboxes` int NOT NULL DEFAULT '0',
+  `NumberAlreadyCompleted` int NOT NULL DEFAULT '0',
+  `ListOrder` int NOT NULL DEFAULT '100',
+  `LongDescription` varchar(1000) DEFAULT NULL,
+  `Hidden` tinyint(1) NOT NULL DEFAULT '0',
+  `DateCreated` datetime(3) DEFAULT CURRENT_TIMESTAMP(3),
+  `DateLastUpdated` datetime(3) DEFAULT CURRENT_TIMESTAMP(3) ON UPDATE CURRENT_TIMESTAMP(3),
+  PRIMARY KEY (`ID`),
+  KEY `SectionID` (`SectionID`),
+  KEY `GameID` (`GameID`),
+  CONSTRAINT `GameRecords_ibfk_1` FOREIGN KEY (`SectionID`) REFERENCES `GameSections` (`ID`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `GameRecords_ibfk_2` FOREIGN KEY (`GameID`) REFERENCES `Games` (`ID`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=10643 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `GameSections`
+--
+
+DROP TABLE IF EXISTS `GameSections`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `GameSections` (
+  `ID` int NOT NULL AUTO_INCREMENT,
+  `Name` varchar(100) NOT NULL,
+  `GameID` int NOT NULL,
+  `ListOrder` int NOT NULL DEFAULT '0',
+  `RecordOrderPreference` varchar(100) DEFAULT NULL,
+  `Hidden` tinyint(1) NOT NULL DEFAULT '0',
+  `DateCreated` datetime(3) DEFAULT CURRENT_TIMESTAMP(3),
+  `DateLastUpdated` datetime(3) DEFAULT CURRENT_TIMESTAMP(3) ON UPDATE CURRENT_TIMESTAMP(3),
+  `SectionGroupID` int DEFAULT NULL,
+  `Description` varchar(250) DEFAULT NULL,
+  PRIMARY KEY (`ID`),
+  KEY `GameID` (`GameID`),
+  KEY `FK_GameSections_SectionGroups` (`SectionGroupID`),
+  CONSTRAINT `FK_GameSections_SectionGroups` FOREIGN KEY (`SectionGroupID`) REFERENCES `SectionGroups` (`ID`),
+  CONSTRAINT `GameSections_ibfk_1` FOREIGN KEY (`GameID`) REFERENCES `Games` (`ID`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=309 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `GameTableRecords`
+--
+
+DROP TABLE IF EXISTS `GameTableRecords`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `GameTableRecords` (
+  `ID` int NOT NULL AUTO_INCREMENT,
+  `TableID` int NOT NULL,
+  `ListOrder` int NOT NULL DEFAULT '1',
+  `Field_01` varchar(500) NOT NULL,
+  `Field_02` varchar(500) DEFAULT NULL,
+  `Field_03` varchar(500) DEFAULT NULL,
+  `Field_04` varchar(500) DEFAULT NULL,
+  `Field_05` varchar(500) DEFAULT NULL,
+  `Field_06` varchar(500) DEFAULT NULL,
+  PRIMARY KEY (`ID`),
+  KEY `TableID` (`TableID`),
+  CONSTRAINT `GameTableRecords_ibfk_1` FOREIGN KEY (`TableID`) REFERENCES `GameTables` (`ID`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=236 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `GameTables`
+--
+
+DROP TABLE IF EXISTS `GameTables`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `GameTables` (
+  `ID` int NOT NULL AUTO_INCREMENT,
+  `Name` varchar(100) NOT NULL,
+  `GameID` int NOT NULL,
+  `ListOrder` int NOT NULL DEFAULT '1',
+  `FieldName_01` varchar(100) DEFAULT NULL,
+  `FieldName_02` varchar(100) DEFAULT NULL,
+  `FieldName_03` varchar(100) DEFAULT NULL,
+  `FieldName_04` varchar(100) DEFAULT NULL,
+  `FieldName_05` varchar(100) DEFAULT NULL,
+  `FieldName_06` varchar(100) DEFAULT NULL,
+  PRIMARY KEY (`ID`),
+  KEY `GameID` (`GameID`),
+  CONSTRAINT `GameTables_ibfk_1` FOREIGN KEY (`GameID`) REFERENCES `Games` (`ID`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `Games`
+--
+
+DROP TABLE IF EXISTS `Games`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `Games` (
+  `ID` int NOT NULL AUTO_INCREMENT,
+  `Name` varchar(100) NOT NULL,
+  `FriendlyName` varchar(100) NOT NULL,
+  `HasDataTables` tinyint(1) NOT NULL DEFAULT '0',
+  PRIMARY KEY (`ID`)
+) ENGINE=InnoDB AUTO_INCREMENT=13 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `SectionGroups`
+--
+
+DROP TABLE IF EXISTS `SectionGroups`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `SectionGroups` (
+  `ID` int NOT NULL AUTO_INCREMENT,
+  `Name` varchar(100) NOT NULL,
+  `FriendlyName` varchar(100) NOT NULL,
+  `GameID` int NOT NULL,
+  `ListOrder` int NOT NULL DEFAULT '1',
+  `DateCreated` datetime(3) DEFAULT CURRENT_TIMESTAMP(3),
+  `DateLastUpdated` datetime(3) DEFAULT CURRENT_TIMESTAMP(3),
+  `Hidden` tinyint(1) NOT NULL DEFAULT '0',
+  `Description` varchar(500) DEFAULT NULL,
+  PRIMARY KEY (`ID`),
+  KEY `GameID` (`GameID`),
+  CONSTRAINT `SectionGroups_ibfk_1` FOREIGN KEY (`GameID`) REFERENCES `Games` (`ID`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=18 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
 
 --
 -- Dumping routines for database 'achievement_vault'
@@ -73,67 +210,6 @@ CREATE DEFINER="doadmin"@"%" PROCEDURE "DeleteGameRecord"(
 BEGIN
     DELETE FROM GameRecords
     WHERE ID = recordId;
-END ;;
-DELIMITER ;
-/*!50003 SET sql_mode              = @saved_sql_mode */ ;
-/*!50003 SET character_set_client  = @saved_cs_client */ ;
-/*!50003 SET character_set_results = @saved_cs_results */ ;
-/*!50003 SET collation_connection  = @saved_col_connection */ ;
-/*!50003 DROP PROCEDURE IF EXISTS `GetAllGameDataByGameID` */;
-/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
-/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
-/*!50003 SET @saved_col_connection = @@collation_connection */ ;
-/*!50003 SET character_set_client  = utf8mb4 */ ;
-/*!50003 SET character_set_results = utf8mb4 */ ;
-/*!50003 SET collation_connection  = utf8mb4_0900_ai_ci */ ;
-/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
-/*!50003 SET sql_mode              = 'REAL_AS_FLOAT,PIPES_AS_CONCAT,ANSI_QUOTES,IGNORE_SPACE,ONLY_FULL_GROUP_BY,ANSI,STRICT_ALL_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION' */ ;
-DELIMITER ;;
-CREATE DEFINER="doadmin"@"%" PROCEDURE "GetAllGameDataByGameID"(IN inputGameID INT)
-BEGIN
-    SELECT 
-        g.ID AS GameID,
-        g.Name AS GameName,
-        g.FriendlyName,
-        
-        s.Name AS SectionName,
-        s.ListOrder AS SectionListOrder,
-        
-        r.ID AS RecordID,
-        r.Name AS RecordName,
-        r.Description AS RecordDescription,
-        r.NumberOfCheckboxes,
-        r.NumberAlreadyCompleted,
-        r.ListOrder AS RecordListOrder,
-        r.LongDescription AS RecordLongDescription
-
-    FROM Games g
-    LEFT JOIN GameSections s ON g.ID = s.GameID
-    LEFT JOIN GameRecords r ON s.ID = r.SectionID
-    WHERE g.ID = inputGameID
-    ORDER BY SectionListOrder ASC, RecordListOrder ASC, RecordName ASC
-    ;
-END ;;
-DELIMITER ;
-/*!50003 SET sql_mode              = @saved_sql_mode */ ;
-/*!50003 SET character_set_client  = @saved_cs_client */ ;
-/*!50003 SET character_set_results = @saved_cs_results */ ;
-/*!50003 SET collation_connection  = @saved_col_connection */ ;
-/*!50003 DROP PROCEDURE IF EXISTS `GetAllGameRecordsByGameID` */;
-/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
-/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
-/*!50003 SET @saved_col_connection = @@collation_connection */ ;
-/*!50003 SET character_set_client  = utf8mb4 */ ;
-/*!50003 SET character_set_results = utf8mb4 */ ;
-/*!50003 SET collation_connection  = utf8mb4_0900_ai_ci */ ;
-/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
-/*!50003 SET sql_mode              = 'REAL_AS_FLOAT,PIPES_AS_CONCAT,ANSI_QUOTES,IGNORE_SPACE,ONLY_FULL_GROUP_BY,ANSI,STRICT_ALL_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION' */ ;
-DELIMITER ;;
-CREATE DEFINER="doadmin"@"%" PROCEDURE "GetAllGameRecordsByGameID"(IN inputGameID INT)
-BEGIN
-    SELECT * FROM GameRecords
-    WHERE GameID = inputGameID
-    ORDER BY ListOrder ASC;
 END ;;
 DELIMITER ;
 /*!50003 SET sql_mode              = @saved_sql_mode */ ;
@@ -202,26 +278,6 @@ DELIMITER ;
 /*!50003 SET character_set_client  = @saved_cs_client */ ;
 /*!50003 SET character_set_results = @saved_cs_results */ ;
 /*!50003 SET collation_connection  = @saved_col_connection */ ;
-/*!50003 DROP PROCEDURE IF EXISTS `GetGameById` */;
-/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
-/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
-/*!50003 SET @saved_col_connection = @@collation_connection */ ;
-/*!50003 SET character_set_client  = utf8mb4 */ ;
-/*!50003 SET character_set_results = utf8mb4 */ ;
-/*!50003 SET collation_connection  = utf8mb4_0900_ai_ci */ ;
-/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
-/*!50003 SET sql_mode              = 'REAL_AS_FLOAT,PIPES_AS_CONCAT,ANSI_QUOTES,IGNORE_SPACE,ONLY_FULL_GROUP_BY,ANSI,STRICT_ALL_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION' */ ;
-DELIMITER ;;
-CREATE DEFINER="doadmin"@"%" PROCEDURE "GetGameById"(IN gameID INT)
-BEGIN
-    SELECT * FROM Games
-    WHERE ID = gameID;
-END ;;
-DELIMITER ;
-/*!50003 SET sql_mode              = @saved_sql_mode */ ;
-/*!50003 SET character_set_client  = @saved_cs_client */ ;
-/*!50003 SET character_set_results = @saved_cs_results */ ;
-/*!50003 SET collation_connection  = @saved_col_connection */ ;
 /*!50003 DROP PROCEDURE IF EXISTS `GetGameByIdV2` */;
 /*!50003 SET @saved_cs_client      = @@character_set_client */ ;
 /*!50003 SET @saved_cs_results     = @@character_set_results */ ;
@@ -276,57 +332,6 @@ DELIMITER ;
 /*!50003 SET character_set_client  = @saved_cs_client */ ;
 /*!50003 SET character_set_results = @saved_cs_results */ ;
 /*!50003 SET collation_connection  = @saved_col_connection */ ;
-/*!50003 DROP PROCEDURE IF EXISTS `GetGameRecordsByGameSectionID` */;
-/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
-/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
-/*!50003 SET @saved_col_connection = @@collation_connection */ ;
-/*!50003 SET character_set_client  = utf8mb4 */ ;
-/*!50003 SET character_set_results = utf8mb4 */ ;
-/*!50003 SET collation_connection  = utf8mb4_0900_ai_ci */ ;
-/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
-/*!50003 SET sql_mode              = 'REAL_AS_FLOAT,PIPES_AS_CONCAT,ANSI_QUOTES,IGNORE_SPACE,ONLY_FULL_GROUP_BY,ANSI,STRICT_ALL_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION' */ ;
-DELIMITER ;;
-CREATE DEFINER="doadmin"@"%" PROCEDURE "GetGameRecordsByGameSectionID"(
-    IN inputSectionID INT,
-    IN inputOrderPreference VARCHAR(50),
-    IN hiddenFilter BOOL
-)
-BEGIN
-    -- Default to 'order-name' if NULL
-    IF inputOrderPreference IS NULL THEN
-        SET inputOrderPreference = 'order-name';
-    END IF;
-
-    SELECT *
-    FROM GameRecords
-    WHERE SectionID = inputSectionID
-      AND (hiddenFilter IS NULL OR Hidden = hiddenFilter)
-    ORDER BY
-        -- First level of sorting
-        CASE
-            WHEN inputOrderPreference = 'name' THEN NULL
-            WHEN inputOrderPreference = 'completed-order-name' THEN NumberAlreadyCompleted
-            ELSE ListOrder
-        END ASC,
-
-        -- Second level
-        CASE
-            WHEN inputOrderPreference = 'completed-order-name' THEN ListOrder
-            WHEN inputOrderPreference = 'name' THEN Name
-            ELSE Name
-        END ASC,
-
-        -- Third level (if needed)
-        CASE
-            WHEN inputOrderPreference = 'completed-order-name' THEN Name
-            ELSE NULL
-        END ASC;
-END ;;
-DELIMITER ;
-/*!50003 SET sql_mode              = @saved_sql_mode */ ;
-/*!50003 SET character_set_client  = @saved_cs_client */ ;
-/*!50003 SET character_set_results = @saved_cs_results */ ;
-/*!50003 SET collation_connection  = @saved_col_connection */ ;
 /*!50003 DROP PROCEDURE IF EXISTS `GetGameRecordsByGameSectionIDV2` */;
 /*!50003 SET @saved_cs_client      = @@character_set_client */ ;
 /*!50003 SET @saved_cs_results     = @@character_set_results */ ;
@@ -354,26 +359,6 @@ BEGIN
     PREPARE stmt FROM @sqlQuery;
     EXECUTE stmt;
     DEALLOCATE PREPARE stmt;
-END ;;
-DELIMITER ;
-/*!50003 SET sql_mode              = @saved_sql_mode */ ;
-/*!50003 SET character_set_client  = @saved_cs_client */ ;
-/*!50003 SET character_set_results = @saved_cs_results */ ;
-/*!50003 SET collation_connection  = @saved_col_connection */ ;
-/*!50003 DROP PROCEDURE IF EXISTS `GetGameSectionById` */;
-/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
-/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
-/*!50003 SET @saved_col_connection = @@collation_connection */ ;
-/*!50003 SET character_set_client  = utf8mb4 */ ;
-/*!50003 SET character_set_results = utf8mb4 */ ;
-/*!50003 SET collation_connection  = utf8mb4_0900_ai_ci */ ;
-/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
-/*!50003 SET sql_mode              = 'REAL_AS_FLOAT,PIPES_AS_CONCAT,ANSI_QUOTES,IGNORE_SPACE,ONLY_FULL_GROUP_BY,ANSI,STRICT_ALL_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION' */ ;
-DELIMITER ;;
-CREATE DEFINER="doadmin"@"%" PROCEDURE "GetGameSectionById"(IN sectionId INT)
-BEGIN
-    SELECT * FROM GameSections
-    WHERE ID = sectionId;
 END ;;
 DELIMITER ;
 /*!50003 SET sql_mode              = @saved_sql_mode */ ;
@@ -559,7 +544,7 @@ DELIMITER ;
 /*!50003 SET character_set_client  = @saved_cs_client */ ;
 /*!50003 SET character_set_results = @saved_cs_results */ ;
 /*!50003 SET collation_connection  = @saved_col_connection */ ;
-/*!50003 DROP PROCEDURE IF EXISTS `InsertSectionGroup` */;
+/*!50003 DROP PROCEDURE IF EXISTS `InsertMultipleGameRecords` */;
 /*!50003 SET @saved_cs_client      = @@character_set_client */ ;
 /*!50003 SET @saved_cs_results     = @@character_set_results */ ;
 /*!50003 SET @saved_col_connection = @@collation_connection */ ;
@@ -569,18 +554,34 @@ DELIMITER ;
 /*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
 /*!50003 SET sql_mode              = 'REAL_AS_FLOAT,PIPES_AS_CONCAT,ANSI_QUOTES,IGNORE_SPACE,ONLY_FULL_GROUP_BY,ANSI,STRICT_ALL_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION' */ ;
 DELIMITER ;;
-CREATE DEFINER="doadmin"@"%" PROCEDURE "InsertSectionGroup"(
-    IN sectionGroupName VARCHAR(100),
-    IN sectionGroupFriendlyName VARCHAR(100),
-    IN gameId INT,
-    IN listOrder INT,
-    IN hidden TINYINT
+CREATE DEFINER="doadmin"@"%" PROCEDURE "InsertMultipleGameRecords"(
+    IN recordsJson JSON
 )
 BEGIN
-    INSERT INTO SectionGroups
-    (Name, FriendlyName, GameID, ListOrder, Hidden, DateCreated)
-    VALUES
-    (sectionGroupName, sectionGroupFriendlyName, gameId, listOrder, hidden, utc_timestamp());
+    INSERT INTO GameRecords
+        (Name, Description, SectionId, GameID, NumberOfCheckboxes, NumberAlreadyCompleted, ListOrder, LongDescription, Hidden, DateCreated)
+    SELECT
+        j.recordName,
+        j.description,
+        j.sectionId,
+        j.gameId,
+        j.numberOfCheckboxes,
+        j.numberAlreadyCompleted,
+        j.listOrder,
+        j.longDescription,
+        j.hidden,
+        UTC_TIMESTAMP()
+    FROM JSON_TABLE(recordsJson, '$[*]' COLUMNS (
+        recordName VARCHAR(100) PATH '$.name',
+        description VARCHAR(1000) PATH '$.description',
+        sectionId INT PATH '$.sectionId',
+        gameId INT PATH '$.gameId',
+        numberOfCheckboxes INT PATH '$.numberOfCheckboxes',
+        numberAlreadyCompleted INT PATH '$.numberAlreadyCompleted',
+        listOrder INT PATH '$.listOrder',
+        longDescription VARCHAR(1000) PATH '$.longDescription',
+        hidden TINYINT PATH '$.hidden'
+    )) AS j;
 END ;;
 DELIMITER ;
 /*!50003 SET sql_mode              = @saved_sql_mode */ ;
@@ -767,38 +768,6 @@ DELIMITER ;
 /*!50003 SET character_set_client  = @saved_cs_client */ ;
 /*!50003 SET character_set_results = @saved_cs_results */ ;
 /*!50003 SET collation_connection  = @saved_col_connection */ ;
-/*!50003 DROP PROCEDURE IF EXISTS `UpdateSectionGroup` */;
-/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
-/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
-/*!50003 SET @saved_col_connection = @@collation_connection */ ;
-/*!50003 SET character_set_client  = utf8mb4 */ ;
-/*!50003 SET character_set_results = utf8mb4 */ ;
-/*!50003 SET collation_connection  = utf8mb4_0900_ai_ci */ ;
-/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
-/*!50003 SET sql_mode              = 'REAL_AS_FLOAT,PIPES_AS_CONCAT,ANSI_QUOTES,IGNORE_SPACE,ONLY_FULL_GROUP_BY,ANSI,STRICT_ALL_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION' */ ;
-DELIMITER ;;
-CREATE DEFINER="doadmin"@"%" PROCEDURE "UpdateSectionGroup"(
-    IN sectionGroupId INT,
-    IN gameId INT,
-    IN sectionGroupName VARCHAR(255),
-    IN sectionGroupFriendlyName VARCHAR(255),
-    IN listOrder INT,
-    IN hidden TINYINT
-)
-BEGIN
-    UPDATE GameSections
-    SET 
-        Name = COALESCE(sectionGroupName, Name),
-        ListOrder = COALESCE(listOrder, ListOrder),
-        Hidden = COALESCE(hidden, Hidden)
-    WHERE 
-        ID = sectionGroupId AND GameID = gameId;
-END ;;
-DELIMITER ;
-/*!50003 SET sql_mode              = @saved_sql_mode */ ;
-/*!50003 SET character_set_client  = @saved_cs_client */ ;
-/*!50003 SET character_set_results = @saved_cs_results */ ;
-/*!50003 SET collation_connection  = @saved_col_connection */ ;
 /*!50003 DROP PROCEDURE IF EXISTS `UpdateSectionGroupsListOrder` */;
 /*!50003 SET @saved_cs_client      = @@character_set_client */ ;
 /*!50003 SET @saved_cs_results     = @@character_set_results */ ;
@@ -810,33 +779,22 @@ DELIMITER ;
 /*!50003 SET sql_mode              = 'REAL_AS_FLOAT,PIPES_AS_CONCAT,ANSI_QUOTES,IGNORE_SPACE,ONLY_FULL_GROUP_BY,ANSI,STRICT_ALL_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION' */ ;
 DELIMITER ;;
 CREATE DEFINER="doadmin"@"%" PROCEDURE "UpdateSectionGroupsListOrder"(
-    IN sectionGroupUpdates JSON,
-    OUT rowsUpdated INT
+    IN p_JsonData JSON,
+    OUT p_RowsUpdated INT
 )
 BEGIN
-    DECLARE i INT DEFAULT 0;
-    DECLARE n INT DEFAULT JSON_LENGTH(sectionGroupUpdates);
-    DECLARE sectionGroupId INT;
-    DECLARE listOrder INT;
-    DECLARE totalRowsUpdated INT DEFAULT 0;
+    UPDATE SectionGroups sg
+    INNER JOIN JSON_TABLE(
+        p_JsonData,
+        '$[*]' COLUMNS (
+            ID INT PATH '$.ID',
+            ListOrder INT PATH '$.ListOrder'
+        )
+    ) AS updates ON sg.ID = updates.ID
+    SET sg.ListOrder = updates.ListOrder;
 
-    WHILE i < n DO
-        -- Extract the ID and ListOrder for this section
-        SET sectionGroupId = JSON_UNQUOTE(JSON_EXTRACT(sectionGroupUpdates, CONCAT('$[', i, '].ID')));
-        SET listOrder = JSON_UNQUOTE(JSON_EXTRACT(sectionGroupUpdates, CONCAT('$[', i, '].ListOrder')));
+    SET p_RowsUpdated = ROW_COUNT();
 
-        -- Update the row and count the affected rows
-        UPDATE SectionGroups
-        SET ListOrder = listOrder
-        WHERE ID = sectionGroupId;
-
-        SET totalRowsUpdated = totalRowsUpdated + ROW_COUNT();
-
-        SET i = i + 1;
-    END WHILE;
-
-    -- Return the total rows updated
-    SET rowsUpdated = totalRowsUpdated;
 END ;;
 DELIMITER ;
 /*!50003 SET sql_mode              = @saved_sql_mode */ ;
@@ -887,6 +845,262 @@ DELIMITER ;
 /*!50003 SET character_set_client  = @saved_cs_client */ ;
 /*!50003 SET character_set_results = @saved_cs_results */ ;
 /*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 DROP PROCEDURE IF EXISTS `z_GetAllGameDataByGameID` */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_0900_ai_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'REAL_AS_FLOAT,PIPES_AS_CONCAT,ANSI_QUOTES,IGNORE_SPACE,ONLY_FULL_GROUP_BY,ANSI,STRICT_ALL_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+CREATE DEFINER="doadmin"@"%" PROCEDURE "z_GetAllGameDataByGameID"(IN inputGameID INT)
+BEGIN
+    SELECT 
+        g.ID AS GameID,
+        g.Name AS GameName,
+        g.FriendlyName,
+        
+        s.Name AS SectionName,
+        s.ListOrder AS SectionListOrder,
+        
+        r.ID AS RecordID,
+        r.Name AS RecordName,
+        r.Description AS RecordDescription,
+        r.NumberOfCheckboxes,
+        r.NumberAlreadyCompleted,
+        r.ListOrder AS RecordListOrder,
+        r.LongDescription AS RecordLongDescription
+
+    FROM Games g
+    LEFT JOIN GameSections s ON g.ID = s.GameID
+    LEFT JOIN GameRecords r ON s.ID = r.SectionID
+    WHERE g.ID = inputGameID
+    ORDER BY SectionListOrder ASC, RecordListOrder ASC, RecordName ASC
+    ;
+END ;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 DROP PROCEDURE IF EXISTS `z_GetAllGameRecordsByGameID` */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_0900_ai_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'REAL_AS_FLOAT,PIPES_AS_CONCAT,ANSI_QUOTES,IGNORE_SPACE,ONLY_FULL_GROUP_BY,ANSI,STRICT_ALL_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+CREATE DEFINER="doadmin"@"%" PROCEDURE "z_GetAllGameRecordsByGameID"(IN inputGameID INT)
+BEGIN
+    SELECT * FROM GameRecords
+    WHERE GameID = inputGameID
+    ORDER BY ListOrder ASC;
+END ;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 DROP PROCEDURE IF EXISTS `z_GetGameById` */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_0900_ai_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'REAL_AS_FLOAT,PIPES_AS_CONCAT,ANSI_QUOTES,IGNORE_SPACE,ONLY_FULL_GROUP_BY,ANSI,STRICT_ALL_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+CREATE DEFINER="doadmin"@"%" PROCEDURE "z_GetGameById"(IN gameID INT)
+BEGIN
+    SELECT * FROM Games
+    WHERE ID = gameID;
+END ;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 DROP PROCEDURE IF EXISTS `z_GetGameRecordsByGameSectionID` */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_0900_ai_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'REAL_AS_FLOAT,PIPES_AS_CONCAT,ANSI_QUOTES,IGNORE_SPACE,ONLY_FULL_GROUP_BY,ANSI,STRICT_ALL_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+CREATE DEFINER="doadmin"@"%" PROCEDURE "z_GetGameRecordsByGameSectionID"(
+    IN inputSectionID INT,
+    IN inputOrderPreference VARCHAR(50),
+    IN hiddenFilter BOOL
+)
+BEGIN
+    -- Default to 'order-name' if NULL
+    IF inputOrderPreference IS NULL THEN
+        SET inputOrderPreference = 'order-name';
+    END IF;
+
+    SELECT *
+    FROM GameRecords
+    WHERE SectionID = inputSectionID
+      AND (hiddenFilter IS NULL OR Hidden = hiddenFilter)
+    ORDER BY
+        -- First level of sorting
+        CASE
+            WHEN inputOrderPreference = 'name' THEN NULL
+            WHEN inputOrderPreference = 'completed-order-name' THEN NumberAlreadyCompleted
+            ELSE ListOrder
+        END ASC,
+
+        -- Second level
+        CASE
+            WHEN inputOrderPreference = 'completed-order-name' THEN ListOrder
+            WHEN inputOrderPreference = 'name' THEN Name
+            ELSE Name
+        END ASC,
+
+        -- Third level (if needed)
+        CASE
+            WHEN inputOrderPreference = 'completed-order-name' THEN Name
+            ELSE NULL
+        END ASC;
+END ;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 DROP PROCEDURE IF EXISTS `z_GetGameSectionById` */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_0900_ai_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'REAL_AS_FLOAT,PIPES_AS_CONCAT,ANSI_QUOTES,IGNORE_SPACE,ONLY_FULL_GROUP_BY,ANSI,STRICT_ALL_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+CREATE DEFINER="doadmin"@"%" PROCEDURE "z_GetGameSectionById"(IN sectionId INT)
+BEGIN
+    SELECT * FROM GameSections
+    WHERE ID = sectionId;
+END ;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 DROP PROCEDURE IF EXISTS `z_InsertSectionGroup` */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_0900_ai_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'REAL_AS_FLOAT,PIPES_AS_CONCAT,ANSI_QUOTES,IGNORE_SPACE,ONLY_FULL_GROUP_BY,ANSI,STRICT_ALL_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+CREATE DEFINER="doadmin"@"%" PROCEDURE "z_InsertSectionGroup"(
+    IN sectionGroupName VARCHAR(100),
+    IN sectionGroupFriendlyName VARCHAR(100),
+    IN gameId INT,
+    IN listOrder INT,
+    IN hidden TINYINT
+)
+BEGIN
+    INSERT INTO SectionGroups
+    (Name, FriendlyName, GameID, ListOrder, Hidden, DateCreated)
+    VALUES
+    (sectionGroupName, sectionGroupFriendlyName, gameId, listOrder, hidden, utc_timestamp());
+END ;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 DROP PROCEDURE IF EXISTS `z_UpdateSectionGroup` */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_0900_ai_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'REAL_AS_FLOAT,PIPES_AS_CONCAT,ANSI_QUOTES,IGNORE_SPACE,ONLY_FULL_GROUP_BY,ANSI,STRICT_ALL_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+CREATE DEFINER="doadmin"@"%" PROCEDURE "z_UpdateSectionGroup"(
+    IN sectionGroupId INT,
+    IN gameId INT,
+    IN sectionGroupName VARCHAR(255),
+    IN sectionGroupFriendlyName VARCHAR(255),
+    IN listOrder INT,
+    IN hidden TINYINT
+)
+BEGIN
+    UPDATE GameSections
+    SET 
+        Name = COALESCE(sectionGroupName, Name),
+        ListOrder = COALESCE(listOrder, ListOrder),
+        Hidden = COALESCE(hidden, Hidden)
+    WHERE 
+        ID = sectionGroupId AND GameID = gameId;
+END ;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 DROP PROCEDURE IF EXISTS `z_UpdateSectionGroupsListOrder` */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_0900_ai_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'REAL_AS_FLOAT,PIPES_AS_CONCAT,ANSI_QUOTES,IGNORE_SPACE,ONLY_FULL_GROUP_BY,ANSI,STRICT_ALL_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+CREATE DEFINER="doadmin"@"%" PROCEDURE "z_UpdateSectionGroupsListOrder"(
+    IN sectionGroupUpdates JSON,
+    OUT rowsUpdated INT
+)
+BEGIN
+    DECLARE i INT DEFAULT 0;
+    DECLARE n INT DEFAULT JSON_LENGTH(sectionGroupUpdates);
+    DECLARE sectionGroupId INT;
+    DECLARE listOrder INT;
+    DECLARE totalRowsUpdated INT DEFAULT 0;
+
+    WHILE i < n DO
+        -- Extract the ID and ListOrder for this section
+        SET sectionGroupId = JSON_UNQUOTE(JSON_EXTRACT(sectionGroupUpdates, CONCAT('$[', i, '].ID')));
+        SET listOrder = JSON_UNQUOTE(JSON_EXTRACT(sectionGroupUpdates, CONCAT('$[', i, '].ListOrder')));
+
+        -- Update the row and count the affected rows
+        UPDATE SectionGroups
+        SET ListOrder = listOrder
+        WHERE ID = sectionGroupId;
+
+        SET totalRowsUpdated = totalRowsUpdated + ROW_COUNT();
+
+        SET i = i + 1;
+    END WHILE;
+
+    -- Return the total rows updated
+    SET rowsUpdated = totalRowsUpdated;
+END ;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
 SET @@SESSION.SQL_LOG_BIN = @MYSQLDUMP_TEMP_LOG_BIN;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
@@ -898,4 +1112,4 @@ SET @@SESSION.SQL_LOG_BIN = @MYSQLDUMP_TEMP_LOG_BIN;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2026-02-14 11:49:13
+-- Dump completed on 2026-02-27 10:22:28

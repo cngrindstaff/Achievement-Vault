@@ -400,3 +400,83 @@ Use this file to reference work you've done previously and post patch notes. Als
 - New styles: `.nav-hamburger`, `.nav-overlay`, `.nav-slideout`, `.nav-header`, `.nav-title`, `.nav-close`, `.nav-links`, `.nav-link`
 - Old `.link-container` set to `display: none`
 - `.container` / `.game-list-container` given `padding-top: 56px` for the fixed hamburger button
+
+---
+
+## Database Schema Reference (Feb 27, 2026)
+
+SQL dump lives in `sql/Dump20260227.sql`. MySQL 8.0 on DigitalOcean. Database name: `achievement_vault`.
+
+### Tables
+
+| Table | Columns (key ones) | Foreign Keys |
+|-------|-------------------|-------------|
+| **Games** | ID, Name, FriendlyName, HasDataTables | — (root entity) |
+| **SectionGroups** | ID, Name, FriendlyName, GameID, ListOrder, Hidden, Description, DateCreated, DateLastUpdated | GameID → Games (CASCADE) |
+| **GameSections** | ID, Name, GameID, ListOrder, RecordOrderPreference, Hidden, SectionGroupID, Description, DateCreated, DateLastUpdated | GameID → Games (CASCADE), SectionGroupID → SectionGroups |
+| **GameRecords** | ID, Name, Description, SectionID, GameID, NumberOfCheckboxes, NumberAlreadyCompleted, ListOrder, LongDescription, Hidden, DateCreated, DateLastUpdated | SectionID → GameSections (CASCADE), GameID → Games (CASCADE) |
+| **GameTables** | ID, Name, GameID, ListOrder, FieldName_01..06 | GameID → Games (CASCADE) |
+| **GameTableRecords** | ID, TableID, ListOrder, Field_01..06 | TableID → GameTables (CASCADE) |
+
+### Hierarchy
+
+`Games` → `SectionGroups` → `GameSections` → `GameRecords`
+`Games` → `GameTables` → `GameTableRecords`
+
+All foreign keys use ON DELETE CASCADE ON UPDATE CASCADE (except SectionGroupID on GameSections which has no cascade rule).
+
+### Active Stored Procedures
+
+| Procedure | Purpose |
+|-----------|---------|
+| `GetAllGames` | All games, ORDER BY Name |
+| `GetGameByIdV2` | Game + GameTableCount + SectionGroupCount (subqueries) |
+| `GetSectionGroupsByGameID(gameId, hiddenFilter)` | Section groups for a game |
+| `GetSectionGroupById(id)` | Single section group |
+| `GetGameSectionsByGameID(gameId, hiddenFilter)` | Sections by game, ORDER BY SectionGroupId, ListOrder, ID |
+| `GetGameSectionsBySectionGroupID(sgId, hiddenFilter)` | Sections by section group |
+| `GetSectionById(id)` | Single section |
+| `GetGameRecordsByGameSectionIDV2(sectionId, hiddenFilter)` | Records by section (dynamic SQL) |
+| `GetGameRecordByRecordID(id)` | Single record |
+| `GetAllGameTablesByGameID(gameId)` | Tables for a game |
+| `GetAllTableRecordsByTableID(tableId)` | Records for a table |
+| `InsertGameRecord(...)` | Insert single record |
+| `InsertMultipleGameRecords(json)` | Bulk insert via JSON_TABLE |
+| `InsertGameSection(...)` | Insert section |
+| `UpdateGameRecord(...)` | Update record (COALESCE for partial updates, validates match count) |
+| `UpdateGameRecordCompletion(id, count)` | Update checkbox progress |
+| `UpdateGameSection(...)` | Update section (COALESCE) |
+| `UpdateGameSectionsListOrder(json, OUT)` | Batch reorder sections (WHILE loop) |
+| `UpdateSectionGroupsListOrder(json, OUT)` | Batch reorder section groups (JSON_TABLE) |
+| `UpdateSectionRecordsListOrder(json, OUT)` | Batch reorder records (WHILE loop) |
+| `DeleteGameRecord(id)` | Delete record |
+
+### Deprecated Stored Procedures (z_ prefix)
+
+These are unused by the app. Safe to drop at any time.
+
+| Procedure | Notes |
+|-----------|-------|
+| `z_GetGameById` | Replaced by `GetGameByIdV2` |
+| `z_GetGameRecordsByGameSectionID` | Old version with server-side ordering (removed from app) |
+| `z_GetAllGameDataByGameID` | Joined game+sections+records in one query (never used by frontend) |
+| `z_GetAllGameRecordsByGameID` | All records for a game (not used) |
+| `z_GetGameSectionById` | Duplicate of `GetSectionById` |
+| `z_InsertSectionGroup` | Insert section group (not exposed via API) |
+| `z_UpdateSectionGroup` | **BUG**: updates `GameSections` table instead of `SectionGroups` |
+| `z_UpdateSectionGroupsListOrder` | Old WHILE loop version, replaced by JSON_TABLE version |
+
+### Hidden Filter Behavior (important inconsistency)
+
+Two different patterns exist for the `hiddenFilter` parameter:
+
+1. **`GetGameSectionsByGameID`** — uses `(hiddenFilter IS NULL OR Hidden = hiddenFilter)`. Passing NULL returns all rows. **This is the correct pattern.**
+
+2. **`GetSectionGroupsByGameID` and `GetGameSectionsBySectionGroupID`** — default NULL to TRUE, then filter `WHERE Hidden = hiddenFilter`. This means NULL → `Hidden = 1` → **only returns hidden items**. This is likely a bug; the intent was probably "include everything" but the effect is the opposite. The frontend works around this by always passing `false` (0) which returns non-hidden items.
+
+### Other Notes
+
+- `GetGameRecordsByGameSectionIDV2` uses dynamic SQL (`PREPARE`/`EXECUTE`) with string concatenation. The inputs are typed INT/BOOL params so SQL injection risk is mitigated, but parameterized queries would be safer.
+- Two batch update patterns: `UpdateGameSectionsListOrder` and `UpdateSectionRecordsListOrder` use a WHILE loop (N individual UPDATE statements), while `UpdateSectionGroupsListOrder` uses JSON_TABLE with a single UPDATE JOIN (more efficient). The older procs could be modernized to use JSON_TABLE.
+- `InsertGameRecord` references `GameID` (column name) in the VALUES clause instead of the parameter `gameId` — works due to MySQL's resolution rules but is confusing.
+- `admin_GetUserPermissionsForStoredProcedures` is a utility proc for checking execution permissions.
