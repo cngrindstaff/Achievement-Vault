@@ -70,7 +70,7 @@ $(document).ready(async function () {
     // Event delegation for section header clicks (toggle collapse)
     // Ignore clicks on the add button
     $('#grid-checklist-container').on('click', '.section-header', function (e) {
-        if ($(e.target).closest('.section-add-btn').length) return;
+        if ($(e.target).closest('.section-add-btn, .section-edit-desc-btn').length) return;
         $(this).next('.section').slideToggle(250);
         $(this).toggleClass('open');
     });
@@ -89,6 +89,78 @@ $(document).ready(async function () {
         e.stopPropagation();
         const recordId = $(this).closest('[data-record-id]').data('recordId');
         if (recordId) window._recordModal.openForEdit(recordId);
+    });
+
+    // --- ADD SECTION ---
+    document.getElementById('add-section-btn').addEventListener('click', async () => {
+        const name = prompt('Enter new section name:');
+        if (!name || !name.trim()) return;
+
+        const sections = await dbUtils.getSectionsBySectionGroupId(sectionGroupId, false);
+        const maxOrder = sections.reduce((max, s) => Math.max(max, s.ListOrder || 0), 0);
+
+        await dbUtils.insertGameSection({
+            sectionName: name.trim(),
+            gameId,
+            listOrder: maxOrder + 1,
+            recordOrderPreference: 'completed-order-name',
+            hidden: 0,
+            sectionGroupId
+        });
+
+        const freshSections = await dbUtils.getSectionsBySectionGroupId(sectionGroupId, false);
+        const allRecords = await fetchAllRecords(freshSections);
+        renderChecklist(freshSections, allRecords, { startExpanded: false });
+        updateAllSectionsCompletion();
+        updateTotalCompletion();
+    });
+
+    // --- SECTION DESCRIPTION MODAL ---
+    const sectionDescModalHTML = `
+        <div id="section-desc-modal" class="modal hidden">
+            <div class="modal-content">
+                <span class="close-modal">&times;</span>
+                <h3 id="section-desc-modal-title"></h3>
+                <form id="section-desc-form" class="add-record-container">
+                    <label class="add-record">Description:<textarea id="section-desc-input" class="add-record" rows="3" maxlength="250"></textarea></label>
+                    <button type="submit" class="save-btn">Save</button>
+                </form>
+            </div>
+        </div>
+    `;
+    document.body.insertAdjacentHTML('beforeend', sectionDescModalHTML);
+
+    const sectionDescModal = document.getElementById('section-desc-modal');
+    sectionDescModal.querySelector('.close-modal').addEventListener('click', () => sectionDescModal.classList.add('hidden'));
+    window.addEventListener('click', (e) => { if (e.target === sectionDescModal) sectionDescModal.classList.add('hidden'); });
+
+    let editingSectionId = null;
+
+    $('#grid-checklist-container').on('click', '.section-edit-desc-btn', function (e) {
+        e.stopPropagation();
+        const header = $(this).closest('.section-header');
+        editingSectionId = header.data('sectionId');
+        const sectionName = header.find('.section-header-text').data('sectionTitle');
+        const currentDesc = header.data('sectionDescription') || '';
+
+        document.getElementById('section-desc-modal-title').textContent = sectionName;
+        document.getElementById('section-desc-input').value = currentDesc;
+        sectionDescModal.classList.remove('hidden');
+    });
+
+    document.getElementById('section-desc-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const description = document.getElementById('section-desc-input').value.trim();
+
+        await dbUtils.updateGameSection(editingSectionId, gameId, { description });
+
+        sectionDescModal.classList.add('hidden');
+
+        const freshSections = await dbUtils.getSectionsBySectionGroupId(sectionGroupId, false);
+        const allRecords = await fetchAllRecords(freshSections);
+        renderChecklist(freshSections, allRecords, { startExpanded: false, expandSectionId: editingSectionId });
+        updateAllSectionsCompletion();
+        updateTotalCompletion();
     });
 
     // --- DETAIL MODAL (shows description + long description on tap) ---
@@ -272,6 +344,7 @@ function renderChecklist(sections, allRecordsBySection, options) {
         const headerDiv = headerClone.querySelector('.section-header');
         headerDiv.dataset.section = sectionIndex;
         headerDiv.dataset.sectionId = section.ID;
+        headerDiv.dataset.sectionDescription = section.Description || '';
 
         const headerText = headerClone.querySelector('.section-header-text');
         headerText.dataset.section = sectionIndex;
