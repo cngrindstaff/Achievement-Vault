@@ -21,8 +21,17 @@
     <h1 id="game-name"></h1>
     <h2>Checklist Groups</h2>
 
-    <!-- Section groups rendered here by JS -->
+    <button id="toggle-reorder-btn" class="add-section-btn">Reorder</button>
+
+    <!-- Normal list view -->
     <div id="section-group-list-container"></div>
+
+    <!-- Reorder view (hidden by default) -->
+    <div id="reorder-view" class="hidden">
+        <div id="grid-reorder-container"></div>
+        <button id="save-order-btn" class="save-button">Save Order</button>
+        <button id="reset-order-btn" class="reset-button">Reset Changes</button>
+    </div>
 </div>
 
 <!-- Templates -->

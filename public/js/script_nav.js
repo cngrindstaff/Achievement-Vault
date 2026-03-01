@@ -5,13 +5,13 @@
  *   import { initNav } from './script_nav.js';
  *
  *   initNav({
- *       currentPage: 'checklist',      // one of: 'home','game','checklistGroups','checklist','table','manage_sections','manage_sectionRecords'
+ *       currentPage: 'checklist',      // one of: 'home','game','checklistGroups','checklist','table','reorder_sections','reorder_records'
  *       gameId: 5,                      // optional — needed for back/game links
  *       gameNameFriendly: 'Elden Ring', // optional — shown in menu
  *   });
  */
 
-export function initNav({ currentPage, gameId, gameNameFriendly }) {
+export function initNav({ currentPage, gameId, gameNameFriendly, sectionGroupId }) {
 
     // Build nav items based on current page context
     const items = [];
@@ -23,7 +23,7 @@ export function initNav({ currentPage, gameId, gameNameFriendly }) {
 
     // 2. Back button — always, unless on Home
     if (currentPage !== 'home') {
-        const backHref = getBackHref(currentPage, gameId);
+        const backHref = getBackHref(currentPage, gameId, sectionGroupId);
         if (backHref) {
             items.push({ label: 'Back', icon: 'fa-arrow-left', href: backHref });
         }
@@ -129,16 +129,20 @@ export function initNav({ currentPage, gameId, gameNameFriendly }) {
         .catch(() => {});
 }
 
-function getBackHref(currentPage, gameId) {
+function getBackHref(currentPage, gameId, sectionGroupId) {
     switch (currentPage) {
         case 'game':
-            return './'; // back to home
+            return './';
         case 'checklistGroups':
-        case 'checklist':
         case 'table':
-        case 'manage_sections':
-        case 'manage_sectionRecords':
             return gameId ? `/game?id=${gameId}` : './';
+        case 'checklist':
+            return gameId ? `/checklistGroups?gameId=${gameId}` : './';
+        case 'reorder_sections':
+        case 'reorder_records':
+            return (gameId && sectionGroupId)
+                ? `/checklist?gameId=${gameId}&sectionGroupId=${sectionGroupId}`
+                : gameId ? `/game?id=${gameId}` : './';
         case 'changelog':
             return './';
         default:

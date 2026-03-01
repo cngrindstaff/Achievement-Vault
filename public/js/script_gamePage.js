@@ -36,7 +36,6 @@ $(document).ready(async function () {
         appendGameLink(linkContainer, `/table?id=${gameId}`, 'Other Tables', 'link-tables');
     }
 
-    appendGameLink(linkContainer, `/manage_sectionGroups?gameId=${gameId}`, 'Admin', 'link-checklist');
 });
 
 function appendGameLink(container, href, text, extraClass) {

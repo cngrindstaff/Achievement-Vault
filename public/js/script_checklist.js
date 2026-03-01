@@ -70,7 +70,7 @@ $(document).ready(async function () {
     // Event delegation for section header clicks (toggle collapse)
     // Ignore clicks on the add button
     $('#grid-checklist-container').on('click', '.section-header', function (e) {
-        if ($(e.target).closest('.section-add-btn, .section-edit-desc-btn').length) return;
+        if ($(e.target).closest('.section-add-btn, .section-edit-desc-btn, .section-reorder-btn').length) return;
         $(this).next('.section').slideToggle(250);
         $(this).toggleClass('open');
     });
@@ -89,6 +89,19 @@ $(document).ready(async function () {
         e.stopPropagation();
         const recordId = $(this).closest('[data-record-id]').data('recordId');
         if (recordId) window._recordModal.openForEdit(recordId);
+    });
+
+    // --- REORDER SECTIONS ---
+    document.getElementById('reorder-sections-btn').addEventListener('click', () => {
+        window.location.href = `/reorder_sections?gameId=${gameId}&sectionGroupId=${sectionGroupId}`;
+    });
+
+    // --- REORDER RECORDS (per section) ---
+    $('#grid-checklist-container').on('click', '.section-reorder-btn', function (e) {
+        e.stopPropagation();
+        const header = $(this).closest('.section-header');
+        const sectionId = header.data('sectionId');
+        window.location.href = `/reorder_records?gameId=${gameId}&sectionId=${sectionId}&sectionGroupId=${sectionGroupId}`;
     });
 
     // --- ADD SECTION ---
