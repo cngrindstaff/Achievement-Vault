@@ -74,14 +74,11 @@ app.get('/table', (req, res) => {
 app.get('/changelog', (req, res) => {
     res.sendFile(path.join(__dirname, '../public/changelog.html'));
 });
-app.get('/manage_sectionGroups', (req, res) => {
-    res.sendFile(path.join(__dirname, '../public/manage_sectionGroups.html'));
+app.get('/reorder_sections', (req, res) => {
+    res.sendFile(path.join(__dirname, '../public/reorder_sections.html'));
 });
-app.get('/manage_sections', (req, res) => {
-    res.sendFile(path.join(__dirname, '../public/manage_sections.html'));
-});
-app.get('/manage_sectionRecords', (req, res) => {
-    res.sendFile(path.join(__dirname, '../public/manage_sectionRecords.html'));
+app.get('/reorder_records', (req, res) => {
+    res.sendFile(path.join(__dirname, '../public/reorder_records.html'));
 });
 
 

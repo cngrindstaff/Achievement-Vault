@@ -1,3 +1,9 @@
+## v3.2.0 - 2026-03-01
+
+### Changed
+
+- Removed separate Admin section, and combined it with the main section.
+
 ## v3.1.1 - 2026-02-27
 
 ### Added
