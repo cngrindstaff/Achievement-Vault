@@ -56,7 +56,7 @@ export function initRecordModal({ gameId, defaultAlreadyCompleted = 0, onSave })
                         <label class="add-record">Number of Checkboxes:<input type="number" id="numberOfCheckboxes" class="add-record default-value" min="0" value="1" required></label>
                         <label class="add-record">Number Already Completed:<input type="number" id="numberAlreadyCompleted" class="add-record default-value" min="0" value="${defaultAlreadyCompleted}" required></label>
                     </div>
-                    <label class="add-record">List Order:<input type="number" id="listOrder" class="add-record default-value" min="0" value="100" required></label>
+                    <label class="add-record">List Order:<input type="number" id="listOrder" class="add-record default-value" min="0" value="1" required></label>
                     <label class="add-record">Long Description:<textarea id="longDescription" class="add-record" rows="2"></textarea></label>
                     <label class="modern-checkbox add-record">
                         <input type="checkbox" id="hidden">
