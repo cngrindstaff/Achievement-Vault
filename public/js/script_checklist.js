@@ -128,24 +128,29 @@ $(document).ready(async function () {
         updateTotalCompletion();
     });
 
-    // --- SECTION DESCRIPTION MODAL ---
-    const sectionDescModalHTML = `
-        <div id="section-desc-modal" class="modal hidden">
+    // --- EDIT SECTION MODAL ---
+    const sectionEditModalHTML = `
+        <div id="section-edit-modal" class="modal hidden">
             <div class="modal-content">
                 <span class="close-modal">&times;</span>
-                <h3 id="section-desc-modal-title"></h3>
-                <form id="section-desc-form" class="add-record-container">
-                    <label class="add-record">Description:<textarea id="section-desc-input" class="add-record" rows="3" maxlength="250"></textarea></label>
+                <h3 id="section-edit-modal-title">Edit Section</h3>
+                <form id="section-edit-form" class="add-record-container">
+                    <label class="add-record">Name:<input type="text" id="section-edit-name" class="add-record" required></label>
+                    <label class="add-record">Description:<textarea id="section-edit-description" class="add-record" rows="3" maxlength="250"></textarea></label>
+                    <label class="add-record">List Order:<input type="number" id="section-edit-listorder" class="add-record" min="0" required></label>
+                    <label class="add-record">
+                        <input type="checkbox" id="section-edit-hidden"> Hidden
+                    </label>
                     <button type="submit" class="save-btn">Save</button>
                 </form>
             </div>
         </div>
     `;
-    document.body.insertAdjacentHTML('beforeend', sectionDescModalHTML);
+    document.body.insertAdjacentHTML('beforeend', sectionEditModalHTML);
 
-    const sectionDescModal = document.getElementById('section-desc-modal');
-    sectionDescModal.querySelector('.close-modal').addEventListener('click', () => sectionDescModal.classList.add('hidden'));
-    window.addEventListener('click', (e) => { if (e.target === sectionDescModal) sectionDescModal.classList.add('hidden'); });
+    const sectionEditModal = document.getElementById('section-edit-modal');
+    sectionEditModal.querySelector('.close-modal').addEventListener('click', () => sectionEditModal.classList.add('hidden'));
+    window.addEventListener('click', (e) => { if (e.target === sectionEditModal) sectionEditModal.classList.add('hidden'); });
 
     let editingSectionId = null;
     let editingSectionHeader = null;
@@ -155,27 +160,27 @@ $(document).ready(async function () {
         const header = $(this).closest('.section-header');
         editingSectionId = header.data('sectionId');
         editingSectionHeader = header;
-        const sectionName = header.find('.section-header-text').data('sectionTitle');
-        const currentDesc = header.data('sectionDescription') || '';
 
-        document.getElementById('section-desc-modal-title').textContent = sectionName;
-        document.getElementById('section-desc-input').value = currentDesc;
-        sectionDescModal.classList.remove('hidden');
+        document.getElementById('section-edit-modal-title').textContent = `Edit: ${header.data('sectionName')}`;
+        document.getElementById('section-edit-name').value = header.data('sectionName') || '';
+        document.getElementById('section-edit-description').value = header.data('sectionDescription') || '';
+        document.getElementById('section-edit-listorder').value = header.data('sectionListOrder') || 0;
+        document.getElementById('section-edit-hidden').checked = !!header.data('sectionHidden');
+        sectionEditModal.classList.remove('hidden');
     });
 
-    document.getElementById('section-desc-form').addEventListener('submit', async (e) => {
+    document.getElementById('section-edit-form').addEventListener('submit', async (e) => {
         e.preventDefault();
-        const description = document.getElementById('section-desc-input').value.trim();
 
         await dbUtils.updateGameSection(editingSectionId, gameId, {
-            description,
-            sectionName: editingSectionHeader.data('sectionName'),
-            listOrder: editingSectionHeader.data('sectionListOrder'),
+            sectionName: document.getElementById('section-edit-name').value.trim() || null,
+            description: document.getElementById('section-edit-description').value.trim() || null,
+            listOrder: parseInt(document.getElementById('section-edit-listorder').value) || 0,
             recordOrderPreference: editingSectionHeader.data('sectionRecordOrderPreference'),
-            hidden: editingSectionHeader.data('sectionHidden')
+            hidden: document.getElementById('section-edit-hidden').checked ? 1 : 0
         });
 
-        sectionDescModal.classList.add('hidden');
+        sectionEditModal.classList.add('hidden');
 
         const freshSections = await dbUtils.getSectionsBySectionGroupId(sectionGroupId, false);
         const allRecords = await fetchAllRecords(freshSections);
