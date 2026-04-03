@@ -56,7 +56,7 @@ export function initRecordModal({ gameId, defaultAlreadyCompleted = 0, onSave })
                         <label class="add-record">Number of Checkboxes:<input type="number" id="numberOfCheckboxes" class="add-record default-value" min="0" value="1" required></label>
                         <label class="add-record">Number Already Completed:<input type="number" id="numberAlreadyCompleted" class="add-record default-value" min="0" value="${defaultAlreadyCompleted}" required></label>
                     </div>
-                    <label class="add-record">List Order:<input type="number" id="listOrder" class="add-record default-value" min="0" value="100" required></label>
+                    <label class="add-record">List Order:<input type="number" id="listOrder" class="add-record default-value" min="0" value="1" required></label>
                     <label class="add-record">Long Description:<textarea id="longDescription" class="add-record" rows="2"></textarea></label>
                     <label class="modern-checkbox add-record">
                         <input type="checkbox" id="hidden">
@@ -90,6 +90,24 @@ export function initRecordModal({ gameId, defaultAlreadyCompleted = 0, onSave })
     const deleteButton = document.getElementById('delete-record-button');
 
     let currentSectionId = null;
+    let initialFormState = null;
+
+    function captureFormState() {
+        return JSON.stringify([
+            recordNameInput.value,
+            recordNamesTextarea.value,
+            document.getElementById('description').value,
+            document.getElementById('numberOfCheckboxes').value,
+            document.getElementById('numberAlreadyCompleted').value,
+            document.getElementById('listOrder').value,
+            document.getElementById('longDescription').value,
+            document.getElementById('hidden').checked
+        ]);
+    }
+
+    function formIsDirty() {
+        return initialFormState !== null && captureFormState() !== initialFormState;
+    }
 
     // ─── Title Case ──────────────────────────────────────────────
 
@@ -135,18 +153,21 @@ export function initRecordModal({ gameId, defaultAlreadyCompleted = 0, onSave })
 
     // ─── Open / Close ────────────────────────────────────────────
 
-    function closeModal() {
+    function closeModal(force = false) {
+        if (!force && formIsDirty()) {
+            if (!confirm('You have unsaved changes. Discard them?')) return;
+        }
         modal.classList.add('hidden');
         form.reset();
         delete form.dataset.editId;
         restoreDefaults();
-        // Reset success message state
+        initialFormState = null;
         const successMessage = document.getElementById('success-message');
         successMessage.classList.add('hidden');
         successMessage.classList.remove('fade-out');
     }
 
-    closeBtn.addEventListener('click', closeModal);
+    closeBtn.addEventListener('click', () => closeModal());
     window.addEventListener('click', (e) => {
         if (e.target === modal) closeModal();
     });
@@ -161,6 +182,7 @@ export function initRecordModal({ gameId, defaultAlreadyCompleted = 0, onSave })
         currentSectionId = sectionId;
         modalSectionHeading.textContent = 'Add to: ' + sectionName;
         modal.classList.remove('hidden');
+        initialFormState = captureFormState();
     }
 
     async function openForEdit(recordId) {
@@ -192,6 +214,7 @@ export function initRecordModal({ gameId, defaultAlreadyCompleted = 0, onSave })
         form.dataset.editId = recordId;
 
         modal.classList.remove('hidden');
+        initialFormState = captureFormState();
     }
 
     // ─── Form Submission ─────────────────────────────────────────
@@ -279,7 +302,7 @@ export function initRecordModal({ gameId, defaultAlreadyCompleted = 0, onSave })
                     successMessage.classList.add('fade-out');
                     setTimeout(async () => {
                         const savedSectionId = currentSectionId;
-                        closeModal();
+                        closeModal(true);
                         if (onSave) await onSave(savedSectionId);
                     }, 300);
                 }, 500);
@@ -306,7 +329,7 @@ export function initRecordModal({ gameId, defaultAlreadyCompleted = 0, onSave })
             const success = await dbUtils.deleteGameRecord(editId);
             if (success) {
                 const savedSectionId = currentSectionId;
-                closeModal();
+                closeModal(true);
                 if (onSave) await onSave(savedSectionId);
             } else {
                 alert('Failed to delete record. Please try again.');
