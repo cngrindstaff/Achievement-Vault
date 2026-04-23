@@ -425,6 +425,21 @@ h3 {
 	transform: translateY(0);
 }
 
+.section-group-item {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 8px;
+}
+
+.section-group-link {
+	flex: 1;
+}
+
+.section-group-edit-btn {
+	margin-right: 0;
+}
+
 .section-header-text {
 	flex-grow: 1;
 }

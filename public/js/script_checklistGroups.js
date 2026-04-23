@@ -7,6 +7,9 @@ var debugLogging = false;
 let gameId = null;
 let gameNameFriendly = null;
 let isReorderMode = false;
+let currentSectionGroups = [];
+const sectionGroupNamePattern = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
+let sectionGroupModalApi = null;
 
 const sectionGroupItemTemplate = document.getElementById('section-group-item-template');
 
@@ -27,7 +30,11 @@ $(document).ready(async function () {
 
     initNav({ currentPage: 'checklistGroups', gameId, gameNameFriendly });
 
-    renderSectionGroups(sectionGroups);
+    currentSectionGroups = sectionGroups;
+    renderSectionGroups(currentSectionGroups);
+
+    const addSectionGroupBtn = document.getElementById('add-section-group-btn');
+    sectionGroupModalApi = initSectionGroupModal(addSectionGroupBtn);
 
     // --- TOGGLE REORDER MODE ---
     const toggleBtn = document.getElementById('toggle-reorder-btn');
@@ -38,15 +45,19 @@ $(document).ready(async function () {
         isReorderMode = !isReorderMode;
         if (isReorderMode) {
             toggleBtn.textContent = 'Done';
+            addSectionGroupBtn.classList.add('hidden');
             listView.classList.add('hidden');
             reorderView.classList.remove('hidden');
             const fresh = await dbUtils.getSectionGroupsByGameId(gameId, false);
+            currentSectionGroups = fresh;
             initReorder(fresh);
         } else {
             toggleBtn.textContent = 'Reorder';
+            addSectionGroupBtn.classList.remove('hidden');
             reorderView.classList.add('hidden');
             listView.classList.remove('hidden');
             const fresh = await dbUtils.getSectionGroupsByGameId(gameId, false);
+            currentSectionGroups = fresh;
             listView.innerHTML = '';
             renderSectionGroups(fresh);
         }
@@ -68,6 +79,7 @@ $(document).ready(async function () {
             if (success) {
                 alert('List order updated successfully!');
                 const fresh = await dbUtils.getSectionGroupsByGameId(gameId, false);
+                currentSectionGroups = fresh;
                 initReorder(fresh);
             } else {
                 alert('Failed to update list order.');
@@ -79,9 +91,138 @@ $(document).ready(async function () {
 
     document.getElementById('reset-order-btn').addEventListener('click', async () => {
         const fresh = await dbUtils.getSectionGroupsByGameId(gameId, false);
+        currentSectionGroups = fresh;
         initReorder(fresh);
     });
 });
+
+function initSectionGroupModal(addSectionGroupBtn) {
+    const modalHtml = `
+        <div id="section-group-edit-modal" class="modal hidden">
+            <div class="modal-content">
+                <span class="close-modal">&times;</span>
+                <h3 id="section-group-modal-title">Add Section Group</h3>
+                <form id="section-group-edit-form" class="add-record-container">
+                    <label class="add-record">Name:<input type="text" id="section-group-edit-name" class="add-record" pattern="[a-z0-9]+(?:-[a-z0-9]+)*" title="Use lowercase letters, numbers, and hyphens only." required></label>
+                    <label id="section-group-edit-friendly-name-row" class="add-record">Friendly Name:<input type="text" id="section-group-edit-friendly-name" class="add-record" required></label>
+                    <label class="add-record">Description:<textarea id="section-group-edit-description" class="add-record" rows="3" maxlength="500"></textarea></label>
+                    <label class="add-record">List Order:<input type="number" id="section-group-edit-listorder" class="add-record" min="0" required></label>
+                    <button type="submit" class="save-btn">Save</button>
+                </form>
+            </div>
+        </div>
+    `;
+    document.body.insertAdjacentHTML('beforeend', modalHtml);
+
+    const modal = document.getElementById('section-group-edit-modal');
+    const closeBtn = modal.querySelector('.close-modal');
+    const modalTitle = document.getElementById('section-group-modal-title');
+    const form = document.getElementById('section-group-edit-form');
+    const nameInput = document.getElementById('section-group-edit-name');
+    const friendlyNameRow = document.getElementById('section-group-edit-friendly-name-row');
+    const friendlyNameInput = document.getElementById('section-group-edit-friendly-name');
+    const descriptionInput = document.getElementById('section-group-edit-description');
+    const listOrderInput = document.getElementById('section-group-edit-listorder');
+    let modalMode = 'add';
+    let editingSectionGroupId = null;
+
+    function openForAdd() {
+        const maxOrder = currentSectionGroups.reduce((max, item) => Math.max(max, item.ListOrder || 0), 0);
+        modalMode = 'add';
+        editingSectionGroupId = null;
+        modalTitle.textContent = 'Add Section Group';
+        friendlyNameRow.classList.remove('hidden');
+        friendlyNameInput.required = true;
+        nameInput.value = '';
+        nameInput.setCustomValidity('');
+        friendlyNameInput.value = '';
+        descriptionInput.value = '';
+        listOrderInput.value = maxOrder + 1;
+        modal.classList.remove('hidden');
+    }
+
+    function openForEdit(sectionGroup) {
+        modalMode = 'edit';
+        editingSectionGroupId = sectionGroup.ID;
+        modalTitle.textContent = `Edit Section Group: ${sectionGroup.FriendlyName}`;
+        friendlyNameRow.classList.remove('hidden');
+        friendlyNameInput.required = true;
+        nameInput.value = sectionGroup.Name || '';
+        nameInput.setCustomValidity('');
+        friendlyNameInput.value = sectionGroup.FriendlyName || '';
+        descriptionInput.value = sectionGroup.Description || '';
+        listOrderInput.value = sectionGroup.ListOrder || 0;
+        modal.classList.remove('hidden');
+    }
+
+    function closeModal() {
+        modal.classList.add('hidden');
+    }
+
+    addSectionGroupBtn.addEventListener('click', openForAdd);
+    closeBtn.addEventListener('click', closeModal);
+    window.addEventListener('click', (e) => {
+        if (e.target === modal) closeModal();
+    });
+
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const sectionGroupName = nameInput.value.trim();
+        const sectionGroupFriendlyName = friendlyNameInput.value.trim();
+        const description = descriptionInput.value.trim() || null;
+        const listOrder = parseInt(listOrderInput.value, 10) || 0;
+
+        if (!sectionGroupNamePattern.test(sectionGroupName)) {
+            nameInput.setCustomValidity('Use lowercase letters, numbers, and hyphens only.');
+            nameInput.reportValidity();
+            return;
+        }
+        nameInput.setCustomValidity('');
+
+        if (modalMode === 'add' && (!sectionGroupName || !sectionGroupFriendlyName)) {
+            alert('Please provide both Name and Friendly Name.');
+            return;
+        }
+        if (modalMode === 'edit' && (!sectionGroupName || !sectionGroupFriendlyName)) {
+            alert('Please provide both Name and Friendly Name.');
+            return;
+        }
+
+        let result = null;
+        if (modalMode === 'add') {
+            result = await dbUtils.insertSectionGroup({
+                sectionGroupName,
+                sectionGroupFriendlyName,
+                gameId,
+                listOrder,
+                hidden: 0,
+                description
+            });
+        } else {
+            result = await dbUtils.updateSectionGroup(editingSectionGroupId, gameId, {
+                sectionGroupName,
+                sectionGroupFriendlyName,
+                description,
+                listOrder
+            });
+        }
+
+        if (!result) {
+            alert(modalMode === 'add' ? 'Failed to add section group.' : 'Failed to update section group.');
+            return;
+        }
+
+        closeModal();
+        const fresh = await dbUtils.getSectionGroupsByGameId(gameId, false);
+        currentSectionGroups = fresh;
+        const listView = document.getElementById('section-group-list-container');
+        listView.innerHTML = '';
+        renderSectionGroups(fresh);
+    });
+
+    return { openForEdit };
+}
 
 function renderSectionGroups(sectionGroups) {
     if (debugLogging) console.log('SectionGroups:', sectionGroups);
@@ -90,9 +231,15 @@ function renderSectionGroups(sectionGroups) {
 
     sectionGroups.forEach(sectionGroup => {
         const clone = sectionGroupItemTemplate.content.cloneNode(true);
-        const p = clone.querySelector('.game-list-item');
-        p.textContent = sectionGroup.FriendlyName;
-        p.onclick = () => window.location.href = `checklist?gameId=${gameId}&sectionGroupId=${sectionGroup.ID}`;
+        const sectionGroupItem = clone.querySelector('.section-group-item');
+        const groupLink = clone.querySelector('.section-group-link');
+        const editButton = clone.querySelector('.section-group-edit-btn');
+        groupLink.textContent = sectionGroup.FriendlyName;
+        sectionGroupItem.onclick = () => window.location.href = `checklist?gameId=${gameId}&sectionGroupId=${sectionGroup.ID}`;
+        editButton.addEventListener('click', (event) => {
+            event.stopPropagation();
+            sectionGroupModalApi?.openForEdit(sectionGroup);
+        });
         fragment.appendChild(clone);
     });
 

@@ -4,6 +4,8 @@ const router = express.Router();
 import db from '../config/mysqlConnector.js';
 
 const debugLogging = process.env.DEBUG_LOGGING === 'true';
+const gameNamePattern = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
+const sectionGroupNamePattern = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 
 function parseHiddenFilter(value) {
     if (value === 'true') return 1;
@@ -42,6 +44,35 @@ router.get('/db/game/:gameId', async (req, res) => {
     } catch (err) {
         console.error(`Error fetching game with ID ${gameId}:`, err);
         res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
+//************************************ INSERT GAME + MAIN SECTION GROUP ************************************//
+router.post('/db/game/insert', async (req, res) => {
+    const { gameName, gameFriendlyName, hasDataTables } = req.body;
+
+    if (!gameName || !gameFriendlyName) {
+        return res.status(400).json({ error: 'Missing required fields: gameName and gameFriendlyName' });
+    }
+    if (!gameNamePattern.test(gameName)) {
+        return res.status(400).json({
+            error: 'Invalid gameName. Use lowercase letters, numbers, and hyphens only.'
+        });
+    }
+
+    try {
+        const [rows] = await db.query(
+            'CALL InsertGameWithMainSectionGroup(?, ?, ?)',
+            [gameName, gameFriendlyName, hasDataTables ?? 0]
+        );
+        const result = rows[0]?.[0] || null;
+        res.json({
+            message: 'Game and default section group created successfully',
+            gameId: result?.GameID ?? null
+        });
+    } catch (err) {
+        console.error('Error inserting game:', err);
+        res.status(500).json({ error: 'Database error' });
     }
 });
 
@@ -403,6 +434,64 @@ router.get('/db/sectionGroups/:gameId/:hiddenFilter', async (req, res) => {
     } catch (err) {
         console.error(`Error fetching sectionGroups with game ID ${gameId}:`, err);
         res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
+//************************************ INSERT SECTION GROUP ************************************//
+router.post('/db/sectionGroup/insert', async (req, res) => {
+    const {
+        sectionGroupName,
+        sectionGroupFriendlyName,
+        gameId,
+        listOrder,
+        hidden,
+        description
+    } = req.body;
+
+    if (!sectionGroupName || !sectionGroupFriendlyName || gameId === undefined || listOrder === undefined || hidden === undefined) {
+        return res.status(400).json({ error: 'Missing required fields' });
+    }
+    if (!sectionGroupNamePattern.test(sectionGroupName)) {
+        return res.status(400).json({
+            error: 'Invalid sectionGroupName. Use lowercase letters, numbers, and hyphens only.'
+        });
+    }
+
+    try {
+        await db.query(
+            'CALL InsertSectionGroup(?, ?, ?, ?, ?, ?)',
+            [sectionGroupName, sectionGroupFriendlyName, gameId, listOrder, hidden, description ?? null]
+        );
+        res.json({ message: 'Section group inserted successfully' });
+    } catch (err) {
+        console.error('Error inserting section group:', err);
+        res.status(500).json({ error: 'Database error' });
+    }
+});
+
+//************************************ UPDATE SECTION GROUP ************************************//
+router.put('/db/sectionGroup/update/:sectionGroupId/:gameId', async (req, res) => {
+    const { sectionGroupId, gameId } = req.params;
+    const { sectionGroupName, sectionGroupFriendlyName, description, listOrder } = req.body;
+
+    if (!sectionGroupName || !sectionGroupFriendlyName || listOrder === undefined) {
+        return res.status(400).json({ error: 'Missing required fields' });
+    }
+    if (!sectionGroupNamePattern.test(sectionGroupName)) {
+        return res.status(400).json({
+            error: 'Invalid sectionGroupName. Use lowercase letters, numbers, and hyphens only.'
+        });
+    }
+
+    try {
+        await db.query(
+            'CALL UpdateSectionGroup(?, ?, ?, ?, ?, ?)',
+            [sectionGroupId, gameId, sectionGroupName, sectionGroupFriendlyName, description ?? null, listOrder]
+        );
+        res.json({ message: 'Section group updated successfully' });
+    } catch (err) {
+        console.error('Error updating section group:', err);
+        res.status(500).json({ error: 'Database error' });
     }
 });
 

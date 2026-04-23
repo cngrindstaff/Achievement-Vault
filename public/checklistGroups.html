@@ -21,7 +21,10 @@
     <h1 id="game-name"></h1>
     <h2>Checklist Groups</h2>
 
-    <button id="toggle-reorder-btn" class="add-section-btn">Reorder</button>
+    <div class="checklist-actions">
+        <button id="add-section-group-btn" class="add-section-btn">+ Add Section Group</button>
+        <button id="toggle-reorder-btn" class="add-section-btn">Reorder</button>
+    </div>
 
     <!-- Normal list view -->
     <div id="section-group-list-container"></div>
@@ -36,7 +39,12 @@
 
 <!-- Templates -->
 <template id="section-group-item-template">
-    <p class="game-list-item"></p>
+    <div class="game-list-item section-group-item">
+        <span class="section-group-link"></span>
+        <button class="section-edit-desc-btn section-group-edit-btn" type="button" title="Edit Section Group">
+            <i class="fas fa-pencil-alt"></i>
+        </button>
+    </div>
 </template>
 
 </body>

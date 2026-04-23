@@ -36,6 +36,40 @@ export async function getGameData(passed_gameId) {
     //document.querySelector('.game-name').textContent = passed_gameNameFriendly;
 }
 
+//************************************ INSERT GAME + MAIN SECTION GROUP ************************************//
+export async function insertGame(gameData) {
+    if (!gameData) {
+        alert("Missing game data.");
+        return;
+    }
+
+    try {
+        const res = await fetch(`/api/db/game/insert`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(gameData)
+        });
+
+        if (!res || !res.ok) {
+            console.log('No response or response not ok:', res);
+            return [];
+        }
+
+        const text = await res.text();
+        if (!text) {
+            console.log('Response body empty');
+            return [];
+        }
+
+        return JSON.parse(text);
+    } catch (err) {
+        console.error("Error inserting game:", err);
+        return null;
+    }
+}
+
 
 //************************************ GET ALL SECTIONS FOR A GAME BY GAME ID ************************************//
 export async function getSectionsByGameId(gameId, hiddenFilter) {
@@ -466,6 +500,72 @@ export async function insertGameSection(sectionData) {
         return data;
     } catch (err) {
         console.error("Error inserting game section:", err);
+        return null;
+    }
+}
+
+//************************************ INSERT SECTION GROUP ************************************//
+export async function insertSectionGroup(sectionGroupData) {
+    if (!sectionGroupData) {
+        alert("Missing section group data.");
+        return;
+    }
+
+    try {
+        const res = await fetch(`/api/db/sectionGroup/insert`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(sectionGroupData)
+        });
+
+        if (!res || !res.ok) {
+            console.log('No response or response not ok:', res);
+            return [];
+        }
+        const text = await res.text();
+        if (!text) {
+            console.log('Response body empty');
+            return [];
+        }
+        const data = JSON.parse(text);
+        return data;
+    } catch (err) {
+        console.error("Error inserting section group:", err);
+        return null;
+    }
+}
+
+//************************************ UPDATE SECTION GROUP ************************************//
+export async function updateSectionGroup(sectionGroupId, gameId, updateData) {
+    if (!sectionGroupId || !gameId || !updateData) {
+        alert("Missing section group ID, game ID, or update data.");
+        return;
+    }
+
+    try {
+        const res = await fetch(`/api/db/sectionGroup/update/${sectionGroupId}/${gameId}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(updateData)
+        });
+
+        if (!res || !res.ok) {
+            console.log('No response or response not ok:', res);
+            return [];
+        }
+        const text = await res.text();
+        if (!text) {
+            console.log('Response body empty');
+            return [];
+        }
+        const data = JSON.parse(text);
+        return data;
+    } catch (err) {
+        console.error("Error updating section group:", err);
         return null;
     }
 }
