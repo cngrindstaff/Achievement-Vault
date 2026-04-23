@@ -34,13 +34,9 @@ $(document).ready(async function () {
 });
 
 async function getAllSections(sectionGroupId) {
-    const [visible, hidden] = await Promise.all([
-        dbUtils.getSectionsBySectionGroupId(sectionGroupId, false),
-        dbUtils.getSectionsBySectionGroupId(sectionGroupId, true)
-    ]);
-    const all = [...(visible || []), ...(hidden || [])];
-    all.sort((a, b) => (a.ListOrder || 0) - (b.ListOrder || 0));
-    return all;
+    const all = await dbUtils.getSectionsBySectionGroupId(sectionGroupId, true);
+    (all || []).sort((a, b) => (a.ListOrder || 0) - (b.ListOrder || 0));
+    return all || [];
 }
 
 function createCard(section, container) {

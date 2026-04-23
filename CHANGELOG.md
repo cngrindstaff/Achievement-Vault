@@ -7,7 +7,8 @@
     - Adding/editing Section Groups
     - Adding multiple Sections at a time
     - Deleting a Section if it has no Records
-    - 
+    - Going to the Edit Record modal from the View Record modal
+    - Add toggle on records page to show hidden records
 - Fixed
     - Fixed bug where if Total Completion was 0/0, it displayed "Total Completion: (0/0) NaN%". It now displays "Total Completion: (0/0) 0%"
     - Fixed bug where items didn't auto-capitalize if they were the first word after an opening parentheses

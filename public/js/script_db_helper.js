@@ -3,6 +3,16 @@ import {getQueryParam} from "./script_utilities.js";
 //can't use env var on client-side js file, so make sure this is 'false' when checking in to GitHub
 var debugLogging = false
 
+// Maps UI booleans to the `/api/db/.../:hiddenFilter` segment contract (see `parseHiddenFilter` in `backend/routes/db.js`):
+// - false => non-hidden only ('0')
+// - true  => include hidden too ('all')
+// Explicit strings like '0', '1', 'all' are passed through unchanged.
+function normalizeHiddenListFilterParam(hiddenFilter) {
+    if (hiddenFilter === true) return 'all';
+    if (hiddenFilter === false) return '0';
+    return hiddenFilter;
+}
+
 //************************************ GET GAME BY ID ************************************//
 export async function getGameData(passed_gameId) {
     if (!passed_gameId) {
@@ -79,6 +89,7 @@ export async function getSectionsByGameId(gameId, hiddenFilter) {
     }
 
     try {
+        hiddenFilter = normalizeHiddenListFilterParam(hiddenFilter);
         //if(debugLogging) console.log('made it here loadSectionsByGameId');
         const res = await fetch(`/api/db/sections/${gameId}/${hiddenFilter}`);
         if (!res || !res.ok) {
@@ -159,6 +170,7 @@ export async function getRecordsBySectionIdV2(sectionId, recordOrderPreference, 
     //if(debugLogging) console.log('sectionId: ' + sectionId );
 
     try {
+        hiddenFilter = normalizeHiddenListFilterParam(hiddenFilter);
         const res = await fetch(`/api/db/records/v2/${sectionId}/hiddenFilter/${hiddenFilter}`);
         if (!res || !res.ok) {
             console.log('No response or response not ok:', res);
@@ -779,6 +791,7 @@ export async function getSectionGroupsByGameId(gameId, hiddenFilter) {
     }
 
     try {
+        hiddenFilter = normalizeHiddenListFilterParam(hiddenFilter);
         //if(debugLogging) console.log('made it here getSectionGroupsByGameId');
         const res = await fetch(`/api/db/sectionGroups/${gameId}/${hiddenFilter}`);
         if (!res || !res.ok) {
@@ -806,6 +819,7 @@ export async function getSectionsBySectionGroupId(sectionGroupId, hiddenFilter) 
     }
 
     try {
+        hiddenFilter = normalizeHiddenListFilterParam(hiddenFilter);
         //if(debugLogging) console.log('made it here loadSectionsByGameId');
         if(debugLogging) console.log('getSectionsBySectionGroupId sectionGroupId: ' + sectionGroupId);
         const res = await fetch(`/api/db/sections/sectionGroupId/${sectionGroupId}/${hiddenFilter}`);

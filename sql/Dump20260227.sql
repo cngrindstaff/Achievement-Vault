@@ -375,18 +375,11 @@ CREATE DEFINER="doadmin"@"%" PROCEDURE "GetGameRecordsByGameSectionIDV2"(
     IN hiddenFilter BOOL
 )
 BEGIN
-    -- Build and execute the query
-    SET @sqlQuery = CONCAT(
-        'SELECT * FROM GameRecords WHERE SectionID = ', inputSectionID,
-        IF(hiddenFilter IS NOT NULL, CONCAT(' AND Hidden = ', hiddenFilter), '')
-    );
-
-    -- Debug (optional)
-    -- SELECT @sqlQuery;
-
-    PREPARE stmt FROM @sqlQuery;
-    EXECUTE stmt;
-    DEALLOCATE PREPARE stmt;
+    -- hiddenFilter: NULL = no Hidden filter (all), 0 = non-hidden only, 1 = hidden only
+    SELECT * FROM GameRecords
+    WHERE SectionID = inputSectionID
+      AND (hiddenFilter IS NULL OR Hidden = hiddenFilter)
+    ORDER BY ListOrder ASC, Name ASC;
 END ;;
 DELIMITER ;
 /*!50003 SET sql_mode              = @saved_sql_mode */ ;
@@ -411,7 +404,7 @@ BEGIN
     SELECT * FROM GameSections
     WHERE GameID = inputGameID
       AND (hiddenFilter IS NULL OR Hidden = hiddenFilter)
-    ORDER BY SectionGroupId ASC, ListOrder ASC, ID ASC;
+    ORDER BY SectionGroupID ASC, ListOrder ASC, ID ASC;
 END ;;
 DELIMITER ;
 /*!50003 SET sql_mode              = @saved_sql_mode */ ;
@@ -430,15 +423,11 @@ DELIMITER ;
 DELIMITER ;;
 CREATE DEFINER="doadmin"@"%" PROCEDURE "GetGameSectionsBySectionGroupID"(IN inputSectionGroupID INT, IN includeHiddenSections bool)
 BEGIN
-    -- Default to TRUE if NULL is passed
-    IF includeHiddenSections IS NULL THEN
-        SET includeHiddenSections = TRUE;
-    END IF;
-    
+    -- includeHiddenSections: NULL = no Hidden filter (all), 0 = non-hidden only, 1 = hidden only
     SELECT * FROM GameSections
-    WHERE SectionGroupId = inputSectionGroupID
-    AND Hidden = includeHiddenSections
-    ORDER BY ListOrder ASC, name ASC;
+    WHERE SectionGroupID = inputSectionGroupID
+      AND (includeHiddenSections IS NULL OR Hidden = includeHiddenSections)
+    ORDER BY ListOrder ASC, Name ASC;
 END ;;
 DELIMITER ;
 /*!50003 SET sql_mode              = @saved_sql_mode */ ;
@@ -497,14 +486,10 @@ DELIMITER ;
 DELIMITER ;;
 CREATE DEFINER="doadmin"@"%" PROCEDURE "GetSectionGroupsByGameID"(IN inputGameID INT, IN includeHiddenSectionGroups bool)
 BEGIN
-    -- Default to TRUE if NULL is passed
-    IF includeHiddenSectionGroups IS NULL THEN
-        SET includeHiddenSectionGroups = TRUE;
-    END IF;
-    
+    -- includeHiddenSectionGroups: NULL = no Hidden filter (all), 0 = non-hidden only, 1 = hidden only
     SELECT * FROM SectionGroups
     WHERE GameID = inputGameID
-    AND Hidden = includeHiddenSectionGroups
+      AND (includeHiddenSectionGroups IS NULL OR Hidden = includeHiddenSectionGroups)
     ORDER BY ListOrder ASC, ID ASC;
 END ;;
 DELIMITER ;

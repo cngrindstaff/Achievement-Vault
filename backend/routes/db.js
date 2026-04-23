@@ -7,9 +7,14 @@ const debugLogging = process.env.DEBUG_LOGGING === 'true';
 const gameNamePattern = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 const sectionGroupNamePattern = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 
+// URL segment meanings:
+// - '0' / 'false'  => non-hidden only (Hidden = 0)
+// - '1'            => hidden only (Hidden = 1)
+// - 'all' / 'true' / (omitted/unknown) => no Hidden filter (visible + hidden)
 function parseHiddenFilter(value) {
-    if (value === 'true') return 1;
-    if (value === 'false') return 0;
+    const v = String(value).toLowerCase();
+    if (v === '0' || v === 'false') return 0;
+    if (v === '1') return 1;
     return null;
 }
 
@@ -92,10 +97,6 @@ router.get('/db/sections/:gameId/:hiddenFilter', async (req, res) => {
     try {
         const [rows] = await db.query('CALL GetGameSectionsByGameID(?, ?)', [gameId, hiddenFilter]);
         const result = rows[0];
-
-        if (result.length === 0) {
-            return res.status(404).json({ error: 'Game not found' });
-        }
 
         res.json(result);
     } catch (err) {
@@ -424,10 +425,6 @@ router.get('/db/gameTables/:gameId', async (req, res) => {
         const [rows] = await db.query('CALL GetAllGameTablesByGameID(?)', [gameId]);
         const result = rows[0];
 
-        if (result.length === 0) {
-            return res.status(404).json({ error: 'Game not found' });
-        }
-
         res.json(result);
     } catch (err) {
         console.error(`Error fetching game tables with game ID ${gameId}:`, err);
@@ -462,10 +459,6 @@ router.get('/db/sectionGroups/:gameId/:hiddenFilter', async (req, res) => {
     try {
         const [rows] = await db.query('CALL GetSectionGroupsByGameID(?, ?)', [gameId, hiddenFilter]);
         const result = rows[0];
-
-        if (result.length === 0) {
-            return res.status(404).json({ error: 'Game not found' });
-        }
 
         res.json(result);
     } catch (err) {
@@ -586,10 +579,6 @@ router.get('/db/sections/sectionGroupId/:sectionGroupId/:hiddenFilter', async (r
     try {
         const [rows] = await db.query('CALL GetGameSectionsBySectionGroupID(?, ?)', [sectionGroupId, hiddenFilter]);
         const result = rows[0];
-
-        if (result.length === 0) {
-            return res.status(404).json({ error: 'Game not found' });
-        }
 
         res.json(result);
     } catch (err) {

@@ -12,6 +12,7 @@ let gameNameFriendly = null;
 let linkToGamePage = null;
 let sectionGroupId = null;
 let sectionGroupFriendlyName = null;
+let showHidden = false;
 
 // Template references (cached on load)
 let sectionHeaderTemplate = null;
@@ -33,7 +34,7 @@ $(document).ready(async function () {
     const [gameData, sectionGroupData, sections] = await Promise.all([
         dbUtils.getGameData(gameId),
         dbUtils.getSectionGroupById(sectionGroupId),
-        dbUtils.getSectionsBySectionGroupId(sectionGroupId, false)
+        dbUtils.getSectionsBySectionGroupId(sectionGroupId, showHidden)
     ]);
 
     gameNameFriendly = gameData.FriendlyName;
@@ -56,7 +57,7 @@ $(document).ready(async function () {
     initNav({ currentPage: 'checklist', gameId, gameNameFriendly });
 
     // Fetch all section records in parallel
-    const allRecordsBySection = await fetchAllRecords(sections);
+    const allRecordsBySection = await fetchAllRecords(sections, showHidden);
     renderChecklist(sections, allRecordsBySection, { startExpanded: false, filterValue: null });
     updateAllSectionsCompletion();
     updateTotalCompletion();
@@ -203,7 +204,7 @@ $(document).ready(async function () {
         editingSectionId = null;
         editingSectionHeader = null;
 
-        const sections = await dbUtils.getSectionsBySectionGroupId(sectionGroupId, false);
+        const sections = await dbUtils.getSectionsBySectionGroupId(sectionGroupId, showHidden);
         const maxOrder = sections.reduce((max, s) => Math.max(max, s.ListOrder || 0), 0);
 
         document.getElementById('section-edit-modal-title').textContent = 'Add Section';
@@ -270,10 +271,10 @@ $(document).ready(async function () {
                     return;
                 }
                 await dbUtils.insertMultipleGameSections(
-                    names.map((sectionName, index) => ({
+                    names.map((sectionName) => ({
                         sectionName,
                         gameId,
-                        listOrder: listOrder + index,
+                        listOrder,
                         recordOrderPreference: 'completed-order-name',
                         hidden,
                         sectionGroupId,
@@ -303,8 +304,8 @@ $(document).ready(async function () {
 
         closeSectionModal(true);
 
-        const freshSections = await dbUtils.getSectionsBySectionGroupId(sectionGroupId, false);
-        const allRecords = await fetchAllRecords(freshSections);
+        const freshSections = await dbUtils.getSectionsBySectionGroupId(sectionGroupId, showHidden);
+        const allRecords = await fetchAllRecords(freshSections, showHidden);
         renderChecklist(freshSections, allRecords, { startExpanded: false, expandSectionId: editingSectionId });
         updateAllSectionsCompletion();
         updateTotalCompletion();
@@ -313,12 +314,20 @@ $(document).ready(async function () {
     sectionDeleteButton.addEventListener('click', async () => {
         if (!editingSectionId) return;
 
-        const records = await dbUtils.getRecordsBySectionIdV2(
-            editingSectionId,
-            editingSectionHeader?.data('sectionRecordOrderPreference') || null,
-            false
-        );
-        if (Array.isArray(records) && records.length > 0) {
+        const [visibleRecords, hiddenRecords] = await Promise.all([
+            dbUtils.getRecordsBySectionIdV2(
+                editingSectionId,
+                editingSectionHeader?.data('sectionRecordOrderPreference') || null,
+                '0'
+            ),
+            dbUtils.getRecordsBySectionIdV2(
+                editingSectionId,
+                editingSectionHeader?.data('sectionRecordOrderPreference') || null,
+                '1'
+            )
+        ]);
+        if ((Array.isArray(visibleRecords) && visibleRecords.length > 0) ||
+            (Array.isArray(hiddenRecords) && hiddenRecords.length > 0)) {
             setSectionModalMessage('This section has records and cannot be deleted.');
             return;
         }
@@ -332,8 +341,8 @@ $(document).ready(async function () {
         }
 
         closeSectionModal(true);
-        const freshSections = await dbUtils.getSectionsBySectionGroupId(sectionGroupId, false);
-        const allRecords = await fetchAllRecords(freshSections);
+        const freshSections = await dbUtils.getSectionsBySectionGroupId(sectionGroupId, showHidden);
+        const allRecords = await fetchAllRecords(freshSections, showHidden);
         renderChecklist(freshSections, allRecords, { startExpanded: false });
         updateAllSectionsCompletion();
         updateTotalCompletion();
@@ -413,6 +422,19 @@ $(document).ready(async function () {
 
     // --- FILTER AND TOGGLE LOGIC ---
     $('#container').on('input', '#filter-input', applyFilterAndRender);
+    $('#container').on('change', '#show-hidden-toggle', async function () {
+        showHidden = $(this).is(':checked');
+        const currentFilter = $('#filter-input').val().toLowerCase();
+        if (currentFilter) {
+            await applyFilterAndRender();
+            return;
+        }
+        const sections = await dbUtils.getSectionsBySectionGroupId(sectionGroupId, showHidden);
+        const allRecordsBySection = await fetchAllRecords(sections, showHidden);
+        renderChecklist(sections, allRecordsBySection, { startExpanded: false });
+        updateAllSectionsCompletion();
+        updateTotalCompletion();
+    });
     $('#container').on('change', '#hide-completed-toggle', applyHideCompletedToDOM);
     $('#container').on('change', '#expand-all-toggle', applyExpandAllToDOM);
 
@@ -424,8 +446,8 @@ $(document).ready(async function () {
     async function applyFilterAndRender() {
         const filterValue = $('#filter-input').val().toLowerCase();
         // Re-fetch sections and records
-        const sections = await dbUtils.getSectionsBySectionGroupId(sectionGroupId, false);
-        const allRecordsBySection = await fetchAllRecords(sections);
+        const sections = await dbUtils.getSectionsBySectionGroupId(sectionGroupId, showHidden);
+        const allRecordsBySection = await fetchAllRecords(sections, showHidden);
 
         // Filter records by name/description
         const filteredSections = [];
@@ -486,8 +508,8 @@ $(document).ready(async function () {
         defaultAlreadyCompleted: 0,
         onSave: async (savedSectionId) => {
             // Re-fetch and re-render — only expand the section that was changed
-            const sections = await dbUtils.getSectionsBySectionGroupId(sectionGroupId, false);
-            const allRecordsBySection = await fetchAllRecords(sections);
+            const sections = await dbUtils.getSectionsBySectionGroupId(sectionGroupId, showHidden);
+            const allRecordsBySection = await fetchAllRecords(sections, showHidden);
             renderChecklist(sections, allRecordsBySection, { startExpanded: false, expandSectionId: savedSectionId });
             updateAllSectionsCompletion();
             updateTotalCompletion();
@@ -502,9 +524,9 @@ $(document).ready(async function () {
 /*************************************** DATA FETCHING ***************************************/
 
 // Fetch all records for all sections in parallel
-async function fetchAllRecords(sections) {
+async function fetchAllRecords(sections, hiddenFilter = '0') {
     const recordsPromises = sections.map(section =>
-        dbUtils.getRecordsBySectionIdV2(section.ID, section.RecordOrderPreference || null, false)
+        dbUtils.getRecordsBySectionIdV2(section.ID, section.RecordOrderPreference || null, hiddenFilter)
             .catch(err => {
                 console.error(`Failed to load records for section ${section.Name} (ID: ${section.ID})`, err);
                 return [];
