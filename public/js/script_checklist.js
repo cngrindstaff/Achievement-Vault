@@ -523,16 +523,38 @@ $(document).ready(async function () {
 
 /*************************************** DATA FETCHING ***************************************/
 
-// Fetch all records for all sections in parallel
-async function fetchAllRecords(sections, hiddenFilter = '0') {
+function recordIsHidden(record) {
+    return Number(record?.Hidden) === 1;
+}
+
+// Fetch records per section: toggle off => Hidden=0 only; toggle on => Hidden=1 only (hidden items only).
+// Sections list still comes from getSectionsBySectionGroupId (all sections when toggle on via 'all').
+async function fetchAllRecords(sections, includeHidden = false) {
+    const recordFilter = includeHidden ? '1' : '0';
     const recordsPromises = sections.map(section =>
-        dbUtils.getRecordsBySectionIdV2(section.ID, section.RecordOrderPreference || null, hiddenFilter)
+        dbUtils.getRecordsBySectionIdV2(section.ID, section.RecordOrderPreference || null, recordFilter)
             .catch(err => {
                 console.error(`Failed to load records for section ${section.Name} (ID: ${section.ID})`, err);
                 return [];
             })
     );
-    return await Promise.all(recordsPromises);
+    const bySection = await Promise.all(recordsPromises);
+    if (debugLogging || dbUtils.isAvDebugRecordsEnabled()) {
+        let total = 0;
+        let hidden1 = 0;
+        bySection.forEach((recs) => {
+            if (!Array.isArray(recs)) return;
+            total += recs.length;
+            hidden1 += recs.filter((r) => recordIsHidden(r)).length;
+        });
+        console.log('[AV_DEBUG_RECORDS] fetchAllRecords', {
+            sectionCount: sections.length,
+            recordApiHiddenFilter: recordFilter,
+            totalRows: total,
+            hiddenEq1: hidden1,
+        });
+    }
+    return bySection;
 }
 
 
@@ -546,7 +568,17 @@ function renderChecklist(sections, allRecordsBySection, options) {
 
     const fragment = document.createDocumentFragment();
 
-    sections.forEach((section, sectionIndex) => {
+    let renderPairs = sections.map((section, i) => ({
+        section,
+        records: allRecordsBySection[i] || [],
+    }));
+    // "Show hidden" = hidden records only; omit sections with nothing to show (keeps section indices contiguous).
+    if (showHidden) {
+        renderPairs = renderPairs.filter((p) => p.records.length > 0);
+    }
+
+    renderPairs.forEach((pair, sectionIndex) => {
+        const section = pair.section;
         const sectionTitle = section.Name;
         const sectionTitleClean = utils.createSlug(sectionTitle);
 
@@ -580,7 +612,7 @@ function renderChecklist(sections, allRecordsBySection, options) {
         bodyDiv.style.display = shouldExpand ? 'block' : 'none';
 
         // Populate with records
-        const records = allRecordsBySection[sectionIndex] || [];
+        const records = pair.records;
         if (records.length === 0) {
             const noRecords = document.createElement('div');
             noRecords.className = 'no-records';

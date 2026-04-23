@@ -28,7 +28,7 @@ function renderGames(games) {
 
 async function loadGames() {
     try {
-        const res = await fetch('/api/db/games');
+        const res = await dbUtils.apiFetch('/api/db/games');
         const games = await res.json();
         renderGames(games);
         return games;

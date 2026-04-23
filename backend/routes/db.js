@@ -3,7 +3,16 @@ import express from "express";
 const router = express.Router();
 import db from '../config/mysqlConnector.js';
 
+router.use((req, res, next) => {
+    res.set('Cache-Control', 'no-store, no-cache, must-revalidate, private');
+    res.set('Pragma', 'no-cache');
+    res.set('Expires', '0');
+    next();
+});
+
 const debugLogging = process.env.DEBUG_LOGGING === 'true';
+/** When true, logs row counts and Hidden=1 vs Hidden=0 for checklist list endpoints (see AV_DEBUG_RECORDS). */
+const recordsListDebug = debugLogging || process.env.AV_DEBUG_RECORDS === 'true';
 const gameNamePattern = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 const sectionGroupNamePattern = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 
@@ -16,6 +25,20 @@ function parseHiddenFilter(value) {
     if (v === '0' || v === 'false') return 0;
     if (v === '1') return 1;
     return null;
+}
+
+function countHiddenColumn(rows, hiddenKey = 'Hidden') {
+    const list = Array.isArray(rows) ? rows : [];
+    let eq1 = 0;
+    let eq0 = 0;
+    let other = 0;
+    for (const r of list) {
+        const n = Number(r[hiddenKey]);
+        if (n === 1) eq1++;
+        else if (n === 0) eq0++;
+        else other++;
+    }
+    return { total: list.length, hiddenEq1: eq1, hiddenEq0: eq0, hiddenOther: other };
 }
 
 
@@ -256,10 +279,19 @@ router.get('/db/records/v2/:sectionId/hiddenFilter/:hiddenFilter', async (req, r
     //if(debugLogging) console.log('made it records/sectionId');
     const sectionId = req.params.sectionId;
     const hiddenFilter = parseHiddenFilter(req.params.hiddenFilter);
-
     try {
         const [rows] = await db.query('CALL GetGameRecordsByGameSectionIDV2(?, ?)', [sectionId, hiddenFilter]);
         const result = rows[0];
+
+        if (recordsListDebug) {
+            const stats = countHiddenColumn(result);
+            console.log('[AV_DEBUG_RECORDS] GET /db/records/v2', {
+                sectionId,
+                hiddenFilterParam: req.params.hiddenFilter,
+                parsedHiddenFilter: hiddenFilter,
+                ...stats,
+            });
+        }
 
         if (result.length === 0) {
             return res.json([]);
@@ -579,6 +611,19 @@ router.get('/db/sections/sectionGroupId/:sectionGroupId/:hiddenFilter', async (r
     try {
         const [rows] = await db.query('CALL GetGameSectionsBySectionGroupID(?, ?)', [sectionGroupId, hiddenFilter]);
         const result = rows[0];
+
+        if (recordsListDebug) {
+            const stats = countHiddenColumn(result, 'Hidden');
+            console.log('[AV_DEBUG_RECORDS] GET /db/sections/sectionGroupId', {
+                sectionGroupId,
+                hiddenFilterParam: req.params.hiddenFilter,
+                parsedHiddenFilter: hiddenFilter,
+                sectionsTotal: stats.total,
+                sectionsHiddenEq1: stats.hiddenEq1,
+                sectionsVisibleEq0: stats.hiddenEq0,
+                sectionsHiddenOther: stats.hiddenOther,
+            });
+        }
 
         res.json(result);
     } catch (err) {

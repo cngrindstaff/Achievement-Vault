@@ -1,10 +1,11 @@
 import { initNav } from './script_nav.js';
+import { apiFetch } from './script_db_helper.js';
 
 $(document).ready(async function () {
     initNav({ currentPage: 'changelog' });
 
     try {
-        const res = await fetch('/api/changelog');
+        const res = await apiFetch('/api/changelog');
         const markdown = await res.text();
         const content = markdown.split('\n# Format')[0].trim();
         document.getElementById('changelog-content').innerHTML = marked.parse(content);
