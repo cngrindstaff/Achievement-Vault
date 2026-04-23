@@ -111,7 +111,12 @@ $(document).ready(async function () {
                 <span class="close-modal">&times;</span>
                 <h3 id="section-edit-modal-title">Edit Section</h3>
                 <form id="section-edit-form" class="add-record-container">
-                    <label class="add-record">Name:<input type="text" id="section-edit-name" class="add-record" required></label>
+                    <label class="switch multi-toggle" id="section-multi-toggle-row">
+                        <input type="checkbox" id="section-multi-mode-toggle">
+                        <span class="slider"></span>Add Multiple
+                    </label>
+                    <label class="add-record" id="section-single-name-row">Name:<input type="text" id="section-edit-name" class="add-record" required></label>
+                    <label class="add-record hidden" id="section-multi-names-row">Names (one per line):<textarea id="section-edit-names" class="add-record" rows="6"></textarea></label>
                     <label class="add-record">Description:<textarea id="section-edit-description" class="add-record" rows="3" maxlength="250"></textarea></label>
                     <label class="add-record">List Order:<input type="number" id="section-edit-listorder" class="add-record" min="0" required></label>
                     <label class="add-record">
@@ -125,11 +130,19 @@ $(document).ready(async function () {
     document.body.insertAdjacentHTML('beforeend', sectionEditModalHTML);
 
     const sectionEditModal = document.getElementById('section-edit-modal');
+    const sectionMultiToggleRow = document.getElementById('section-multi-toggle-row');
+    const sectionMultiModeToggle = document.getElementById('section-multi-mode-toggle');
+    const sectionSingleNameRow = document.getElementById('section-single-name-row');
+    const sectionMultiNamesRow = document.getElementById('section-multi-names-row');
+    const sectionEditNameInput = document.getElementById('section-edit-name');
+    const sectionEditNamesInput = document.getElementById('section-edit-names');
     let sectionInitialState = null;
 
     function captureSectionFormState() {
         return JSON.stringify([
             document.getElementById('section-edit-name').value,
+            document.getElementById('section-edit-names').value,
+            document.getElementById('section-multi-mode-toggle').checked,
             document.getElementById('section-edit-description').value,
             document.getElementById('section-edit-listorder').value,
             document.getElementById('section-edit-hidden').checked
@@ -155,6 +168,18 @@ $(document).ready(async function () {
     let editingSectionId = null;
     let editingSectionHeader = null;
 
+    sectionMultiModeToggle.addEventListener('change', () => {
+        const isMultiMode = sectionMultiModeToggle.checked;
+        sectionSingleNameRow.classList.toggle('hidden', isMultiMode);
+        sectionMultiNamesRow.classList.toggle('hidden', !isMultiMode);
+        sectionEditNameInput.required = !isMultiMode;
+        if (isMultiMode) {
+            sectionEditNameInput.value = '';
+        } else {
+            sectionEditNamesInput.value = '';
+        }
+    });
+
     // Open for ADD
     document.getElementById('add-section-btn').addEventListener('click', async () => {
         sectionModalMode = 'add';
@@ -165,7 +190,13 @@ $(document).ready(async function () {
         const maxOrder = sections.reduce((max, s) => Math.max(max, s.ListOrder || 0), 0);
 
         document.getElementById('section-edit-modal-title').textContent = 'Add Section';
+        sectionMultiToggleRow.classList.remove('hidden');
+        sectionMultiModeToggle.checked = false;
+        sectionSingleNameRow.classList.remove('hidden');
+        sectionMultiNamesRow.classList.add('hidden');
+        sectionEditNameInput.required = true;
         document.getElementById('section-edit-name').value = '';
+        document.getElementById('section-edit-names').value = '';
         document.getElementById('section-edit-description').value = '';
         document.getElementById('section-edit-listorder').value = maxOrder + 1;
         document.getElementById('section-edit-hidden').checked = false;
@@ -182,7 +213,13 @@ $(document).ready(async function () {
         editingSectionHeader = header;
 
         document.getElementById('section-edit-modal-title').textContent = `Edit: ${header.data('sectionName')}`;
+        sectionMultiToggleRow.classList.add('hidden');
+        sectionMultiModeToggle.checked = false;
+        sectionSingleNameRow.classList.remove('hidden');
+        sectionMultiNamesRow.classList.add('hidden');
+        sectionEditNameInput.required = true;
         document.getElementById('section-edit-name').value = header.data('sectionName') || '';
+        document.getElementById('section-edit-names').value = '';
         document.getElementById('section-edit-description').value = header.data('sectionDescription') || '';
         document.getElementById('section-edit-listorder').value = header.data('sectionListOrder') || 0;
         document.getElementById('section-edit-hidden').checked = !!header.data('sectionHidden');
@@ -194,21 +231,44 @@ $(document).ready(async function () {
     document.getElementById('section-edit-form').addEventListener('submit', async (e) => {
         e.preventDefault();
 
+        const isMultiMode = sectionModalMode === 'add' && sectionMultiModeToggle.checked;
         const name = document.getElementById('section-edit-name').value.trim();
+        const names = document.getElementById('section-edit-names').value
+            .split(/\r?\n/)
+            .map((line) => line.trim())
+            .filter((line) => line.length > 0);
         const description = document.getElementById('section-edit-description').value.trim() || null;
         const listOrder = parseInt(document.getElementById('section-edit-listorder').value) || 0;
         const hidden = document.getElementById('section-edit-hidden').checked ? 1 : 0;
 
         if (sectionModalMode === 'add') {
-            await dbUtils.insertGameSection({
-                sectionName: name,
-                gameId,
-                listOrder,
-                recordOrderPreference: 'completed-order-name',
-                hidden,
-                sectionGroupId,
-                description
-            });
+            if (isMultiMode) {
+                if (names.length === 0) {
+                    alert('Please enter at least one section name.');
+                    return;
+                }
+                await dbUtils.insertMultipleGameSections(
+                    names.map((sectionName, index) => ({
+                        sectionName,
+                        gameId,
+                        listOrder: listOrder + index,
+                        recordOrderPreference: 'completed-order-name',
+                        hidden,
+                        sectionGroupId,
+                        description
+                    }))
+                );
+            } else {
+                await dbUtils.insertGameSection({
+                    sectionName: name,
+                    gameId,
+                    listOrder,
+                    recordOrderPreference: 'completed-order-name',
+                    hidden,
+                    sectionGroupId,
+                    description
+                });
+            }
         } else {
             await dbUtils.updateGameSection(editingSectionId, gameId, {
                 sectionName: name || null,

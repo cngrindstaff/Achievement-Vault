@@ -581,10 +581,10 @@ CREATE DEFINER="doadmin"@"%" PROCEDURE "UpdateSectionGroup"(
 BEGIN
     UPDATE SectionGroups
     SET
-        Name = COALESCE(sectionGroupName, Name),
-        FriendlyName = COALESCE(sectionGroupFriendlyName, FriendlyName),
-        Description = COALESCE(sectionGroupDescription, Description),
-        ListOrder = COALESCE(sectionGroupListOrder, ListOrder),
+        Name = sectionGroupName,
+        FriendlyName = sectionGroupFriendlyName,
+        Description = sectionGroupDescription,
+        ListOrder = sectionGroupListOrder,
         DateLastUpdated = utc_timestamp()
     WHERE
         ID = sectionGroupId AND GameID = gameId;
@@ -641,13 +641,55 @@ CREATE DEFINER="doadmin"@"%" PROCEDURE "InsertGameSection"(
     IN gameId INT,
     IN listOrder INT,
     IN recordOrderPreference VARCHAR(100),
-    IN hidden TINYINT
+    IN hidden TINYINT,
+    IN sectionGroupId INT,
+    IN description VARCHAR(250)
 )
 BEGIN
     INSERT INTO GameSections
-    (Name, GameID, ListOrder, RecordOrderPreference, Hidden, DateCreated)
+    (Name, GameID, ListOrder, RecordOrderPreference, Hidden, SectionGroupID, Description, DateCreated)
     VALUES
-    (sectionName, gameId, listOrder, recordOrderPreference, hidden, utc_timestamp());
+    (sectionName, gameId, listOrder, recordOrderPreference, hidden, sectionGroupId, description, utc_timestamp());
+END ;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 DROP PROCEDURE IF EXISTS `InsertMultipleGameSections` */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_0900_ai_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'REAL_AS_FLOAT,PIPES_AS_CONCAT,ANSI_QUOTES,IGNORE_SPACE,ONLY_FULL_GROUP_BY,ANSI,STRICT_ALL_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+CREATE DEFINER="doadmin"@"%" PROCEDURE "InsertMultipleGameSections"(
+    IN sectionsJson JSON
+)
+BEGIN
+    INSERT INTO GameSections
+        (Name, GameID, ListOrder, RecordOrderPreference, Hidden, SectionGroupID, Description, DateCreated)
+    SELECT
+        j.sectionName,
+        j.gameId,
+        j.listOrder,
+        j.recordOrderPreference,
+        j.hidden,
+        j.sectionGroupId,
+        j.description,
+        UTC_TIMESTAMP()
+    FROM JSON_TABLE(sectionsJson, '$[*]' COLUMNS (
+        sectionName VARCHAR(100) PATH '$.sectionName',
+        gameId INT PATH '$.gameId',
+        listOrder INT PATH '$.listOrder',
+        recordOrderPreference VARCHAR(100) PATH '$.recordOrderPreference',
+        hidden TINYINT PATH '$.hidden',
+        sectionGroupId INT PATH '$.sectionGroupId',
+        description VARCHAR(250) PATH '$.description'
+    )) AS j;
 END ;;
 DELIMITER ;
 /*!50003 SET sql_mode              = @saved_sql_mode */ ;

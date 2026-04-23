@@ -504,6 +504,31 @@ export async function insertGameSection(sectionData) {
     }
 }
 
+//************************************ INSERT MULTIPLE GAME SECTIONS ************************************//
+export async function insertMultipleGameSections(sections) {
+    if (!Array.isArray(sections) || sections.length === 0) {
+        alert("No sections to insert.");
+        return null;
+    }
+
+    try {
+        const res = await fetch('/api/db/sections/insertMultiple', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(sections)
+        });
+
+        if (!res || !res.ok) {
+            console.log('No response or response not ok:', res);
+            return null;
+        }
+        return await res.json();
+    } catch (err) {
+        console.error("Error inserting multiple game sections:", err);
+        return null;
+    }
+}
+
 //************************************ INSERT SECTION GROUP ************************************//
 export async function insertSectionGroup(sectionGroupData) {
     if (!sectionGroupData) {

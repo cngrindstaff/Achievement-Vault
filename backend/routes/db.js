@@ -145,6 +145,24 @@ router.post('/db/section/insert', async (req, res) => {
     }
 });
 
+//************************************ INSERT MULTIPLE GAME SECTIONS ************************************//
+router.post('/db/sections/insertMultiple', async (req, res) => {
+    const sections = req.body;
+
+    if (!Array.isArray(sections) || sections.length === 0) {
+        return res.status(400).json({ error: 'Invalid input. Expected a non-empty array of sections.' });
+    }
+
+    try {
+        const jsonString = JSON.stringify(sections);
+        await db.query('CALL InsertMultipleGameSections(?)', [jsonString]);
+        res.json({ message: `${sections.length} game sections inserted successfully` });
+    } catch (err) {
+        console.error('Error inserting multiple game sections:', err);
+        res.status(500).json({ error: 'Database error' });
+    }
+});
+
 //************************************ UPDATE GAME SECTION ************************************//
 // Update Game Section
 router.put('/db/section/update/:sectionId/:gameId', async (req, res) => {
