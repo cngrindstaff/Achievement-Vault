@@ -354,20 +354,33 @@ $(document).ready(async function () {
                     <p id="detail-modal-longdesc-text"></p>
                 </div>
                 <p id="detail-modal-empty" class="detail-empty hidden">No description available.</p>
+                <div class="button-container">
+                    <button type="button" id="detail-modal-edit-btn" class="edit-button">Edit Record</button>
+                </div>
             </div>
         </div>
     `;
     document.body.insertAdjacentHTML('beforeend', detailModalHTML);
 
     const detailModal = document.getElementById('detail-modal');
+    const detailModalEditButton = document.getElementById('detail-modal-edit-btn');
+    let detailModalRecordId = null;
     detailModal.querySelector('.close-modal').addEventListener('click', () => detailModal.classList.add('hidden'));
     window.addEventListener('click', (e) => { if (e.target === detailModal) detailModal.classList.add('hidden'); });
+    detailModalEditButton.addEventListener('click', () => {
+        if (!detailModalRecordId) return;
+        detailModal.classList.add('hidden');
+        if (window._recordModal) {
+            window._recordModal.openForEdit(detailModalRecordId);
+        }
+    });
 
     // Open detail modal when clicking on a label that has details
     $('#grid-checklist-container').on('click', '.label.has-details', function (e) {
         e.stopPropagation();
         const item = $(this).closest('[data-record-id]')[0];
         if (!item) return;
+        detailModalRecordId = item.dataset.recordId || null;
 
         const name = this.textContent;
         const desc = item.dataset.description || '';
