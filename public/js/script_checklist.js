@@ -122,7 +122,11 @@ $(document).ready(async function () {
                     <label class="add-record">
                         <input type="checkbox" id="section-edit-hidden"> Hidden
                     </label>
-                    <button type="submit" class="save-btn">Save</button>
+                    <div class="button-container">
+                        <button type="submit" class="save-button">Save</button>
+                        <button type="button" id="section-delete-btn" class="delete-button hidden">Delete Section</button>
+                    </div>
+                    <div id="section-modal-message" class="error-message hidden"></div>
                 </form>
             </div>
         </div>
@@ -136,6 +140,8 @@ $(document).ready(async function () {
     const sectionMultiNamesRow = document.getElementById('section-multi-names-row');
     const sectionEditNameInput = document.getElementById('section-edit-name');
     const sectionEditNamesInput = document.getElementById('section-edit-names');
+    const sectionDeleteButton = document.getElementById('section-delete-btn');
+    const sectionModalMessage = document.getElementById('section-modal-message');
     let sectionInitialState = null;
 
     function captureSectionFormState() {
@@ -153,10 +159,21 @@ $(document).ready(async function () {
         return sectionInitialState !== null && captureSectionFormState() !== sectionInitialState;
     }
 
+    function setSectionModalMessage(message) {
+        if (!message) {
+            sectionModalMessage.textContent = '';
+            sectionModalMessage.classList.add('hidden');
+            return;
+        }
+        sectionModalMessage.textContent = message;
+        sectionModalMessage.classList.remove('hidden');
+    }
+
     function closeSectionModal(force = false) {
         if (!force && sectionFormIsDirty()) {
             if (!confirm('You have unsaved changes. Discard them?')) return;
         }
+        setSectionModalMessage('');
         sectionEditModal.classList.add('hidden');
         sectionInitialState = null;
     }
@@ -200,6 +217,8 @@ $(document).ready(async function () {
         document.getElementById('section-edit-description').value = '';
         document.getElementById('section-edit-listorder').value = maxOrder + 1;
         document.getElementById('section-edit-hidden').checked = false;
+        sectionDeleteButton.classList.add('hidden');
+        setSectionModalMessage('');
         sectionEditModal.classList.remove('hidden');
         sectionInitialState = captureSectionFormState();
     });
@@ -223,6 +242,8 @@ $(document).ready(async function () {
         document.getElementById('section-edit-description').value = header.data('sectionDescription') || '';
         document.getElementById('section-edit-listorder').value = header.data('sectionListOrder') || 0;
         document.getElementById('section-edit-hidden').checked = !!header.data('sectionHidden');
+        sectionDeleteButton.classList.remove('hidden');
+        setSectionModalMessage('');
         sectionEditModal.classList.remove('hidden');
         sectionInitialState = captureSectionFormState();
     });
@@ -230,6 +251,7 @@ $(document).ready(async function () {
     // Save (handles both add and edit)
     document.getElementById('section-edit-form').addEventListener('submit', async (e) => {
         e.preventDefault();
+        setSectionModalMessage('');
 
         const isMultiMode = sectionModalMode === 'add' && sectionMultiModeToggle.checked;
         const name = document.getElementById('section-edit-name').value.trim();
@@ -284,6 +306,35 @@ $(document).ready(async function () {
         const freshSections = await dbUtils.getSectionsBySectionGroupId(sectionGroupId, false);
         const allRecords = await fetchAllRecords(freshSections);
         renderChecklist(freshSections, allRecords, { startExpanded: false, expandSectionId: editingSectionId });
+        updateAllSectionsCompletion();
+        updateTotalCompletion();
+    });
+
+    sectionDeleteButton.addEventListener('click', async () => {
+        if (!editingSectionId) return;
+
+        const records = await dbUtils.getRecordsBySectionIdV2(
+            editingSectionId,
+            editingSectionHeader?.data('sectionRecordOrderPreference') || null,
+            false
+        );
+        if (Array.isArray(records) && records.length > 0) {
+            setSectionModalMessage('This section has records and cannot be deleted.');
+            return;
+        }
+
+        if (!confirm('Delete this section? This cannot be undone.')) return;
+
+        const result = await dbUtils.deleteGameSection(editingSectionId, gameId);
+        if (!result) {
+            setSectionModalMessage('Failed to delete section.');
+            return;
+        }
+
+        closeSectionModal(true);
+        const freshSections = await dbUtils.getSectionsBySectionGroupId(sectionGroupId, false);
+        const allRecords = await fetchAllRecords(freshSections);
+        renderChecklist(freshSections, allRecords, { startExpanded: false });
         updateAllSectionsCompletion();
         updateTotalCompletion();
     });
@@ -700,6 +751,10 @@ function updateTotalCompletion() {
             if (debugLogging) console.log('totalCheckboxes ' + totalCheckboxes);
         });
         totalCompletionText = totalCheckedCheckboxes + '/' + totalCheckboxes;
+        if (totalCheckboxes === 0) {
+            $('#total-completion').text(`Total Completion: (${totalCompletionText}) 0%`);
+            return;
+        }
         totalCompletionPercent = ((totalCheckedCheckboxes / totalCheckboxes) * 100).toFixed(2);
         $('#total-completion').text(`Total Completion: (${totalCompletionText}) ${totalCompletionPercent}%`);
     } catch (error) {

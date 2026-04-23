@@ -181,6 +181,25 @@ router.put('/db/section/update/:sectionId/:gameId', async (req, res) => {
     }
 });
 
+//************************************ DELETE GAME SECTION (ONLY IF NO RECORDS) ************************************//
+router.delete('/db/section/delete/:sectionId/:gameId', async (req, res) => {
+    const { sectionId, gameId } = req.params;
+
+    try {
+        const [rows] = await db.query('CALL DeleteGameSection(?, ?)', [sectionId, gameId]);
+        const rowsDeleted = rows?.[0]?.[0]?.RowsDeleted ?? 0;
+
+        if (rowsDeleted === 0) {
+            return res.status(400).json({ error: 'Section can only be deleted when it has 0 records.' });
+        }
+
+        res.status(200).json({ message: 'Section deleted successfully' });
+    } catch (err) {
+        console.error('Error deleting section:', err);
+        res.status(500).json({ error: 'Database error' });
+    }
+});
+
 
 //************************************ UPDATE THE ORDER OF GAME SECTIONS ************************************//
 /*

@@ -470,6 +470,35 @@ export async function updateGameSection(sectionId, gameId, updateData) {
     }
 }
 
+//************************************ DELETE GAME SECTION ************************************//
+export async function deleteGameSection(sectionId, gameId) {
+    if (!sectionId || !gameId) {
+        alert("Missing section ID or game ID.");
+        return null;
+    }
+
+    try {
+        const res = await fetch(`/api/db/section/delete/${sectionId}/${gameId}`, {
+            method: 'DELETE'
+        });
+
+        if (!res || !res.ok) {
+            console.log('No response or response not ok:', res);
+            return null;
+        }
+
+        const text = await res.text();
+        if (!text) {
+            console.log('Response body empty');
+            return [];
+        }
+        return JSON.parse(text);
+    } catch (err) {
+        console.error("Error deleting section:", err);
+        return null;
+    }
+}
+
 
 //************************************ INSERT GAME SECTION************************************//
 export async function insertGameSection(sectionData) {

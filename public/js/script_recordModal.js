@@ -26,11 +26,28 @@ const lowercaseWords = new Set([
 ]);
 
 function toTitleCase(str) {
-    return str.split(' ').map((word, i) => {
+    let forceCapitalize = true;
+    return str.split(/\s+/).map((word) => {
         if (!word) return word;
-        const lower = word.toLowerCase();
-        if (i > 0 && lowercaseWords.has(lower)) return lower;
-        return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
+
+        const match = word.match(/^([^A-Za-z0-9]*)([A-Za-z0-9][A-Za-z0-9'’-]*)(.*)$/);
+        if (!match) {
+            forceCapitalize = /[)\].:;!?]$/.test(word);
+            return word;
+        }
+
+        const prefix = match[1];
+        const core = match[2];
+        const suffix = match[3];
+        const lowerCore = core.toLowerCase();
+        const shouldLowercaseMinor = !forceCapitalize && lowercaseWords.has(lowerCore);
+        const normalizedCore = shouldLowercaseMinor
+            ? lowerCore
+            : lowerCore.charAt(0).toUpperCase() + lowerCore.slice(1);
+
+        const rebuilt = `${prefix}${normalizedCore}${suffix}`;
+        forceCapitalize = /[)\].:;!?]$/.test(rebuilt);
+        return rebuilt;
     }).join(' ');
 }
 
@@ -48,6 +65,11 @@ export function initRecordModal({ gameId, defaultAlreadyCompleted = 0, onSave })
                     <label class="switch multi-toggle">
                         <input type="checkbox" id="multi-mode-toggle">
                         <span class="slider"></span>Add Multiple
+                    </label>
+                    <label class="modern-checkbox add-record">
+                        <input type="checkbox" id="preserve-casing">
+                        <span class="checkmark"></span>
+                        Override auto-casing
                     </label>
                     <label class="add-record" id="single-name-label">Name:<input type="text" id="recordName" class="add-record" required></label>
                     <label class="add-record hidden" id="multi-name-label">Names (one per line):<textarea id="recordNames" class="add-record" rows="6" placeholder="Record One&#10;Record Two&#10;Record Three"></textarea></label>
@@ -85,6 +107,7 @@ export function initRecordModal({ gameId, defaultAlreadyCompleted = 0, onSave })
     const multiNameLabel = document.getElementById('multi-name-label');
     const recordNameInput = document.getElementById('recordName');
     const recordNamesTextarea = document.getElementById('recordNames');
+    const preserveCasingInput = document.getElementById('preserve-casing');
     const multiToggleLabel = modal.querySelector('.multi-toggle');
     const modalSectionHeading = document.getElementById('modal-section-name');
     const deleteButton = document.getElementById('delete-record-button');
@@ -112,10 +135,12 @@ export function initRecordModal({ gameId, defaultAlreadyCompleted = 0, onSave })
     // ─── Title Case ──────────────────────────────────────────────
 
     recordNameInput.addEventListener('blur', function () {
+        if (preserveCasingInput.checked) return;
         this.value = toTitleCase(this.value);
     });
 
     recordNamesTextarea.addEventListener('blur', function () {
+        if (preserveCasingInput.checked) return;
         this.value = this.value.split('\n').map(line => {
             const trimmed = line.trim();
             return trimmed ? toTitleCase(trimmed) : '';
@@ -143,6 +168,7 @@ export function initRecordModal({ gameId, defaultAlreadyCompleted = 0, onSave })
         document.getElementById('numberOfCheckboxes').classList.add('default-value');
         document.getElementById('numberAlreadyCompleted').classList.add('default-value');
         document.getElementById('listOrder').classList.add('default-value');
+        preserveCasingInput.checked = false;
         multiToggle.checked = false;
         singleNameLabel.classList.remove('hidden');
         multiNameLabel.classList.add('hidden');
@@ -223,6 +249,16 @@ export function initRecordModal({ gameId, defaultAlreadyCompleted = 0, onSave })
         event.preventDefault();
 
         const isMultiMode = multiToggle.checked;
+        if (!preserveCasingInput.checked) {
+            if (isMultiMode && !form.dataset.editId) {
+                recordNamesTextarea.value = recordNamesTextarea.value.split('\n').map(line => {
+                    const trimmed = line.trim();
+                    return trimmed ? toTitleCase(trimmed) : '';
+                }).join('\n');
+            } else {
+                recordNameInput.value = toTitleCase(recordNameInput.value.trim());
+            }
+        }
         const description = document.getElementById('description').value.trim();
         const numberOfCheckboxes = parseInt(document.getElementById('numberOfCheckboxes').value);
         const numberAlreadyCompleted = parseInt(document.getElementById('numberAlreadyCompleted').value);
