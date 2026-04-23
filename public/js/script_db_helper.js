@@ -3,6 +3,35 @@ import {getQueryParam} from "./script_utilities.js";
 //can't use env var on client-side js file, so make sure this is 'false' when checking in to GitHub
 var debugLogging = false
 
+/** In DevTools: localStorage.setItem('AV_DEBUG_RECORDS','1') then reload. Remove with removeItem. */
+export function isAvDebugRecordsEnabled() {
+    try {
+        return typeof localStorage !== 'undefined' && localStorage.getItem('AV_DEBUG_RECORDS') === '1';
+    } catch {
+        return false;
+    }
+}
+
+// Maps UI booleans to the `/api/db/.../:hiddenFilter` segment contract (see `parseHiddenFilter` in `backend/routes/db.js`):
+// - false => non-hidden only ('0')
+// - true  => include hidden too ('all')
+// Explicit strings like '0', '1', 'all' are passed through unchanged.
+function normalizeHiddenListFilterParam(hiddenFilter) {
+    if (hiddenFilter === true) return 'all';
+    if (hiddenFilter === false) return '0';
+    return hiddenFilter;
+}
+
+/**
+ * Same-origin `/api/...` requests: bypass HTTP cache and avoid 304 + empty body edge cases
+ * (Express weak ETags, reverse proxies, or identical URLs after toggles).
+ */
+export function apiFetch(url, init = {}) {
+    const sep = url.includes('?') ? '&' : '?';
+    const busted = `${url}${sep}_=${Date.now()}`;
+    return fetch(busted, { ...init, cache: 'no-store' });
+}
+
 //************************************ GET GAME BY ID ************************************//
 export async function getGameData(passed_gameId) {
     if (!passed_gameId) {
@@ -11,7 +40,7 @@ export async function getGameData(passed_gameId) {
     }
 
     try {
-        const res = await fetch(`/api/db/game/${passed_gameId}`);
+        const res = await apiFetch(`/api/db/game/${passed_gameId}`);
         if (!res || !res.ok) {
             console.log('No response or response not ok:', res);
             return [];
@@ -36,6 +65,40 @@ export async function getGameData(passed_gameId) {
     //document.querySelector('.game-name').textContent = passed_gameNameFriendly;
 }
 
+//************************************ INSERT GAME + MAIN SECTION GROUP ************************************//
+export async function insertGame(gameData) {
+    if (!gameData) {
+        alert("Missing game data.");
+        return;
+    }
+
+    try {
+        const res = await apiFetch(`/api/db/game/insert`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(gameData)
+        });
+
+        if (!res || !res.ok) {
+            console.log('No response or response not ok:', res);
+            return [];
+        }
+
+        const text = await res.text();
+        if (!text) {
+            console.log('Response body empty');
+            return [];
+        }
+
+        return JSON.parse(text);
+    } catch (err) {
+        console.error("Error inserting game:", err);
+        return null;
+    }
+}
+
 
 //************************************ GET ALL SECTIONS FOR A GAME BY GAME ID ************************************//
 export async function getSectionsByGameId(gameId, hiddenFilter) {
@@ -45,8 +108,9 @@ export async function getSectionsByGameId(gameId, hiddenFilter) {
     }
 
     try {
+        hiddenFilter = normalizeHiddenListFilterParam(hiddenFilter);
         //if(debugLogging) console.log('made it here loadSectionsByGameId');
-        const res = await fetch(`/api/db/sections/${gameId}/${hiddenFilter}`);
+        const res = await apiFetch(`/api/db/sections/${gameId}/${hiddenFilter}`);
         if (!res || !res.ok) {
             console.log('No response or response not ok:', res);
             return [];
@@ -90,7 +154,7 @@ export async function getSectionById(passed_sectionId) {
     }
 
     try {
-        const res = await fetch(`/api/db/section/${passed_sectionId}`);
+        const res = await apiFetch(`/api/db/section/${passed_sectionId}`);
         if (!res || !res.ok) {
             console.log('No response or response not ok:', res);
             return [];
@@ -125,7 +189,8 @@ export async function getRecordsBySectionIdV2(sectionId, recordOrderPreference, 
     //if(debugLogging) console.log('sectionId: ' + sectionId );
 
     try {
-        const res = await fetch(`/api/db/records/v2/${sectionId}/hiddenFilter/${hiddenFilter}`);
+        hiddenFilter = normalizeHiddenListFilterParam(hiddenFilter);
+        const res = await apiFetch(`/api/db/records/v2/${sectionId}/hiddenFilter/${hiddenFilter}`);
         if (!res || !res.ok) {
             console.log('No response or response not ok:', res);
             return [];
@@ -136,6 +201,18 @@ export async function getRecordsBySectionIdV2(sectionId, recordOrderPreference, 
             return [];
         }
         const data = JSON.parse(text);
+        if (debugLogging || isAvDebugRecordsEnabled()) {
+            const hidden1 = Array.isArray(data) ? data.filter((r) => Number(r?.Hidden) === 1).length : 0;
+            const total = Array.isArray(data) ? data.length : 0;
+            console.log('[AV_DEBUG_RECORDS] getRecordsBySectionIdV2 (client)', {
+                sectionId,
+                hiddenFilterSent: hiddenFilter,
+                httpStatus: res.status,
+                totalRows: total,
+                hiddenEq1: hidden1,
+                hiddenEq0: total - hidden1,
+            });
+        }
         //if(debugLogging) console.log('Records data:', data);
         /*        return {
                     gameId: data.ID,
@@ -208,7 +285,7 @@ export async function getGameRecordById(passed_recordId) {
     }
 
     try {
-        const res = await fetch(`/api/db/record/${passed_recordId}`);
+        const res = await apiFetch(`/api/db/record/${passed_recordId}`);
         if (!res || !res.ok) {
             console.log('No response or response not ok:', res);
             return [];
@@ -237,7 +314,7 @@ export async function getGameRecordById(passed_recordId) {
 //************************************ UPDATE RECORD COMPLETION ************************************//
 export async function updateRecordCompletion(recordId, numberAlreadyCompleted){
     try {
-        const res = await fetch(`/api/db/record/updateCompletion/${recordId}`, {
+        const res = await apiFetch(`/api/db/record/updateCompletion/${recordId}`, {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json',
@@ -269,7 +346,7 @@ export async function getGameTablesByGameId(gameId) {
     }
 
     try {
-        const res = await fetch(`/api/db/gameTables/${gameId}`);
+        const res = await apiFetch(`/api/db/gameTables/${gameId}`);
         if (!res || !res.ok) {
             console.log('No response or response not ok:', res);
             return [];
@@ -293,7 +370,7 @@ export async function getTableRecordsByTableId(tableId) {
     }
 
     try {
-        const res = await fetch(`/api/db/tableRecords/${tableId}`);
+        const res = await apiFetch(`/api/db/tableRecords/${tableId}`);
         if (!res || !res.ok) {
             console.log('No response or response not ok:', res);
             return [];
@@ -318,7 +395,7 @@ export async function updateGameRecord(recordId, updateData) {
     }
 
     try {
-        const res = await fetch(`/api/db/record/update/${recordId}`, {
+        const res = await apiFetch(`/api/db/record/update/${recordId}`, {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json'
@@ -351,7 +428,7 @@ export async function insertGameRecord(recordData) {
     }
 
     try {
-        const res = await fetch(`/api/db/record/insert`, {
+        const res = await apiFetch(`/api/db/record/insert`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -385,7 +462,7 @@ export async function insertMultipleGameRecords(records) {
     }
 
     try {
-        const res = await fetch('/api/db/records/insertMultiple', {
+        const res = await apiFetch('/api/db/records/insertMultiple', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(records)
@@ -411,7 +488,7 @@ export async function updateGameSection(sectionId, gameId, updateData) {
     }
 
     try {
-        const res = await fetch(`/api/db/section/update/${sectionId}/${gameId}`, {
+        const res = await apiFetch(`/api/db/section/update/${sectionId}/${gameId}`, {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json'
@@ -436,6 +513,35 @@ export async function updateGameSection(sectionId, gameId, updateData) {
     }
 }
 
+//************************************ DELETE GAME SECTION ************************************//
+export async function deleteGameSection(sectionId, gameId) {
+    if (!sectionId || !gameId) {
+        alert("Missing section ID or game ID.");
+        return null;
+    }
+
+    try {
+        const res = await apiFetch(`/api/db/section/delete/${sectionId}/${gameId}`, {
+            method: 'DELETE'
+        });
+
+        if (!res || !res.ok) {
+            console.log('No response or response not ok:', res);
+            return null;
+        }
+
+        const text = await res.text();
+        if (!text) {
+            console.log('Response body empty');
+            return [];
+        }
+        return JSON.parse(text);
+    } catch (err) {
+        console.error("Error deleting section:", err);
+        return null;
+    }
+}
+
 
 //************************************ INSERT GAME SECTION************************************//
 export async function insertGameSection(sectionData) {
@@ -445,7 +551,7 @@ export async function insertGameSection(sectionData) {
     }
 
     try {
-        const res = await fetch(`/api/db/section/insert`, {
+        const res = await apiFetch(`/api/db/section/insert`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -470,6 +576,97 @@ export async function insertGameSection(sectionData) {
     }
 }
 
+//************************************ INSERT MULTIPLE GAME SECTIONS ************************************//
+export async function insertMultipleGameSections(sections) {
+    if (!Array.isArray(sections) || sections.length === 0) {
+        alert("No sections to insert.");
+        return null;
+    }
+
+    try {
+        const res = await apiFetch('/api/db/sections/insertMultiple', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(sections)
+        });
+
+        if (!res || !res.ok) {
+            console.log('No response or response not ok:', res);
+            return null;
+        }
+        return await res.json();
+    } catch (err) {
+        console.error("Error inserting multiple game sections:", err);
+        return null;
+    }
+}
+
+//************************************ INSERT SECTION GROUP ************************************//
+export async function insertSectionGroup(sectionGroupData) {
+    if (!sectionGroupData) {
+        alert("Missing section group data.");
+        return;
+    }
+
+    try {
+        const res = await apiFetch(`/api/db/sectionGroup/insert`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(sectionGroupData)
+        });
+
+        if (!res || !res.ok) {
+            console.log('No response or response not ok:', res);
+            return [];
+        }
+        const text = await res.text();
+        if (!text) {
+            console.log('Response body empty');
+            return [];
+        }
+        const data = JSON.parse(text);
+        return data;
+    } catch (err) {
+        console.error("Error inserting section group:", err);
+        return null;
+    }
+}
+
+//************************************ UPDATE SECTION GROUP ************************************//
+export async function updateSectionGroup(sectionGroupId, gameId, updateData) {
+    if (!sectionGroupId || !gameId || !updateData) {
+        alert("Missing section group ID, game ID, or update data.");
+        return;
+    }
+
+    try {
+        const res = await apiFetch(`/api/db/sectionGroup/update/${sectionGroupId}/${gameId}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(updateData)
+        });
+
+        if (!res || !res.ok) {
+            console.log('No response or response not ok:', res);
+            return [];
+        }
+        const text = await res.text();
+        if (!text) {
+            console.log('Response body empty');
+            return [];
+        }
+        const data = JSON.parse(text);
+        return data;
+    } catch (err) {
+        console.error("Error updating section group:", err);
+        return null;
+    }
+}
+
 
 //************************************ UPDATE THE ORDER OF SECTION GROUPS ************************************//
 export async function updateSectionGroupsListOrder(sectionGroupUpdates) {
@@ -479,7 +676,7 @@ export async function updateSectionGroupsListOrder(sectionGroupUpdates) {
     }
 
     try {
-        const res = await fetch(`/api/db/sectionGroups/updateListOrder`, {
+        const res = await apiFetch(`/api/db/sectionGroups/updateListOrder`, {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json'
@@ -507,7 +704,7 @@ export async function updateGameSectionsListOrder(sectionUpdates) {
     }
 
     try {
-        const res = await fetch(`/api/db/sections/updateListOrder`, {
+        const res = await apiFetch(`/api/db/sections/updateListOrder`, {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json'
@@ -540,7 +737,7 @@ export async function updateSectionRecordsListOrder(recordUpdates) {
     }
 
     try {
-        const res = await fetch(`/api/db/records/updateListOrder`, {
+        const res = await apiFetch(`/api/db/records/updateListOrder`, {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json'
@@ -570,7 +767,7 @@ export async function updateSectionRecordsListOrder(recordUpdates) {
 export async function deleteGameRecord(recordId) {
     try {
         if (debugLogging) console.log('deleteGameRecord called with ID:', recordId);
-        const res = await fetch(`/api/db/record/delete/${recordId}`, {
+        const res = await apiFetch(`/api/db/record/delete/${recordId}`, {
             method: 'DELETE'
         });
 
@@ -600,7 +797,7 @@ export async function getSectionGroupById(sectionGroupId) {
 
     try {
         //if(debugLogging) console.log('made it here getSectionGroupsByGameId');
-        const res = await fetch(`/api/db/sectionGroup/${sectionGroupId}`);
+        const res = await apiFetch(`/api/db/sectionGroup/${sectionGroupId}`);
         if (!res || !res.ok) {
             console.log('No response or response not ok:', res);
             return [];
@@ -618,6 +815,33 @@ export async function getSectionGroupById(sectionGroupId) {
     }
 }
 //************************************ GET ALL SECTIONGROUPS FOR A GAME BY GAME ID ************************************//
+async function fetchSectionGroupsByGameIdRaw(gameId, hiddenFilterSegment) {
+    const res = await apiFetch(`/api/db/sectionGroups/${gameId}/${hiddenFilterSegment}`);
+    if (!res || !res.ok) {
+        console.log('No response or response not ok:', res);
+        return [];
+    }
+    const text = await res.text();
+    if (!text) {
+        console.log('Response body empty');
+        return [];
+    }
+    return JSON.parse(text);
+}
+
+function mergeSectionGroupsVisibleAndHidden(visible, hidden) {
+    const byId = new Map();
+    for (const row of [...(visible || []), ...(hidden || [])]) {
+        if (row && row.ID != null) byId.set(row.ID, row);
+    }
+    return Array.from(byId.values()).sort((a, b) => {
+        if ((a.ListOrder || 0) !== (b.ListOrder || 0)) {
+            return (a.ListOrder || 0) - (b.ListOrder || 0);
+        }
+        return (a.ID || 0) - (b.ID || 0);
+    });
+}
+
 export async function getSectionGroupsByGameId(gameId, hiddenFilter) {
     if (!gameId) {
         alert("Missing game ID in URL.");
@@ -625,26 +849,49 @@ export async function getSectionGroupsByGameId(gameId, hiddenFilter) {
     }
 
     try {
+        hiddenFilter = normalizeHiddenListFilterParam(hiddenFilter);
         //if(debugLogging) console.log('made it here getSectionGroupsByGameId');
-        const res = await fetch(`/api/db/sectionGroups/${gameId}/${hiddenFilter}`);
-        if (!res || !res.ok) {
-            console.log('No response or response not ok:', res);
-            return [];
+        if (hiddenFilter === 'all') {
+            const [visible, hidden] = await Promise.all([
+                fetchSectionGroupsByGameIdRaw(gameId, '0'),
+                fetchSectionGroupsByGameIdRaw(gameId, '1'),
+            ]);
+            return mergeSectionGroupsVisibleAndHidden(visible, hidden);
         }
-        const text = await res.text();
-        if (!text) {
-            console.log('Response body empty');
-            return [];
-        }
-        const data = JSON.parse(text);
-        //if(debugLogging) console.log('SectionGroup data:', data);
-        return data;
+        return await fetchSectionGroupsByGameIdRaw(gameId, hiddenFilter);
     } catch (err) {
         console.error("Error fetching SectionGroup data:", err);
     }
 }
 
 //************************************ GET ALL SECTIONS FOR A GAME BY SECTION GROUP ID ************************************//
+async function fetchSectionsBySectionGroupIdRaw(sectionGroupId, hiddenFilterSegment) {
+    const res = await apiFetch(`/api/db/sections/sectionGroupId/${sectionGroupId}/${hiddenFilterSegment}`);
+    if (!res || !res.ok) {
+        console.log('No response or response not ok:', res);
+        return [];
+    }
+    const text = await res.text();
+    if (!text) {
+        console.log('Response body empty');
+        return [];
+    }
+    return JSON.parse(text);
+}
+
+function mergeSectionsVisibleAndHidden(visible, hidden) {
+    const byId = new Map();
+    for (const row of [...(visible || []), ...(hidden || [])]) {
+        if (row && row.ID != null) byId.set(row.ID, row);
+    }
+    return Array.from(byId.values()).sort((a, b) => {
+        if ((a.ListOrder || 0) !== (b.ListOrder || 0)) {
+            return (a.ListOrder || 0) - (b.ListOrder || 0);
+        }
+        return String(a.Name || '').localeCompare(String(b.Name || ''), undefined, { sensitivity: 'base' });
+    });
+}
+
 export async function getSectionsBySectionGroupId(sectionGroupId, hiddenFilter) {
     if (!sectionGroupId) {
         alert("Missing sectionGroupId in URL.");
@@ -652,21 +899,19 @@ export async function getSectionsBySectionGroupId(sectionGroupId, hiddenFilter) 
     }
 
     try {
+        hiddenFilter = normalizeHiddenListFilterParam(hiddenFilter);
         //if(debugLogging) console.log('made it here loadSectionsByGameId');
         if(debugLogging) console.log('getSectionsBySectionGroupId sectionGroupId: ' + sectionGroupId);
-        const res = await fetch(`/api/db/sections/sectionGroupId/${sectionGroupId}/${hiddenFilter}`);
-        if (!res || !res.ok) {
-            console.log('No response or response not ok:', res);
-            return [];
+        // Older DB procs treated NULL as "hidden only" for this endpoint. Request 0 + 1 and merge
+        // so "show all sections" works even before the stored procedure is updated.
+        if (hiddenFilter === 'all') {
+            const [visible, hidden] = await Promise.all([
+                fetchSectionsBySectionGroupIdRaw(sectionGroupId, '0'),
+                fetchSectionsBySectionGroupIdRaw(sectionGroupId, '1'),
+            ]);
+            return mergeSectionsVisibleAndHidden(visible, hidden);
         }
-        const text = await res.text();
-        if (!text) {
-            console.log('Response body empty');
-            return [];
-        }
-        const data = JSON.parse(text);
-        //if(debugLogging) console.log('Section data:', data);
-        return data;
+        return await fetchSectionsBySectionGroupIdRaw(sectionGroupId, hiddenFilter);
     } catch (err) {
         console.error("Error getSectionsBySectionGroupId: ", err);
     }

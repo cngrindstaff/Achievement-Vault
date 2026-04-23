@@ -12,6 +12,7 @@ let gameNameFriendly = null;
 let linkToGamePage = null;
 let sectionGroupId = null;
 let sectionGroupFriendlyName = null;
+let showHidden = false;
 
 // Template references (cached on load)
 let sectionHeaderTemplate = null;
@@ -33,7 +34,7 @@ $(document).ready(async function () {
     const [gameData, sectionGroupData, sections] = await Promise.all([
         dbUtils.getGameData(gameId),
         dbUtils.getSectionGroupById(sectionGroupId),
-        dbUtils.getSectionsBySectionGroupId(sectionGroupId, false)
+        dbUtils.getSectionsBySectionGroupId(sectionGroupId, showHidden)
     ]);
 
     gameNameFriendly = gameData.FriendlyName;
@@ -56,7 +57,7 @@ $(document).ready(async function () {
     initNav({ currentPage: 'checklist', gameId, gameNameFriendly });
 
     // Fetch all section records in parallel
-    const allRecordsBySection = await fetchAllRecords(sections);
+    const allRecordsBySection = await fetchAllRecords(sections, showHidden);
     renderChecklist(sections, allRecordsBySection, { startExpanded: false, filterValue: null });
     updateAllSectionsCompletion();
     updateTotalCompletion();
@@ -111,13 +112,22 @@ $(document).ready(async function () {
                 <span class="close-modal">&times;</span>
                 <h3 id="section-edit-modal-title">Edit Section</h3>
                 <form id="section-edit-form" class="add-record-container">
-                    <label class="add-record">Name:<input type="text" id="section-edit-name" class="add-record" required></label>
+                    <label class="switch multi-toggle" id="section-multi-toggle-row">
+                        <input type="checkbox" id="section-multi-mode-toggle">
+                        <span class="slider"></span>Add Multiple
+                    </label>
+                    <label class="add-record" id="section-single-name-row">Name:<input type="text" id="section-edit-name" class="add-record" required></label>
+                    <label class="add-record hidden" id="section-multi-names-row">Names (one per line):<textarea id="section-edit-names" class="add-record" rows="6"></textarea></label>
                     <label class="add-record">Description:<textarea id="section-edit-description" class="add-record" rows="3" maxlength="250"></textarea></label>
                     <label class="add-record">List Order:<input type="number" id="section-edit-listorder" class="add-record" min="0" required></label>
                     <label class="add-record">
                         <input type="checkbox" id="section-edit-hidden"> Hidden
                     </label>
-                    <button type="submit" class="save-btn">Save</button>
+                    <div class="button-container">
+                        <button type="submit" class="save-button">Save</button>
+                        <button type="button" id="section-delete-btn" class="delete-button hidden">Delete Section</button>
+                    </div>
+                    <div id="section-modal-message" class="error-message hidden"></div>
                 </form>
             </div>
         </div>
@@ -125,11 +135,21 @@ $(document).ready(async function () {
     document.body.insertAdjacentHTML('beforeend', sectionEditModalHTML);
 
     const sectionEditModal = document.getElementById('section-edit-modal');
+    const sectionMultiToggleRow = document.getElementById('section-multi-toggle-row');
+    const sectionMultiModeToggle = document.getElementById('section-multi-mode-toggle');
+    const sectionSingleNameRow = document.getElementById('section-single-name-row');
+    const sectionMultiNamesRow = document.getElementById('section-multi-names-row');
+    const sectionEditNameInput = document.getElementById('section-edit-name');
+    const sectionEditNamesInput = document.getElementById('section-edit-names');
+    const sectionDeleteButton = document.getElementById('section-delete-btn');
+    const sectionModalMessage = document.getElementById('section-modal-message');
     let sectionInitialState = null;
 
     function captureSectionFormState() {
         return JSON.stringify([
             document.getElementById('section-edit-name').value,
+            document.getElementById('section-edit-names').value,
+            document.getElementById('section-multi-mode-toggle').checked,
             document.getElementById('section-edit-description').value,
             document.getElementById('section-edit-listorder').value,
             document.getElementById('section-edit-hidden').checked
@@ -140,10 +160,21 @@ $(document).ready(async function () {
         return sectionInitialState !== null && captureSectionFormState() !== sectionInitialState;
     }
 
+    function setSectionModalMessage(message) {
+        if (!message) {
+            sectionModalMessage.textContent = '';
+            sectionModalMessage.classList.add('hidden');
+            return;
+        }
+        sectionModalMessage.textContent = message;
+        sectionModalMessage.classList.remove('hidden');
+    }
+
     function closeSectionModal(force = false) {
         if (!force && sectionFormIsDirty()) {
             if (!confirm('You have unsaved changes. Discard them?')) return;
         }
+        setSectionModalMessage('');
         sectionEditModal.classList.add('hidden');
         sectionInitialState = null;
     }
@@ -155,20 +186,40 @@ $(document).ready(async function () {
     let editingSectionId = null;
     let editingSectionHeader = null;
 
+    sectionMultiModeToggle.addEventListener('change', () => {
+        const isMultiMode = sectionMultiModeToggle.checked;
+        sectionSingleNameRow.classList.toggle('hidden', isMultiMode);
+        sectionMultiNamesRow.classList.toggle('hidden', !isMultiMode);
+        sectionEditNameInput.required = !isMultiMode;
+        if (isMultiMode) {
+            sectionEditNameInput.value = '';
+        } else {
+            sectionEditNamesInput.value = '';
+        }
+    });
+
     // Open for ADD
     document.getElementById('add-section-btn').addEventListener('click', async () => {
         sectionModalMode = 'add';
         editingSectionId = null;
         editingSectionHeader = null;
 
-        const sections = await dbUtils.getSectionsBySectionGroupId(sectionGroupId, false);
+        const sections = await dbUtils.getSectionsBySectionGroupId(sectionGroupId, showHidden);
         const maxOrder = sections.reduce((max, s) => Math.max(max, s.ListOrder || 0), 0);
 
         document.getElementById('section-edit-modal-title').textContent = 'Add Section';
+        sectionMultiToggleRow.classList.remove('hidden');
+        sectionMultiModeToggle.checked = false;
+        sectionSingleNameRow.classList.remove('hidden');
+        sectionMultiNamesRow.classList.add('hidden');
+        sectionEditNameInput.required = true;
         document.getElementById('section-edit-name').value = '';
+        document.getElementById('section-edit-names').value = '';
         document.getElementById('section-edit-description').value = '';
         document.getElementById('section-edit-listorder').value = maxOrder + 1;
         document.getElementById('section-edit-hidden').checked = false;
+        sectionDeleteButton.classList.add('hidden');
+        setSectionModalMessage('');
         sectionEditModal.classList.remove('hidden');
         sectionInitialState = captureSectionFormState();
     });
@@ -182,10 +233,18 @@ $(document).ready(async function () {
         editingSectionHeader = header;
 
         document.getElementById('section-edit-modal-title').textContent = `Edit: ${header.data('sectionName')}`;
+        sectionMultiToggleRow.classList.add('hidden');
+        sectionMultiModeToggle.checked = false;
+        sectionSingleNameRow.classList.remove('hidden');
+        sectionMultiNamesRow.classList.add('hidden');
+        sectionEditNameInput.required = true;
         document.getElementById('section-edit-name').value = header.data('sectionName') || '';
+        document.getElementById('section-edit-names').value = '';
         document.getElementById('section-edit-description').value = header.data('sectionDescription') || '';
         document.getElementById('section-edit-listorder').value = header.data('sectionListOrder') || 0;
         document.getElementById('section-edit-hidden').checked = !!header.data('sectionHidden');
+        sectionDeleteButton.classList.remove('hidden');
+        setSectionModalMessage('');
         sectionEditModal.classList.remove('hidden');
         sectionInitialState = captureSectionFormState();
     });
@@ -193,22 +252,46 @@ $(document).ready(async function () {
     // Save (handles both add and edit)
     document.getElementById('section-edit-form').addEventListener('submit', async (e) => {
         e.preventDefault();
+        setSectionModalMessage('');
 
+        const isMultiMode = sectionModalMode === 'add' && sectionMultiModeToggle.checked;
         const name = document.getElementById('section-edit-name').value.trim();
+        const names = document.getElementById('section-edit-names').value
+            .split(/\r?\n/)
+            .map((line) => line.trim())
+            .filter((line) => line.length > 0);
         const description = document.getElementById('section-edit-description').value.trim() || null;
         const listOrder = parseInt(document.getElementById('section-edit-listorder').value) || 0;
         const hidden = document.getElementById('section-edit-hidden').checked ? 1 : 0;
 
         if (sectionModalMode === 'add') {
-            await dbUtils.insertGameSection({
-                sectionName: name,
-                gameId,
-                listOrder,
-                recordOrderPreference: 'completed-order-name',
-                hidden,
-                sectionGroupId,
-                description
-            });
+            if (isMultiMode) {
+                if (names.length === 0) {
+                    alert('Please enter at least one section name.');
+                    return;
+                }
+                await dbUtils.insertMultipleGameSections(
+                    names.map((sectionName) => ({
+                        sectionName,
+                        gameId,
+                        listOrder,
+                        recordOrderPreference: 'completed-order-name',
+                        hidden,
+                        sectionGroupId,
+                        description
+                    }))
+                );
+            } else {
+                await dbUtils.insertGameSection({
+                    sectionName: name,
+                    gameId,
+                    listOrder,
+                    recordOrderPreference: 'completed-order-name',
+                    hidden,
+                    sectionGroupId,
+                    description
+                });
+            }
         } else {
             await dbUtils.updateGameSection(editingSectionId, gameId, {
                 sectionName: name || null,
@@ -221,9 +304,46 @@ $(document).ready(async function () {
 
         closeSectionModal(true);
 
-        const freshSections = await dbUtils.getSectionsBySectionGroupId(sectionGroupId, false);
-        const allRecords = await fetchAllRecords(freshSections);
+        const freshSections = await dbUtils.getSectionsBySectionGroupId(sectionGroupId, showHidden);
+        const allRecords = await fetchAllRecords(freshSections, showHidden);
         renderChecklist(freshSections, allRecords, { startExpanded: false, expandSectionId: editingSectionId });
+        updateAllSectionsCompletion();
+        updateTotalCompletion();
+    });
+
+    sectionDeleteButton.addEventListener('click', async () => {
+        if (!editingSectionId) return;
+
+        const [visibleRecords, hiddenRecords] = await Promise.all([
+            dbUtils.getRecordsBySectionIdV2(
+                editingSectionId,
+                editingSectionHeader?.data('sectionRecordOrderPreference') || null,
+                '0'
+            ),
+            dbUtils.getRecordsBySectionIdV2(
+                editingSectionId,
+                editingSectionHeader?.data('sectionRecordOrderPreference') || null,
+                '1'
+            )
+        ]);
+        if ((Array.isArray(visibleRecords) && visibleRecords.length > 0) ||
+            (Array.isArray(hiddenRecords) && hiddenRecords.length > 0)) {
+            setSectionModalMessage('This section has records and cannot be deleted.');
+            return;
+        }
+
+        if (!confirm('Delete this section? This cannot be undone.')) return;
+
+        const result = await dbUtils.deleteGameSection(editingSectionId, gameId);
+        if (!result) {
+            setSectionModalMessage('Failed to delete section.');
+            return;
+        }
+
+        closeSectionModal(true);
+        const freshSections = await dbUtils.getSectionsBySectionGroupId(sectionGroupId, showHidden);
+        const allRecords = await fetchAllRecords(freshSections, showHidden);
+        renderChecklist(freshSections, allRecords, { startExpanded: false });
         updateAllSectionsCompletion();
         updateTotalCompletion();
     });
@@ -243,20 +363,33 @@ $(document).ready(async function () {
                     <p id="detail-modal-longdesc-text"></p>
                 </div>
                 <p id="detail-modal-empty" class="detail-empty hidden">No description available.</p>
+                <div class="button-container">
+                    <button type="button" id="detail-modal-edit-btn" class="edit-button">Edit Record</button>
+                </div>
             </div>
         </div>
     `;
     document.body.insertAdjacentHTML('beforeend', detailModalHTML);
 
     const detailModal = document.getElementById('detail-modal');
+    const detailModalEditButton = document.getElementById('detail-modal-edit-btn');
+    let detailModalRecordId = null;
     detailModal.querySelector('.close-modal').addEventListener('click', () => detailModal.classList.add('hidden'));
     window.addEventListener('click', (e) => { if (e.target === detailModal) detailModal.classList.add('hidden'); });
+    detailModalEditButton.addEventListener('click', () => {
+        if (!detailModalRecordId) return;
+        detailModal.classList.add('hidden');
+        if (window._recordModal) {
+            window._recordModal.openForEdit(detailModalRecordId);
+        }
+    });
 
     // Open detail modal when clicking on a label that has details
     $('#grid-checklist-container').on('click', '.label.has-details', function (e) {
         e.stopPropagation();
         const item = $(this).closest('[data-record-id]')[0];
         if (!item) return;
+        detailModalRecordId = item.dataset.recordId || null;
 
         const name = this.textContent;
         const desc = item.dataset.description || '';
@@ -289,6 +422,19 @@ $(document).ready(async function () {
 
     // --- FILTER AND TOGGLE LOGIC ---
     $('#container').on('input', '#filter-input', applyFilterAndRender);
+    $('#container').on('change', '#show-hidden-toggle', async function () {
+        showHidden = $(this).is(':checked');
+        const currentFilter = $('#filter-input').val().toLowerCase();
+        if (currentFilter) {
+            await applyFilterAndRender();
+            return;
+        }
+        const sections = await dbUtils.getSectionsBySectionGroupId(sectionGroupId, showHidden);
+        const allRecordsBySection = await fetchAllRecords(sections, showHidden);
+        renderChecklist(sections, allRecordsBySection, { startExpanded: false });
+        updateAllSectionsCompletion();
+        updateTotalCompletion();
+    });
     $('#container').on('change', '#hide-completed-toggle', applyHideCompletedToDOM);
     $('#container').on('change', '#expand-all-toggle', applyExpandAllToDOM);
 
@@ -300,8 +446,8 @@ $(document).ready(async function () {
     async function applyFilterAndRender() {
         const filterValue = $('#filter-input').val().toLowerCase();
         // Re-fetch sections and records
-        const sections = await dbUtils.getSectionsBySectionGroupId(sectionGroupId, false);
-        const allRecordsBySection = await fetchAllRecords(sections);
+        const sections = await dbUtils.getSectionsBySectionGroupId(sectionGroupId, showHidden);
+        const allRecordsBySection = await fetchAllRecords(sections, showHidden);
 
         // Filter records by name/description
         const filteredSections = [];
@@ -362,8 +508,8 @@ $(document).ready(async function () {
         defaultAlreadyCompleted: 0,
         onSave: async (savedSectionId) => {
             // Re-fetch and re-render — only expand the section that was changed
-            const sections = await dbUtils.getSectionsBySectionGroupId(sectionGroupId, false);
-            const allRecordsBySection = await fetchAllRecords(sections);
+            const sections = await dbUtils.getSectionsBySectionGroupId(sectionGroupId, showHidden);
+            const allRecordsBySection = await fetchAllRecords(sections, showHidden);
             renderChecklist(sections, allRecordsBySection, { startExpanded: false, expandSectionId: savedSectionId });
             updateAllSectionsCompletion();
             updateTotalCompletion();
@@ -377,16 +523,38 @@ $(document).ready(async function () {
 
 /*************************************** DATA FETCHING ***************************************/
 
-// Fetch all records for all sections in parallel
-async function fetchAllRecords(sections) {
+function recordIsHidden(record) {
+    return Number(record?.Hidden) === 1;
+}
+
+// Fetch records per section: toggle off => Hidden=0 only; toggle on => Hidden=1 only (hidden items only).
+// Sections list still comes from getSectionsBySectionGroupId (all sections when toggle on via 'all').
+async function fetchAllRecords(sections, includeHidden = false) {
+    const recordFilter = includeHidden ? '1' : '0';
     const recordsPromises = sections.map(section =>
-        dbUtils.getRecordsBySectionIdV2(section.ID, section.RecordOrderPreference || null, false)
+        dbUtils.getRecordsBySectionIdV2(section.ID, section.RecordOrderPreference || null, recordFilter)
             .catch(err => {
                 console.error(`Failed to load records for section ${section.Name} (ID: ${section.ID})`, err);
                 return [];
             })
     );
-    return await Promise.all(recordsPromises);
+    const bySection = await Promise.all(recordsPromises);
+    if (debugLogging || dbUtils.isAvDebugRecordsEnabled()) {
+        let total = 0;
+        let hidden1 = 0;
+        bySection.forEach((recs) => {
+            if (!Array.isArray(recs)) return;
+            total += recs.length;
+            hidden1 += recs.filter((r) => recordIsHidden(r)).length;
+        });
+        console.log('[AV_DEBUG_RECORDS] fetchAllRecords', {
+            sectionCount: sections.length,
+            recordApiHiddenFilter: recordFilter,
+            totalRows: total,
+            hiddenEq1: hidden1,
+        });
+    }
+    return bySection;
 }
 
 
@@ -400,7 +568,17 @@ function renderChecklist(sections, allRecordsBySection, options) {
 
     const fragment = document.createDocumentFragment();
 
-    sections.forEach((section, sectionIndex) => {
+    let renderPairs = sections.map((section, i) => ({
+        section,
+        records: allRecordsBySection[i] || [],
+    }));
+    // "Show hidden" = hidden records only; omit sections with nothing to show (keeps section indices contiguous).
+    if (showHidden) {
+        renderPairs = renderPairs.filter((p) => p.records.length > 0);
+    }
+
+    renderPairs.forEach((pair, sectionIndex) => {
+        const section = pair.section;
         const sectionTitle = section.Name;
         const sectionTitleClean = utils.createSlug(sectionTitle);
 
@@ -434,7 +612,7 @@ function renderChecklist(sections, allRecordsBySection, options) {
         bodyDiv.style.display = shouldExpand ? 'block' : 'none';
 
         // Populate with records
-        const records = allRecordsBySection[sectionIndex] || [];
+        const records = pair.records;
         if (records.length === 0) {
             const noRecords = document.createElement('div');
             noRecords.className = 'no-records';
@@ -640,6 +818,10 @@ function updateTotalCompletion() {
             if (debugLogging) console.log('totalCheckboxes ' + totalCheckboxes);
         });
         totalCompletionText = totalCheckedCheckboxes + '/' + totalCheckboxes;
+        if (totalCheckboxes === 0) {
+            $('#total-completion').text(`Total Completion: (${totalCompletionText}) 0%`);
+            return;
+        }
         totalCompletionPercent = ((totalCheckedCheckboxes / totalCheckboxes) * 100).toFixed(2);
         $('#total-completion').text(`Total Completion: (${totalCompletionText}) ${totalCompletionPercent}%`);
     } catch (error) {

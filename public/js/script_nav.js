@@ -1,3 +1,5 @@
+import { apiFetch } from './script_db_helper.js';
+
 /**
  * Shared slide-out navigation menu.
  *
@@ -121,7 +123,7 @@ export function initNav({ currentPage, gameId, gameNameFriendly, sectionGroupId 
     `;
     document.body.insertAdjacentHTML('beforeend', footerHTML);
 
-    fetch('/api/version')
+    apiFetch('/api/version')
         .then(res => res.json())
         .then(data => {
             document.querySelector('.site-version').textContent = 'v' + data.version;

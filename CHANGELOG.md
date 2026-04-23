@@ -1,3 +1,19 @@
+## v3.3.0 - 2026-04-23
+
+### Added
+
+- Added button to add a new Games
+- Added button to add/edit Section Groups
+- Support adding multiple Sections at a time
+- Add button to delete a Section if it has no Records
+- Add button to go to the Edit Record modal from the View Record modal
+- Add toggle on records page to show hidden records
+- Added a checkbox to override the auto-casing
+
+### Fixed
+- Fixed bug where if Total Completion was 0/0, it displayed "Total Completion: (0/0) NaN%". It now displays "Total Completion: (0/0) 0%"
+- Fixed bug where items didn't auto-capitalize if they were the first word after an opening parentheses
+
 ## v3.2.0 - 2026-03-01
 
 ### Changed

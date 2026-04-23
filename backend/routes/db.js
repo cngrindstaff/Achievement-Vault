@@ -3,12 +3,42 @@ import express from "express";
 const router = express.Router();
 import db from '../config/mysqlConnector.js';
 
-const debugLogging = process.env.DEBUG_LOGGING === 'true';
+router.use((req, res, next) => {
+    res.set('Cache-Control', 'no-store, no-cache, must-revalidate, private');
+    res.set('Pragma', 'no-cache');
+    res.set('Expires', '0');
+    next();
+});
 
+const debugLogging = process.env.DEBUG_LOGGING === 'true';
+/** When true, logs row counts and Hidden=1 vs Hidden=0 for checklist list endpoints (see AV_DEBUG_RECORDS). */
+const recordsListDebug = debugLogging || process.env.AV_DEBUG_RECORDS === 'true';
+const gameNamePattern = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
+const sectionGroupNamePattern = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
+
+// URL segment meanings:
+// - '0' / 'false'  => non-hidden only (Hidden = 0)
+// - '1'            => hidden only (Hidden = 1)
+// - 'all' / 'true' / (omitted/unknown) => no Hidden filter (visible + hidden)
 function parseHiddenFilter(value) {
-    if (value === 'true') return 1;
-    if (value === 'false') return 0;
+    const v = String(value).toLowerCase();
+    if (v === '0' || v === 'false') return 0;
+    if (v === '1') return 1;
     return null;
+}
+
+function countHiddenColumn(rows, hiddenKey = 'Hidden') {
+    const list = Array.isArray(rows) ? rows : [];
+    let eq1 = 0;
+    let eq0 = 0;
+    let other = 0;
+    for (const r of list) {
+        const n = Number(r[hiddenKey]);
+        if (n === 1) eq1++;
+        else if (n === 0) eq0++;
+        else other++;
+    }
+    return { total: list.length, hiddenEq1: eq1, hiddenEq0: eq0, hiddenOther: other };
 }
 
 
@@ -45,6 +75,35 @@ router.get('/db/game/:gameId', async (req, res) => {
     }
 });
 
+//************************************ INSERT GAME + MAIN SECTION GROUP ************************************//
+router.post('/db/game/insert', async (req, res) => {
+    const { gameName, gameFriendlyName, hasDataTables } = req.body;
+
+    if (!gameName || !gameFriendlyName) {
+        return res.status(400).json({ error: 'Missing required fields: gameName and gameFriendlyName' });
+    }
+    if (!gameNamePattern.test(gameName)) {
+        return res.status(400).json({
+            error: 'Invalid gameName. Use lowercase letters, numbers, and hyphens only.'
+        });
+    }
+
+    try {
+        const [rows] = await db.query(
+            'CALL InsertGameWithMainSectionGroup(?, ?, ?)',
+            [gameName, gameFriendlyName, hasDataTables ?? 0]
+        );
+        const result = rows[0]?.[0] || null;
+        res.json({
+            message: 'Game and default section group created successfully',
+            gameId: result?.GameID ?? null
+        });
+    } catch (err) {
+        console.error('Error inserting game:', err);
+        res.status(500).json({ error: 'Database error' });
+    }
+});
+
 
 //#endregion 
 
@@ -61,10 +120,6 @@ router.get('/db/sections/:gameId/:hiddenFilter', async (req, res) => {
     try {
         const [rows] = await db.query('CALL GetGameSectionsByGameID(?, ?)', [gameId, hiddenFilter]);
         const result = rows[0];
-
-        if (result.length === 0) {
-            return res.status(404).json({ error: 'Game not found' });
-        }
 
         res.json(result);
     } catch (err) {
@@ -114,6 +169,24 @@ router.post('/db/section/insert', async (req, res) => {
     }
 });
 
+//************************************ INSERT MULTIPLE GAME SECTIONS ************************************//
+router.post('/db/sections/insertMultiple', async (req, res) => {
+    const sections = req.body;
+
+    if (!Array.isArray(sections) || sections.length === 0) {
+        return res.status(400).json({ error: 'Invalid input. Expected a non-empty array of sections.' });
+    }
+
+    try {
+        const jsonString = JSON.stringify(sections);
+        await db.query('CALL InsertMultipleGameSections(?)', [jsonString]);
+        res.json({ message: `${sections.length} game sections inserted successfully` });
+    } catch (err) {
+        console.error('Error inserting multiple game sections:', err);
+        res.status(500).json({ error: 'Database error' });
+    }
+});
+
 //************************************ UPDATE GAME SECTION ************************************//
 // Update Game Section
 router.put('/db/section/update/:sectionId/:gameId', async (req, res) => {
@@ -128,6 +201,25 @@ router.put('/db/section/update/:sectionId/:gameId', async (req, res) => {
         res.json({ message: 'Game section updated successfully' });
     } catch (err) {
         console.error('Error updating game section:', err);
+        res.status(500).json({ error: 'Database error' });
+    }
+});
+
+//************************************ DELETE GAME SECTION (ONLY IF NO RECORDS) ************************************//
+router.delete('/db/section/delete/:sectionId/:gameId', async (req, res) => {
+    const { sectionId, gameId } = req.params;
+
+    try {
+        const [rows] = await db.query('CALL DeleteGameSection(?, ?)', [sectionId, gameId]);
+        const rowsDeleted = rows?.[0]?.[0]?.RowsDeleted ?? 0;
+
+        if (rowsDeleted === 0) {
+            return res.status(400).json({ error: 'Section can only be deleted when it has 0 records.' });
+        }
+
+        res.status(200).json({ message: 'Section deleted successfully' });
+    } catch (err) {
+        console.error('Error deleting section:', err);
         res.status(500).json({ error: 'Database error' });
     }
 });
@@ -187,10 +279,19 @@ router.get('/db/records/v2/:sectionId/hiddenFilter/:hiddenFilter', async (req, r
     //if(debugLogging) console.log('made it records/sectionId');
     const sectionId = req.params.sectionId;
     const hiddenFilter = parseHiddenFilter(req.params.hiddenFilter);
-
     try {
         const [rows] = await db.query('CALL GetGameRecordsByGameSectionIDV2(?, ?)', [sectionId, hiddenFilter]);
         const result = rows[0];
+
+        if (recordsListDebug) {
+            const stats = countHiddenColumn(result);
+            console.log('[AV_DEBUG_RECORDS] GET /db/records/v2', {
+                sectionId,
+                hiddenFilterParam: req.params.hiddenFilter,
+                parsedHiddenFilter: hiddenFilter,
+                ...stats,
+            });
+        }
 
         if (result.length === 0) {
             return res.json([]);
@@ -356,10 +457,6 @@ router.get('/db/gameTables/:gameId', async (req, res) => {
         const [rows] = await db.query('CALL GetAllGameTablesByGameID(?)', [gameId]);
         const result = rows[0];
 
-        if (result.length === 0) {
-            return res.status(404).json({ error: 'Game not found' });
-        }
-
         res.json(result);
     } catch (err) {
         console.error(`Error fetching game tables with game ID ${gameId}:`, err);
@@ -395,14 +492,68 @@ router.get('/db/sectionGroups/:gameId/:hiddenFilter', async (req, res) => {
         const [rows] = await db.query('CALL GetSectionGroupsByGameID(?, ?)', [gameId, hiddenFilter]);
         const result = rows[0];
 
-        if (result.length === 0) {
-            return res.status(404).json({ error: 'Game not found' });
-        }
-
         res.json(result);
     } catch (err) {
         console.error(`Error fetching sectionGroups with game ID ${gameId}:`, err);
         res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
+//************************************ INSERT SECTION GROUP ************************************//
+router.post('/db/sectionGroup/insert', async (req, res) => {
+    const {
+        sectionGroupName,
+        sectionGroupFriendlyName,
+        gameId,
+        listOrder,
+        hidden,
+        description
+    } = req.body;
+
+    if (!sectionGroupName || !sectionGroupFriendlyName || gameId === undefined || listOrder === undefined || hidden === undefined) {
+        return res.status(400).json({ error: 'Missing required fields' });
+    }
+    if (!sectionGroupNamePattern.test(sectionGroupName)) {
+        return res.status(400).json({
+            error: 'Invalid sectionGroupName. Use lowercase letters, numbers, and hyphens only.'
+        });
+    }
+
+    try {
+        await db.query(
+            'CALL InsertSectionGroup(?, ?, ?, ?, ?, ?)',
+            [sectionGroupName, sectionGroupFriendlyName, gameId, listOrder, hidden, description ?? null]
+        );
+        res.json({ message: 'Section group inserted successfully' });
+    } catch (err) {
+        console.error('Error inserting section group:', err);
+        res.status(500).json({ error: 'Database error' });
+    }
+});
+
+//************************************ UPDATE SECTION GROUP ************************************//
+router.put('/db/sectionGroup/update/:sectionGroupId/:gameId', async (req, res) => {
+    const { sectionGroupId, gameId } = req.params;
+    const { sectionGroupName, sectionGroupFriendlyName, description, listOrder } = req.body;
+
+    if (!sectionGroupName || !sectionGroupFriendlyName || listOrder === undefined) {
+        return res.status(400).json({ error: 'Missing required fields' });
+    }
+    if (!sectionGroupNamePattern.test(sectionGroupName)) {
+        return res.status(400).json({
+            error: 'Invalid sectionGroupName. Use lowercase letters, numbers, and hyphens only.'
+        });
+    }
+
+    try {
+        await db.query(
+            'CALL UpdateSectionGroup(?, ?, ?, ?, ?, ?)',
+            [sectionGroupId, gameId, sectionGroupName, sectionGroupFriendlyName, description ?? null, listOrder]
+        );
+        res.json({ message: 'Section group updated successfully' });
+    } catch (err) {
+        console.error('Error updating section group:', err);
+        res.status(500).json({ error: 'Database error' });
     }
 });
 
@@ -461,8 +612,17 @@ router.get('/db/sections/sectionGroupId/:sectionGroupId/:hiddenFilter', async (r
         const [rows] = await db.query('CALL GetGameSectionsBySectionGroupID(?, ?)', [sectionGroupId, hiddenFilter]);
         const result = rows[0];
 
-        if (result.length === 0) {
-            return res.status(404).json({ error: 'Game not found' });
+        if (recordsListDebug) {
+            const stats = countHiddenColumn(result, 'Hidden');
+            console.log('[AV_DEBUG_RECORDS] GET /db/sections/sectionGroupId', {
+                sectionGroupId,
+                hiddenFilterParam: req.params.hiddenFilter,
+                parsedHiddenFilter: hiddenFilter,
+                sectionsTotal: stats.total,
+                sectionsHiddenEq1: stats.hiddenEq1,
+                sectionsVisibleEq0: stats.hiddenEq0,
+                sectionsHiddenOther: stats.hiddenOther,
+            });
         }
 
         res.json(result);

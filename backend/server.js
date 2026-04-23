@@ -17,6 +17,11 @@ const __dirname = path.dirname(__filename);
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// Dynamic JSON must not use weak ETags + conditional 304: identical bodies (e.g. repeated
+// `/api/db/records/.../hiddenFilter/all`) otherwise return 304 with an empty body, which
+// breaks `fetch().json()` in the browser. Static files below still use `express.static`.
+app.set('etag', false);
+
 app.use(express.json());
 app.use(cors());
 
@@ -37,10 +42,14 @@ app.use(basicAuthMiddleware); // Apply authentication globally
 
 // Version endpoint
 const pkg = JSON.parse(readFileSync(path.join(__dirname, '..', 'package.json'), 'utf-8'));
-app.get('/api/version', (req, res) => res.json({ version: pkg.version }));
+app.get('/api/version', (req, res) => {
+    res.set('Cache-Control', 'no-store, no-cache, must-revalidate, private');
+    res.json({ version: pkg.version });
+});
 
 // Changelog endpoint
 app.get('/api/changelog', (req, res) => {
+    res.set('Cache-Control', 'no-store, no-cache, must-revalidate, private');
     try {
         const changelog = readFileSync(path.join(__dirname, '..', 'CHANGELOG.md'), 'utf-8');
         res.type('text/plain').send(changelog);

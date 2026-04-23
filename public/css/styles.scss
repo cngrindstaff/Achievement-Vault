@@ -425,6 +425,21 @@ h3 {
 	transform: translateY(0);
 }
 
+.section-group-item {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 8px;
+}
+
+.section-group-link {
+	flex: 1;
+}
+
+.section-group-edit-btn {
+	margin-right: 0;
+}
+
 .section-header-text {
 	flex-grow: 1;
 }
@@ -1190,11 +1205,13 @@ tr:nth-child(odd) {
 			background-color: $danger;
 			color: #fff;
 			border: none;
-			padding: 10px 20px;
+			padding: 8px 15px;
 			border-radius: $radius-sm;
 			cursor: pointer;
 			font-size: 14px;
-			margin-left: 8px;
+			margin: 5px;
+			width: auto;
+			display: inline-block;
 			transition: background-color $transition-fast, transform 0.15s ease;
 
 			&:hover {
@@ -1385,6 +1402,17 @@ mark {
 	&.fade-out {
 		opacity: 0;
 	}
+}
+
+.error-message {
+	margin: 12px 0 0;
+	padding: 10px 12px;
+	background-color: $danger;
+	color: #fff;
+	text-align: center;
+	border-radius: $radius-sm;
+	font-weight: 400;
+	font-size: 14px;
 }
 
 .invalid-input {

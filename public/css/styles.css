@@ -330,6 +330,21 @@ h3 .record-count {
   transform: translateY(0);
 }
 
+.section-group-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.section-group-link {
+  flex: 1;
+}
+
+.section-group-edit-btn {
+  margin-right: 0;
+}
+
 .section-header-text {
   flex-grow: 1;
 }
@@ -1023,11 +1038,13 @@ tr:nth-child(odd) {
   background-color: #d94452;
   color: #fff;
   border: none;
-  padding: 10px 20px;
+  padding: 8px 15px;
   border-radius: 6px;
   cursor: pointer;
   font-size: 14px;
-  margin-left: 8px;
+  margin: 5px;
+  width: auto;
+  display: inline-block;
   transition: background-color 0.15s ease, transform 0.15s ease;
 }
 .modal .button-container .delete-button:hover {
@@ -1196,6 +1213,17 @@ mark {
 }
 .success-message.fade-out {
   opacity: 0;
+}
+
+.error-message {
+  margin: 12px 0 0;
+  padding: 10px 12px;
+  background-color: #d94452;
+  color: #fff;
+  text-align: center;
+  border-radius: 6px;
+  font-weight: 400;
+  font-size: 14px;
 }
 
 .invalid-input {
