@@ -11,6 +11,13 @@ let currentSectionGroups = [];
 const sectionGroupNamePattern = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 let sectionGroupModalApi = null;
 
+function toSectionGroupSlug(value) {
+    return value
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/^-+|-+$/g, '');
+}
+
 const sectionGroupItemTemplate = document.getElementById('section-group-item-template');
 
 $(document).ready(async function () {
@@ -103,8 +110,8 @@ function initSectionGroupModal(addSectionGroupBtn) {
                 <span class="close-modal">&times;</span>
                 <h3 id="section-group-modal-title">Add Section Group</h3>
                 <form id="section-group-edit-form" class="add-record-container">
-                    <label class="add-record">Name:<input type="text" id="section-group-edit-name" class="add-record" pattern="[a-z0-9]+(?:-[a-z0-9]+)*" title="Use lowercase letters, numbers, and hyphens only." required></label>
                     <label id="section-group-edit-friendly-name-row" class="add-record">Friendly Name:<input type="text" id="section-group-edit-friendly-name" class="add-record" required></label>
+                    <label class="add-record">Name:<input type="text" id="section-group-edit-name" class="add-record" pattern="[a-z0-9]+(?:-[a-z0-9]+)*" title="Use lowercase letters, numbers, and hyphens only." required></label>
                     <label class="add-record">Description:<textarea id="section-group-edit-description" class="add-record" rows="3" maxlength="500"></textarea></label>
                     <label class="add-record">List Order:<input type="number" id="section-group-edit-listorder" class="add-record" min="0" required></label>
                     <button type="submit" class="save-btn">Save</button>
@@ -125,6 +132,7 @@ function initSectionGroupModal(addSectionGroupBtn) {
     const listOrderInput = document.getElementById('section-group-edit-listorder');
     let modalMode = 'add';
     let editingSectionGroupId = null;
+    let nameManuallyEdited = false;
 
     function openForAdd() {
         const maxOrder = currentSectionGroups.reduce((max, item) => Math.max(max, item.ListOrder || 0), 0);
@@ -138,6 +146,7 @@ function initSectionGroupModal(addSectionGroupBtn) {
         friendlyNameInput.value = '';
         descriptionInput.value = '';
         listOrderInput.value = maxOrder + 1;
+        nameManuallyEdited = false;
         modal.classList.remove('hidden');
     }
 
@@ -152,6 +161,7 @@ function initSectionGroupModal(addSectionGroupBtn) {
         friendlyNameInput.value = sectionGroup.FriendlyName || '';
         descriptionInput.value = sectionGroup.Description || '';
         listOrderInput.value = sectionGroup.ListOrder || 0;
+        nameManuallyEdited = false;
         modal.classList.remove('hidden');
     }
 
@@ -161,6 +171,15 @@ function initSectionGroupModal(addSectionGroupBtn) {
 
     addSectionGroupBtn.addEventListener('click', openForAdd);
     closeBtn.addEventListener('click', closeModal);
+    friendlyNameInput.addEventListener('input', () => {
+        if (nameManuallyEdited && nameInput.value.trim() !== '') return;
+        nameInput.value = toSectionGroupSlug(friendlyNameInput.value);
+        nameInput.setCustomValidity('');
+    });
+    nameInput.addEventListener('input', () => {
+        nameManuallyEdited = true;
+        nameInput.setCustomValidity('');
+    });
     window.addEventListener('click', (e) => {
         if (e.target === modal) closeModal();
     });

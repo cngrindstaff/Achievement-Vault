@@ -406,12 +406,21 @@ h3 {
 	margin-top: 0;
 	margin-bottom: 8px;
 	box-shadow: $shadow-sm;
-	transition: background-color $transition-normal, box-shadow $transition-normal, transform $transition-fast;
+	transition: background-color $transition-normal, box-shadow $transition-normal, transform $transition-fast,
+		opacity $transition-normal;
 }
 
 .section-header {
 	justify-content: space-between;
 	display: flex;
+
+	&.section-header--complete {
+		opacity: 0.65;
+	}
+
+	&.section-header--complete:hover {
+		opacity: 1;
+	}
 }
 
 .game-list-item:hover, .section-header:hover, .game-section-item:hover {
@@ -1273,23 +1282,28 @@ tr:nth-child(odd) {
 
 // ==================== CONTROLS PANEL (filter, toggles) ====================
 
+// Stack filter above toggles so toggle rows aren’t a single orphan right-aligned on wrap.
 .controls-panel {
 	display: flex;
-	align-items: center;
-	justify-content: flex-end;
-	gap: 16px;
+	flex-direction: column;
+	align-items: stretch;
+	gap: 12px;
 	margin-bottom: 12px;
-	flex-wrap: wrap;
 }
 
+// Even columns: avoids one switch alone on a second line hugging the right edge.
 .controls-toggles {
-	display: flex;
-	align-items: center;
-	gap: 16px;
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+	gap: 10px 16px;
+	width: 100%;
+	justify-items: start;
 }
 
 .filter-input {
-	width: 240px;
+	width: 100%;
+	max-width: 280px;
+	align-self: flex-end;
 	padding: 6px 12px;
 	font-family: $font-body;
 	font-size: 13px;
@@ -1324,6 +1338,9 @@ mark {
 	user-select: none;
 	color: $text-secondary;
 	white-space: nowrap;
+	flex: 0 1 auto;
+	max-width: 100%;
+	min-width: 0;
 
 	input {
 		display: none;
@@ -1364,13 +1381,15 @@ mark {
 }
 
 @media (max-width: 600px) {
-	.controls-panel {
-		flex-direction: column;
-		align-items: flex-end;
-		gap: 10px;
+	.controls-toggles {
+		grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+	}
+	.switch {
+		white-space: normal;
 	}
 	.filter-input {
-		width: 100%;
+		align-self: stretch;
+		max-width: none;
 	}
 }
 

@@ -1,3 +1,16 @@
+## v3.4 - 2026-05-08
+
+### Added
+
+- Added Audit Logging capability and new SQL table to support it. 
+- Added toggle to re-order records and sections by name.
+- Added toggle for "Completed Sections Last", so that any sections that have been fully completed now show up at the bottom.
+- Section Headers for completed sections are now faded in color. 
+
+### Fixed
+- Clearing the filter no longer leaves every section expanded; sections collapse again unless Expand all is on.
+- Toggles collapse gracefully as the screen gets smaller.
+
 ## v3.3.0 - 2026-04-23
 
 ### Added

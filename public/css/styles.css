@@ -311,12 +311,20 @@ h3 .record-count {
   margin-top: 0;
   margin-bottom: 8px;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
-  transition: background-color 0.2s ease, box-shadow 0.2s ease, transform 0.15s ease;
+  transition: background-color 0.2s ease, box-shadow 0.2s ease, transform 0.15s ease, opacity 0.2s ease;
 }
 
 .section-header {
   justify-content: space-between;
   display: flex;
+}
+
+.section-header.section-header--complete {
+  opacity: 0.65;
+}
+
+.section-header.section-header--complete:hover {
+  opacity: 1;
 }
 
 .game-list-item:hover, .section-header:hover, .game-section-item:hover {
@@ -1096,21 +1104,24 @@ tr:nth-child(odd) {
 
 .controls-panel {
   display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  gap: 16px;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 12px;
   margin-bottom: 12px;
-  flex-wrap: wrap;
 }
 
 .controls-toggles {
-  display: flex;
-  align-items: center;
-  gap: 16px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 10px 16px;
+  width: 100%;
+  justify-items: start;
 }
 
 .filter-input {
-  width: 240px;
+  width: 100%;
+  max-width: 280px;
+  align-self: flex-end;
   padding: 6px 12px;
   font-family: "Roboto", -apple-system, BlinkMacSystemFont, sans-serif;
   font-size: 13px;
@@ -1145,6 +1156,9 @@ mark {
   user-select: none;
   color: #556565;
   white-space: nowrap;
+  flex: 0 1 auto;
+  max-width: 100%;
+  min-width: 0;
 }
 .switch input {
   display: none;
@@ -1180,13 +1194,15 @@ mark {
 }
 
 @media (max-width: 600px) {
-  .controls-panel {
-    flex-direction: column;
-    align-items: flex-end;
-    gap: 10px;
+  .controls-toggles {
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  }
+  .switch {
+    white-space: normal;
   }
   .filter-input {
-    width: 100%;
+    align-self: stretch;
+    max-width: none;
   }
 }
 .spinner {
