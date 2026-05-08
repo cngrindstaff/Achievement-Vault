@@ -611,6 +611,14 @@ function isSectionFullyComplete(records) {
     return anyCheckboxes;
 }
 
+/** Single checklist row: all checkboxes satisfied (rows with 0 checkboxes count as not "completed" for ordering). */
+function isRecordFullyComplete(record) {
+    const total = Number(record.NumberOfCheckboxes) || 0;
+    if (total === 0) return false;
+    const done = Number(record.NumberAlreadyCompleted) || 0;
+    return done >= total;
+}
+
 function patchRecordCompletionInCache(recordId, numberAlreadyCompleted) {
     if (recordId == null || recordId === '') return;
     const n = parseInt(numberAlreadyCompleted, 10);
@@ -632,9 +640,20 @@ function shallowCloneRecordsBySection(recordsBySection) {
 
 function recordsWithDisplayOrder(recordsBySection) {
     if (!isSortByNameOverrideEnabled()) return recordsBySection;
-    return recordsBySection.map((arr) =>
-        Array.isArray(arr) ? [...arr].sort((a, b) => localeCompareName(a.Name, b.Name)) : []
-    );
+    return recordsBySection.map((arr) => {
+        if (!Array.isArray(arr)) return [];
+        return [...arr]
+            .map((r, i) => ({ r, i }))
+            .sort((a, b) => {
+                const ca = isRecordFullyComplete(a.r);
+                const cb = isRecordFullyComplete(b.r);
+                if (ca !== cb) return ca ? 1 : -1;
+                const byName = localeCompareName(a.r.Name, b.r.Name);
+                if (byName !== 0) return byName;
+                return a.i - b.i;
+            })
+            .map(({ r }) => r);
+    });
 }
 
 /** Updates the view cache and paints (applies optional name-only sort for display). */
@@ -737,6 +756,9 @@ function renderChecklist(sections, allRecordsBySection, options) {
             (expandedIdSet && expandedIdSet.has(String(section.ID)));
         if (shouldExpand) {
             headerDiv.classList.add('open');
+        }
+        if (isSectionFullyComplete(pair.records)) {
+            headerDiv.classList.add('section-header--complete');
         }
 
         // Clone and populate section body template
@@ -937,6 +959,10 @@ function updateSectionCompletion(sectionIndex) {
     const sectionHeaderDiv = $(`div.section-header[data-section="${sectionIndex}"]`);
     sectionHeaderDiv.attr("checked-checkboxes", checkedCheckboxes);
     sectionHeaderDiv.attr("total-checkboxes", totalCheckboxes);
+
+    const recs = checklistViewCache.recordsBySection?.[sectionIndex];
+    const fullyComplete = Array.isArray(recs) && isSectionFullyComplete(recs);
+    sectionHeaderDiv.toggleClass('section-header--complete', fullyComplete);
 }
 
 
