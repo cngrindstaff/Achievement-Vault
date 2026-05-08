@@ -2,6 +2,19 @@
 import express from "express";
 const router = express.Router();
 import db from '../config/mysqlConnector.js';
+import {
+    insertAuditLogSafe,
+    withConnection,
+    fetchSectionById,
+    fetchSectionGroupById,
+    fetchRecordById,
+    contextFromRecordRow,
+    describeGameRecordUpdate,
+    describeRecordCompletionChange,
+    describeSectionUpdate,
+    describeSectionGroupUpdate,
+    q,
+} from '../services/auditLog.js';
 
 router.use((req, res, next) => {
     res.set('Cache-Control', 'no-store, no-cache, must-revalidate, private');
@@ -94,9 +107,18 @@ router.post('/db/game/insert', async (req, res) => {
             [gameName, gameFriendlyName, hasDataTables ?? 0]
         );
         const result = rows[0]?.[0] || null;
+        const newGameId = result?.GameID ?? null;
+        await insertAuditLogSafe({
+            changeDescription:
+                `Game was added: friendly name ${q(gameFriendlyName)}, slug ${q(gameName)}, GameID ${newGameId}. Default "Main" section group was created.`,
+            gameId: newGameId,
+            sectionGroupId: null,
+            sectionId: null,
+            recordId: null,
+        });
         res.json({
             message: 'Game and default section group created successfully',
-            gameId: result?.GameID ?? null
+            gameId: newGameId
         });
     } catch (err) {
         console.error('Error inserting game:', err);
@@ -158,10 +180,26 @@ router.post('/db/section/insert', async (req, res) => {
     }
 
     try {
-        await db.query(
-            'CALL InsertGameSection(?, ?, ?, ?, ?, ?, ?)',
-            [sectionName, gameId, listOrder, recordOrderPreference, hidden, sectionGroupId, description]
-        );
+        const newSectionId = await withConnection(async (conn) => {
+            await conn.query('CALL InsertGameSection(?, ?, ?, ?, ?, ?, ?)', [
+                sectionName,
+                gameId,
+                listOrder,
+                recordOrderPreference,
+                hidden,
+                sectionGroupId,
+                description,
+            ]);
+            const [idRows] = await conn.query('SELECT LAST_INSERT_ID() AS id');
+            return idRows[0]?.id ?? null;
+        });
+        await insertAuditLogSafe({
+            changeDescription: `Section was added: ${q(sectionName)}, SectionID ${newSectionId}, GameID ${gameId}, SectionGroupID ${sectionGroupId}.`,
+            gameId: Number(gameId),
+            sectionGroupId: sectionGroupId != null ? Number(sectionGroupId) : null,
+            sectionId: newSectionId != null ? Number(newSectionId) : null,
+            recordId: null,
+        });
         res.json({ message: 'Game section inserted successfully' });
     } catch (err) {
         console.error('Error inserting game section:', err);
@@ -180,6 +218,17 @@ router.post('/db/sections/insertMultiple', async (req, res) => {
     try {
         const jsonString = JSON.stringify(sections);
         await db.query('CALL InsertMultipleGameSections(?)', [jsonString]);
+        const g0 = sections[0];
+        await insertAuditLogSafe({
+            changeDescription: `Bulk insert: ${sections.length} section(s) added via API` +
+                (g0?.gameId != null ? ` (GameID ${g0.gameId})` : '') +
+                (g0?.sectionGroupId != null ? ` (SectionGroupID ${g0.sectionGroupId})` : '') +
+                '.',
+            gameId: g0?.gameId != null ? Number(g0.gameId) : null,
+            sectionGroupId: g0?.sectionGroupId != null ? Number(g0.sectionGroupId) : null,
+            sectionId: null,
+            recordId: null,
+        });
         res.json({ message: `${sections.length} game sections inserted successfully` });
     } catch (err) {
         console.error('Error inserting multiple game sections:', err);
@@ -194,10 +243,22 @@ router.put('/db/section/update/:sectionId/:gameId', async (req, res) => {
     const { sectionName, listOrder, recordOrderPreference, hidden, description } = req.body;
 
     try {
+        const oldSection = await fetchSectionById(sectionId);
         await db.query(
             'CALL UpdateGameSection(?, ?, ?, ?, ?, ?, ?)',
             [sectionId, gameId, sectionName ?? null, listOrder ?? null, recordOrderPreference ?? null, hidden ?? null, description ?? null]
         );
+        const msg = oldSection ? describeSectionUpdate(oldSection, req.body) : null;
+        if (msg) {
+            await insertAuditLogSafe({
+                changeDescription: msg,
+                gameId: Number(gameId),
+                sectionGroupId:
+                    oldSection?.SectionGroupID != null ? Number(oldSection.SectionGroupID) : null,
+                sectionId: Number(sectionId),
+                recordId: null,
+            });
+        }
         res.json({ message: 'Game section updated successfully' });
     } catch (err) {
         console.error('Error updating game section:', err);
@@ -210,6 +271,7 @@ router.delete('/db/section/delete/:sectionId/:gameId', async (req, res) => {
     const { sectionId, gameId } = req.params;
 
     try {
+        const oldSection = await fetchSectionById(sectionId);
         const [rows] = await db.query('CALL DeleteGameSection(?, ?)', [sectionId, gameId]);
         const rowsDeleted = rows?.[0]?.[0]?.RowsDeleted ?? 0;
 
@@ -217,6 +279,14 @@ router.delete('/db/section/delete/:sectionId/:gameId', async (req, res) => {
             return res.status(400).json({ error: 'Section can only be deleted when it has 0 records.' });
         }
 
+        await insertAuditLogSafe({
+            changeDescription: `SectionID ${sectionId} was deleted (was ${q(oldSection?.Name)}).`,
+            gameId: Number(gameId),
+            sectionGroupId:
+                oldSection?.SectionGroupID != null ? Number(oldSection.SectionGroupID) : null,
+            sectionId: Number(sectionId),
+            recordId: null,
+        });
         res.status(200).json({ message: 'Section deleted successfully' });
     } catch (err) {
         console.error('Error deleting section:', err);
@@ -337,7 +407,21 @@ router.put('/db/record/updateCompletion/:recordId', async (req, res) => {
     }
     
     try {
+        const oldRec = await fetchRecordById(recordId);
         await db.query('CALL UpdateGameRecordCompletion(?, ?)', [recordId, numberAlreadyCompleted]);
+        if (oldRec) {
+            const msg = describeRecordCompletionChange(recordId, oldRec, numberAlreadyCompleted);
+            if (msg) {
+                const ctx = await contextFromRecordRow(oldRec);
+                await insertAuditLogSafe({
+                    changeDescription: msg,
+                    gameId: ctx.gameId,
+                    sectionGroupId: ctx.sectionGroupId,
+                    sectionId: ctx.sectionId,
+                    recordId: Number(recordId),
+                });
+            }
+        }
         res.json({ message: 'Progress updated successfully' });
     } catch (err) {
         console.error('Error updating progress:', err);
@@ -355,10 +439,29 @@ router.post('/db/record/insert', async (req, res) => {
     }
 
     try {
-        await db.query(
-            'CALL InsertGameRecord(?, ?, ?, ?, ?, ?, ?, ?, ?)',
-            [recordName, description, sectionId, gameId, numberOfCheckboxes, numberAlreadyCompleted, listOrder, longDescription, hidden]
-        );
+        const newRecordId = await withConnection(async (conn) => {
+            await conn.query('CALL InsertGameRecord(?, ?, ?, ?, ?, ?, ?, ?, ?)', [
+                recordName,
+                description,
+                sectionId,
+                gameId,
+                numberOfCheckboxes,
+                numberAlreadyCompleted,
+                listOrder,
+                longDescription,
+                hidden,
+            ]);
+            const [idRows] = await conn.query('SELECT LAST_INSERT_ID() AS id');
+            return idRows[0]?.id ?? null;
+        });
+        const sec = await fetchSectionById(sectionId);
+        await insertAuditLogSafe({
+            changeDescription: `Record was added: ${q(recordName)}, RecordID ${newRecordId}, SectionID ${sectionId}, GameID ${gameId}.`,
+            gameId: Number(gameId),
+            sectionGroupId: sec?.SectionGroupID != null ? Number(sec.SectionGroupID) : null,
+            sectionId: Number(sectionId),
+            recordId: newRecordId != null ? Number(newRecordId) : null,
+        });
         res.json({ message: 'Game record inserted successfully' });
     } catch (err) {
         console.error('Error inserting game record:', err);
@@ -377,6 +480,18 @@ router.post('/db/records/insertMultiple', async (req, res) => {
     try {
         const jsonString = JSON.stringify(records);
         await db.query('CALL InsertMultipleGameRecords(?)', [jsonString]);
+        const r0 = records[0];
+        const sec = r0?.sectionId != null ? await fetchSectionById(r0.sectionId) : null;
+        await insertAuditLogSafe({
+            changeDescription: `Bulk insert: ${records.length} game record(s) added via API` +
+                (r0?.sectionId != null ? ` (SectionID ${r0.sectionId})` : '') +
+                (r0?.gameId != null ? ` (GameID ${r0.gameId})` : '') +
+                '.',
+            gameId: r0?.gameId != null ? Number(r0.gameId) : null,
+            sectionGroupId: sec?.SectionGroupID != null ? Number(sec.SectionGroupID) : null,
+            sectionId: r0?.sectionId != null ? Number(r0.sectionId) : null,
+            recordId: null,
+        });
         res.json({ message: `${records.length} game records inserted successfully` });
     } catch (err) {
         console.error('Error inserting multiple game records:', err);
@@ -391,10 +506,24 @@ router.put('/db/record/update/:recordId', async (req, res) => {
         listOrder, longDescription, hidden, sectionId } = req.body;
     if (debugLogging) console.log('recordId: ' + recordId + ' sectionId: ' + sectionId + ' recordName: ' + recordName + ' description: ' + description + ' gameId: ' + gameId + ' numberOfCheckboxes: ' + numberOfCheckboxes + ' numberAlreadyCompleted: ' + numberAlreadyCompleted + ' listOrder: ' + listOrder + ' longDescription: ' + longDescription + ' hidden: ' + hidden);
     try {
+        const oldRec = await fetchRecordById(recordId);
         await db.query(
             'CALL UpdateGameRecord(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
             [recordId, sectionId, recordName, description, gameId, numberOfCheckboxes, numberAlreadyCompleted, listOrder, longDescription, hidden]
         );
+        if (oldRec) {
+            const msg = describeGameRecordUpdate(oldRec, req.body);
+            if (msg) {
+                const ctx = await contextFromRecordRow(oldRec);
+                await insertAuditLogSafe({
+                    changeDescription: msg,
+                    gameId: ctx.gameId,
+                    sectionGroupId: ctx.sectionGroupId,
+                    sectionId: ctx.sectionId,
+                    recordId: Number(recordId),
+                });
+            }
+        }
         res.json({ message: 'Game record updated successfully' });
     } catch (err) {
         console.error('Error updating game record:', err);
@@ -407,7 +536,18 @@ router.delete('/db/record/delete/:recordId', async (req, res) => {
     const recordId = req.params.recordId;
 
     try {
+        const oldRec = await fetchRecordById(recordId);
         await db.query('CALL DeleteGameRecord(?)', [recordId]);
+        if (oldRec) {
+            const ctx = await contextFromRecordRow(oldRec);
+            await insertAuditLogSafe({
+                changeDescription: `RecordID ${recordId} was deleted (was ${q(oldRec.Name)}).`,
+                gameId: ctx.gameId,
+                sectionGroupId: ctx.sectionGroupId,
+                sectionId: ctx.sectionId,
+                recordId: Number(recordId),
+            });
+        }
         res.status(200).json({ message: 'Record deleted successfully' });
     } catch (err) {
         console.error("Error deleting record:", err);
@@ -520,10 +660,26 @@ router.post('/db/sectionGroup/insert', async (req, res) => {
     }
 
     try {
-        await db.query(
-            'CALL InsertSectionGroup(?, ?, ?, ?, ?, ?)',
-            [sectionGroupName, sectionGroupFriendlyName, gameId, listOrder, hidden, description ?? null]
-        );
+        const newSgId = await withConnection(async (conn) => {
+            await conn.query('CALL InsertSectionGroup(?, ?, ?, ?, ?, ?)', [
+                sectionGroupName,
+                sectionGroupFriendlyName,
+                gameId,
+                listOrder,
+                hidden,
+                description ?? null,
+            ]);
+            const [idRows] = await conn.query('SELECT LAST_INSERT_ID() AS id');
+            return idRows[0]?.id ?? null;
+        });
+        await insertAuditLogSafe({
+            changeDescription:
+                `Section group was added: friendly ${q(sectionGroupFriendlyName)}, slug ${q(sectionGroupName)}, SectionGroupID ${newSgId}, GameID ${gameId}.`,
+            gameId: Number(gameId),
+            sectionGroupId: newSgId != null ? Number(newSgId) : null,
+            sectionId: null,
+            recordId: null,
+        });
         res.json({ message: 'Section group inserted successfully' });
     } catch (err) {
         console.error('Error inserting section group:', err);
@@ -546,10 +702,21 @@ router.put('/db/sectionGroup/update/:sectionGroupId/:gameId', async (req, res) =
     }
 
     try {
+        const oldSg = await fetchSectionGroupById(sectionGroupId);
         await db.query(
             'CALL UpdateSectionGroup(?, ?, ?, ?, ?, ?)',
             [sectionGroupId, gameId, sectionGroupName, sectionGroupFriendlyName, description ?? null, listOrder]
         );
+        const msg = oldSg ? describeSectionGroupUpdate(oldSg, req.body) : null;
+        if (msg) {
+            await insertAuditLogSafe({
+                changeDescription: msg,
+                gameId: Number(gameId),
+                sectionGroupId: Number(sectionGroupId),
+                sectionId: null,
+                recordId: null,
+            });
+        }
         res.json({ message: 'Section group updated successfully' });
     } catch (err) {
         console.error('Error updating section group:', err);
