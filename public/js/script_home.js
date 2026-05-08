@@ -6,6 +6,13 @@ const gameListContainer = document.getElementById('game-list-container');
 const addGameButton = document.getElementById('add-game-btn');
 const gameNamePattern = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 
+function toGameNameSlug(value) {
+    return value
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/^-+|-+$/g, '');
+}
+
 // Home page — no back button, no game context
 initNav({ currentPage: 'home' });
 
@@ -45,8 +52,8 @@ function initAddGameModal() {
                 <span id="game-edit-close" class="close-modal">&times;</span>
                 <h3>Add Game</h3>
                 <form id="game-edit-form" class="add-record-container">
-                    <label class="add-record">Name:<input type="text" id="game-edit-name" class="add-record" pattern="[a-z0-9]+(?:-[a-z0-9]+)*" title="Use lowercase letters, numbers, and hyphens only." required></label>
                     <label class="add-record">Friendly Name:<input type="text" id="game-edit-friendly-name" class="add-record" required></label>
+                    <label class="add-record">Name:<input type="text" id="game-edit-name" class="add-record" pattern="[a-z0-9]+(?:-[a-z0-9]+)*" title="Use lowercase letters, numbers, and hyphens only." required></label>
                     <label class="add-record">
                         <input type="checkbox" id="game-edit-has-data-tables"> Has Data Tables
                     </label>
@@ -63,12 +70,14 @@ function initAddGameModal() {
     const nameInput = document.getElementById('game-edit-name');
     const friendlyNameInput = document.getElementById('game-edit-friendly-name');
     const hasDataTablesInput = document.getElementById('game-edit-has-data-tables');
+    let nameManuallyEdited = false;
 
     function openModal() {
         nameInput.value = '';
         nameInput.setCustomValidity('');
         friendlyNameInput.value = '';
         hasDataTablesInput.checked = false;
+        nameManuallyEdited = false;
         modal.classList.remove('hidden');
     }
 
@@ -78,6 +87,15 @@ function initAddGameModal() {
 
     addGameButton?.addEventListener('click', openModal);
     closeButton.addEventListener('click', closeModal);
+    friendlyNameInput.addEventListener('input', () => {
+        if (nameManuallyEdited && nameInput.value.trim() !== '') return;
+        nameInput.value = toGameNameSlug(friendlyNameInput.value);
+        nameInput.setCustomValidity('');
+    });
+    nameInput.addEventListener('input', () => {
+        nameManuallyEdited = true;
+        nameInput.setCustomValidity('');
+    });
     window.addEventListener('click', (event) => {
         if (event.target === modal) {
             closeModal();

@@ -14,6 +14,13 @@ let sectionGroupId = null;
 let sectionGroupFriendlyName = null;
 let showHidden = false;
 
+/** Last painted checklist (section preference order); used to re-render when display toggles change without refetch. */
+let checklistViewCache = {
+    sections: [],
+    recordsBySection: [],
+    options: {},
+};
+
 // Template references (cached on load)
 let sectionHeaderTemplate = null;
 let sectionBodyTemplate = null;
@@ -58,7 +65,7 @@ $(document).ready(async function () {
 
     // Fetch all section records in parallel
     const allRecordsBySection = await fetchAllRecords(sections, showHidden);
-    renderChecklist(sections, allRecordsBySection, { startExpanded: false, filterValue: null });
+    paintChecklist(sections, allRecordsBySection, { startExpanded: false, filterValue: null });
     updateAllSectionsCompletion();
     updateTotalCompletion();
 
@@ -306,7 +313,7 @@ $(document).ready(async function () {
 
         const freshSections = await dbUtils.getSectionsBySectionGroupId(sectionGroupId, showHidden);
         const allRecords = await fetchAllRecords(freshSections, showHidden);
-        renderChecklist(freshSections, allRecords, { startExpanded: false, expandSectionId: editingSectionId });
+        paintChecklist(freshSections, allRecords, { startExpanded: false, expandSectionId: editingSectionId });
         updateAllSectionsCompletion();
         updateTotalCompletion();
     });
@@ -343,7 +350,7 @@ $(document).ready(async function () {
         closeSectionModal(true);
         const freshSections = await dbUtils.getSectionsBySectionGroupId(sectionGroupId, showHidden);
         const allRecords = await fetchAllRecords(freshSections, showHidden);
-        renderChecklist(freshSections, allRecords, { startExpanded: false });
+        paintChecklist(freshSections, allRecords, { startExpanded: false });
         updateAllSectionsCompletion();
         updateTotalCompletion();
     });
@@ -431,10 +438,21 @@ $(document).ready(async function () {
         }
         const sections = await dbUtils.getSectionsBySectionGroupId(sectionGroupId, showHidden);
         const allRecordsBySection = await fetchAllRecords(sections, showHidden);
-        renderChecklist(sections, allRecordsBySection, { startExpanded: false });
+        paintChecklist(sections, allRecordsBySection, { startExpanded: false });
         updateAllSectionsCompletion();
         updateTotalCompletion();
     });
+    function onChecklistDisplayOptionsChanged() {
+        repaintChecklistFromCache();
+        updateAllSectionsCompletion();
+        updateTotalCompletion();
+        applyHideCompletedToDOM();
+        if ($('#expand-all-toggle').is(':checked')) {
+            applyExpandAllToDOM();
+        }
+    }
+    $('#container').on('change', '#sort-by-name-toggle', onChecklistDisplayOptionsChanged);
+    $('#container').on('change', '#defer-complete-sections-toggle', onChecklistDisplayOptionsChanged);
     $('#container').on('change', '#hide-completed-toggle', applyHideCompletedToDOM);
     $('#container').on('change', '#expand-all-toggle', applyExpandAllToDOM);
 
@@ -464,7 +482,11 @@ $(document).ready(async function () {
             }
         });
 
-        renderChecklist(filteredSections, filteredRecordsBySection, { startExpanded: true, filterValue });
+        // Expand matching sections only while a filter is active; clearing search collapses all.
+        paintChecklist(filteredSections, filteredRecordsBySection, {
+            startExpanded: !!filterValue,
+            filterValue: filterValue || null,
+        });
         updateAllSectionsCompletion();
         updateTotalCompletion();
         applyHideCompletedToDOM();
@@ -510,7 +532,7 @@ $(document).ready(async function () {
             // Re-fetch and re-render — only expand the section that was changed
             const sections = await dbUtils.getSectionsBySectionGroupId(sectionGroupId, showHidden);
             const allRecordsBySection = await fetchAllRecords(sections, showHidden);
-            renderChecklist(sections, allRecordsBySection, { startExpanded: false, expandSectionId: savedSectionId });
+            paintChecklist(sections, allRecordsBySection, { startExpanded: false, expandSectionId: savedSectionId });
             updateAllSectionsCompletion();
             updateTotalCompletion();
         }
@@ -560,9 +582,98 @@ async function fetchAllRecords(sections, includeHidden = false) {
 
 /*************************************** RENDERING ***************************************/
 
+function isSortByNameOverrideEnabled() {
+    const el = document.getElementById('sort-by-name-toggle');
+    return !!(el && el.checked);
+}
+
+/** Case-insensitive name order (matches record sort in this view). */
+function localeCompareName(a, b) {
+    return (a || '').localeCompare(b || '', undefined, { sensitivity: 'base' });
+}
+
+function isDeferCompleteSectionsEnabled() {
+    const el = document.getElementById('defer-complete-sections-toggle');
+    return !!(el && el.checked);
+}
+
+/** Section is 100% done when every record that has checkboxes is fully completed. */
+function isSectionFullyComplete(records) {
+    if (!Array.isArray(records) || records.length === 0) return false;
+    let anyCheckboxes = false;
+    for (const r of records) {
+        const total = Number(r.NumberOfCheckboxes) || 0;
+        if (total === 0) continue;
+        anyCheckboxes = true;
+        const done = Number(r.NumberAlreadyCompleted) || 0;
+        if (done < total) return false;
+    }
+    return anyCheckboxes;
+}
+
+function patchRecordCompletionInCache(recordId, numberAlreadyCompleted) {
+    if (recordId == null || recordId === '') return;
+    const n = parseInt(numberAlreadyCompleted, 10);
+    if (Number.isNaN(n)) return;
+    for (const arr of checklistViewCache.recordsBySection) {
+        if (!Array.isArray(arr)) continue;
+        for (const r of arr) {
+            if (String(r.ID) === String(recordId)) {
+                r.NumberAlreadyCompleted = n;
+                return;
+            }
+        }
+    }
+}
+
+function shallowCloneRecordsBySection(recordsBySection) {
+    return recordsBySection.map((arr) => (Array.isArray(arr) ? arr.slice() : []));
+}
+
+function recordsWithDisplayOrder(recordsBySection) {
+    if (!isSortByNameOverrideEnabled()) return recordsBySection;
+    return recordsBySection.map((arr) =>
+        Array.isArray(arr) ? [...arr].sort((a, b) => localeCompareName(a.Name, b.Name)) : []
+    );
+}
+
+/** Updates the view cache and paints (applies optional name-only sort for display). */
+function paintChecklist(sections, allRecordsBySection, options = {}) {
+    checklistViewCache.sections = sections;
+    checklistViewCache.recordsBySection = shallowCloneRecordsBySection(allRecordsBySection);
+    const { expandSectionIds: _omitExpand, ...persistOptions } = options;
+    checklistViewCache.options = { ...persistOptions };
+    const displayRecords = recordsWithDisplayOrder(checklistViewCache.recordsBySection);
+    renderChecklist(sections, displayRecords, options);
+}
+
+function getExpandedSectionIdsFromDom() {
+    return [...document.querySelectorAll('.section-header.open')]
+        .map((el) => el.dataset.sectionId)
+        .filter((id) => id != null && id !== '');
+}
+
+function repaintChecklistFromCache() {
+    const { sections, recordsBySection, options } = checklistViewCache;
+    if (!sections || !recordsBySection) return;
+    const expandedIds = getExpandedSectionIdsFromDom();
+    const displayRecords = recordsWithDisplayOrder(recordsBySection);
+    const paintOptions = { ...options };
+    if (expandedIds.length) {
+        paintOptions.expandSectionIds = expandedIds;
+    } else {
+        delete paintOptions.expandSectionIds;
+    }
+    renderChecklist(sections, displayRecords, paintOptions);
+}
+
 // Single unified render function — replaces both processData() and renderFilteredChecklist()
 function renderChecklist(sections, allRecordsBySection, options) {
-    const { startExpanded = false, filterValue = null, expandSectionId = null } = options;
+    const { startExpanded = false, filterValue = null, expandSectionId = null, expandSectionIds = null } = options;
+    const expandedIdSet =
+        Array.isArray(expandSectionIds) && expandSectionIds.length > 0
+            ? new Set(expandSectionIds.map((id) => String(id)))
+            : null;
     const gridContainer = document.getElementById('grid-checklist-container');
     gridContainer.innerHTML = '';
 
@@ -575,6 +686,26 @@ function renderChecklist(sections, allRecordsBySection, options) {
     // "Show hidden" = hidden records only; omit sections with nothing to show (keeps section indices contiguous).
     if (showHidden) {
         renderPairs = renderPairs.filter((p) => p.records.length > 0);
+    }
+
+    const sortSectionsByName = isSortByNameOverrideEnabled();
+    const deferCompleteSections = isDeferCompleteSectionsEnabled();
+    if (sortSectionsByName || deferCompleteSections) {
+        renderPairs = renderPairs
+            .map((p, i) => ({ p, i }))
+            .sort((a, b) => {
+                if (deferCompleteSections) {
+                    const ca = isSectionFullyComplete(a.p.records);
+                    const cb = isSectionFullyComplete(b.p.records);
+                    if (ca !== cb) return ca ? 1 : -1;
+                }
+                if (sortSectionsByName) {
+                    const byName = localeCompareName(a.p.section.Name, b.p.section.Name);
+                    if (byName !== 0) return byName;
+                }
+                return a.i - b.i;
+            })
+            .map(({ p }) => p);
     }
 
     renderPairs.forEach((pair, sectionIndex) => {
@@ -600,7 +731,10 @@ function renderChecklist(sections, allRecordsBySection, options) {
         headerText.textContent = sectionTitle + ' (0%)';
 
         // Set open state based on whether sections start expanded or this specific section should expand
-        const shouldExpand = startExpanded || (expandSectionId != null && String(section.ID) === String(expandSectionId));
+        const shouldExpand =
+            startExpanded ||
+            (expandSectionId != null && String(section.ID) === String(expandSectionId)) ||
+            (expandedIdSet && expandedIdSet.has(String(section.ID)));
         if (shouldExpand) {
             headerDiv.classList.add('open');
         }
@@ -762,10 +896,21 @@ function updateCompletion() {
             else numberAlreadyCompleted = checkboxNumberClicked - 1;
         }
         dbUtils.updateRecordCompletion(recordId, numberAlreadyCompleted);
+        patchRecordCompletionInCache(recordId, numberAlreadyCompleted);
     }
 
-    updateSectionCompletion(sectionIndex);
-    updateTotalCompletion();
+    if (isDeferCompleteSectionsEnabled()) {
+        repaintChecklistFromCache();
+        updateAllSectionsCompletion();
+        updateTotalCompletion();
+        applyHideCompletedToDOM();
+        if ($('#expand-all-toggle').is(':checked')) {
+            applyExpandAllToDOM();
+        }
+    } else {
+        updateSectionCompletion(sectionIndex);
+        updateTotalCompletion();
+    }
 }
 
 
