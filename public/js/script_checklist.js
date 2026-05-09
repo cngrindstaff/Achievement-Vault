@@ -698,9 +698,12 @@ function renderChecklist(sections, allRecordsBySection, options) {
 
     const fragment = document.createDocumentFragment();
 
+    // cacheSectionIndex = index into checklistViewCache.sections / recordsBySection (stable).
+    // data-section on DOM = visual row index (for checkboxes); they differ when sections are reordered.
     let renderPairs = sections.map((section, i) => ({
         section,
         records: allRecordsBySection[i] || [],
+        cacheSectionIndex: i,
     }));
     // "Show hidden" = hidden records only; omit sections with nothing to show (keeps section indices contiguous).
     if (showHidden) {
@@ -736,6 +739,7 @@ function renderChecklist(sections, allRecordsBySection, options) {
         const headerClone = sectionHeaderTemplate.content.cloneNode(true);
         const headerDiv = headerClone.querySelector('.section-header');
         headerDiv.dataset.section = sectionIndex;
+        headerDiv.dataset.cacheSectionIndex = String(pair.cacheSectionIndex);
         headerDiv.dataset.sectionId = section.ID;
         headerDiv.dataset.sectionDescription = section.Description || '';
         headerDiv.dataset.sectionListOrder = section.ListOrder;
@@ -745,6 +749,7 @@ function renderChecklist(sections, allRecordsBySection, options) {
 
         const headerText = headerClone.querySelector('.section-header-text');
         headerText.dataset.section = sectionIndex;
+        headerText.dataset.cacheSectionIndex = String(pair.cacheSectionIndex);
         headerText.dataset.sectionTitle = sectionTitle;
         headerText.dataset.sectionTitleClean = sectionTitleClean;
         headerText.textContent = sectionTitle + ' (0%)';
@@ -765,6 +770,7 @@ function renderChecklist(sections, allRecordsBySection, options) {
         const bodyClone = sectionBodyTemplate.content.cloneNode(true);
         const bodyDiv = bodyClone.querySelector('.section');
         bodyDiv.dataset.section = sectionIndex;
+        bodyDiv.dataset.cacheSectionIndex = String(pair.cacheSectionIndex);
         bodyDiv.style.display = shouldExpand ? 'block' : 'none';
 
         // Populate with records
@@ -960,7 +966,14 @@ function updateSectionCompletion(sectionIndex) {
     sectionHeaderDiv.attr("checked-checkboxes", checkedCheckboxes);
     sectionHeaderDiv.attr("total-checkboxes", totalCheckboxes);
 
-    const recs = checklistViewCache.recordsBySection?.[sectionIndex];
+    const cacheIdxAttr = sectionHeaderTextDiv.attr('data-cache-section-index');
+    const cacheIdx =
+        cacheIdxAttr !== undefined && cacheIdxAttr !== ''
+            ? parseInt(cacheIdxAttr, 10)
+            : sectionIndex;
+    const recs = Number.isFinite(cacheIdx)
+        ? checklistViewCache.recordsBySection?.[cacheIdx]
+        : undefined;
     const fullyComplete = Array.isArray(recs) && isSectionFullyComplete(recs);
     sectionHeaderDiv.toggleClass('section-header--complete', fullyComplete);
 }
