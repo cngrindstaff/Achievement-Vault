@@ -317,6 +317,21 @@ h3 .record-count {
 .section-header {
   justify-content: space-between;
   display: flex;
+  align-items: center;
+}
+
+.section-header-hidden-badge {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  margin-right: 10px;
+  opacity: 0.9;
+  font-size: 0.9em;
+  flex-shrink: 0;
+}
+
+.section-header.section-header--hidden .section-header-hidden-badge {
+  display: inline-flex;
 }
 
 .section-header.section-header--complete {

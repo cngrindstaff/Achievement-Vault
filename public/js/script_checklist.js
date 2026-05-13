@@ -549,10 +549,14 @@ function recordIsHidden(record) {
     return Number(record?.Hidden) === 1;
 }
 
-// Fetch records per section: toggle off => Hidden=0 only; toggle on => Hidden=1 only (hidden items only).
-// Sections list still comes from getSectionsBySectionGroupId (all sections when toggle on via 'all').
+function sectionIsHidden(section) {
+    return Number(section?.Hidden) === 1;
+}
+
+// Toggle off => non-hidden records only; toggle on => all records (visible + hidden) so hidden sections show their full content.
+// Sections list still comes from getSectionsBySectionGroupId (merged visible + hidden sections when toggle on).
 async function fetchAllRecords(sections, includeHidden = false) {
-    const recordFilter = includeHidden ? '1' : '0';
+    const recordFilter = includeHidden ? 'all' : '0';
     const recordsPromises = sections.map(section =>
         dbUtils.getRecordsBySectionIdV2(section.ID, section.RecordOrderPreference || null, recordFilter)
             .catch(err => {
@@ -705,9 +709,9 @@ function renderChecklist(sections, allRecordsBySection, options) {
         records: allRecordsBySection[i] || [],
         cacheSectionIndex: i,
     }));
-    // "Show hidden" = hidden records only; omit sections with nothing to show (keeps section indices contiguous).
+    // With "Show hidden", skip empty non-hidden sections; keep hidden sections even when they have no rows.
     if (showHidden) {
-        renderPairs = renderPairs.filter((p) => p.records.length > 0);
+        renderPairs = renderPairs.filter((p) => p.records.length > 0 || sectionIsHidden(p.section));
     }
 
     const sortSectionsByName = isSortByNameOverrideEnabled();
@@ -738,6 +742,9 @@ function renderChecklist(sections, allRecordsBySection, options) {
         // Clone and populate section header template
         const headerClone = sectionHeaderTemplate.content.cloneNode(true);
         const headerDiv = headerClone.querySelector('.section-header');
+        if (sectionIsHidden(section)) {
+            headerDiv.classList.add('section-header--hidden');
+        }
         headerDiv.dataset.section = sectionIndex;
         headerDiv.dataset.cacheSectionIndex = String(pair.cacheSectionIndex);
         headerDiv.dataset.sectionId = section.ID;
