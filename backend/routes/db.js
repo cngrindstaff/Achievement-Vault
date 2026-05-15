@@ -531,6 +531,68 @@ router.put('/db/record/update/:recordId', async (req, res) => {
     }
 });
 
+//************************************ MOVE GAME RECORD (change section) ************************************//
+// Uses stored procedure `MoveGameRecord`: `UpdateGameRecord` matches SectionID + ID before update, which fails across sections.
+router.put('/db/record/move/:recordId', async (req, res) => {
+    const { recordId } = req.params;
+    const {
+        recordName,
+        description,
+        gameId,
+        numberOfCheckboxes,
+        numberAlreadyCompleted,
+        listOrder,
+        longDescription,
+        hidden,
+        sectionId,
+    } = req.body;
+
+    if (
+        !recordName ||
+        sectionId === undefined ||
+        gameId === undefined ||
+        numberOfCheckboxes === undefined ||
+        numberAlreadyCompleted === undefined ||
+        listOrder === undefined ||
+        hidden === undefined
+    ) {
+        return res.status(400).json({ error: 'Missing required fields' });
+    }
+
+    try {
+        const oldRec = await fetchRecordById(recordId);
+        await db.query('CALL MoveGameRecord(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', [
+            recordId,
+            sectionId,
+            recordName,
+            description ?? null,
+            gameId,
+            numberOfCheckboxes,
+            numberAlreadyCompleted,
+            listOrder,
+            longDescription ?? null,
+            hidden,
+        ]);
+        if (oldRec) {
+            const msg = describeGameRecordUpdate(oldRec, req.body);
+            if (msg) {
+                const ctx = await contextFromRecordRow(oldRec);
+                await insertAuditLogSafe({
+                    changeDescription: msg,
+                    gameId: ctx.gameId,
+                    sectionGroupId: ctx.sectionGroupId,
+                    sectionId: ctx.sectionId,
+                    recordId: Number(recordId),
+                });
+            }
+        }
+        res.json({ message: 'Game record moved successfully' });
+    } catch (err) {
+        console.error('Error moving game record:', err);
+        res.status(500).json({ error: 'Database error' });
+    }
+});
+
 //************************************ DELETE A RECORD ITEM ************************************//
 router.delete('/db/record/delete/:recordId', async (req, res) => {
     const recordId = req.params.recordId;

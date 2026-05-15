@@ -2,6 +2,7 @@
 
 ### Added
 
+- Move records between sections from the checklist: select records in a section, then choose a destination section group and section within the same game.
 - Added Audit Logging capability and new SQL table to support it. 
 - Added toggle to re-order records and sections by name.
 - Added toggle for "Completed Sections Last", so that any sections that have been fully completed now show up at the bottom.

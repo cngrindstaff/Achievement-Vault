@@ -1,6 +1,7 @@
 import * as utils from './script_utilities.js';
 import * as dbUtils from './script_db_helper.js';
 import { initRecordModal } from './script_recordModal.js';
+import { initMoveRecords } from './script_moveRecords.js';
 import { initNav } from './script_nav.js';
 
 //can't use env var on client-side js file, so make sure this is 'false' when checking in to GitHub
@@ -73,12 +74,12 @@ $(document).ready(async function () {
     // https://chatgpt.com/share/67c0f24e-db90-8004-be01-0dec495fc388
     // This prevents multiple event bindings by using event delegation.
     // The event is attached to the parent element and delegated to the children.
-    $('#grid-checklist-container').on('change', 'input[type="checkbox"]', updateCompletion);
+    $('#grid-checklist-container').on('change', 'input.completion-checkbox', updateCompletion);
 
     // Event delegation for section header clicks (toggle collapse)
     // Ignore clicks on the add button
     $('#grid-checklist-container').on('click', '.section-header', function (e) {
-        if ($(e.target).closest('.section-add-btn, .section-edit-desc-btn, .section-reorder-btn').length) return;
+        if ($(e.target).closest('.section-add-btn, .section-edit-desc-btn, .section-reorder-btn, .section-move-records-btn').length) return;
         $(this).next('.section').slideToggle(250);
         $(this).toggleClass('open');
     });
@@ -529,17 +530,43 @@ $(document).ready(async function () {
         gameId,
         defaultAlreadyCompleted: 0,
         onSave: async (savedSectionId) => {
-            // Re-fetch and re-render — only expand the section that was changed
-            const sections = await dbUtils.getSectionsBySectionGroupId(sectionGroupId, showHidden);
-            const allRecordsBySection = await fetchAllRecords(sections, showHidden);
-            paintChecklist(sections, allRecordsBySection, { startExpanded: false, expandSectionId: savedSectionId });
-            updateAllSectionsCompletion();
-            updateTotalCompletion();
+            await refreshChecklistAfterRecordChange(savedSectionId);
         }
     });
 
     // Wire up the + button in section headers
     window._recordModal = recordModal;
+
+    async function refreshChecklistAfterRecordChange(expandSectionId = null) {
+        const sections = await dbUtils.getSectionsBySectionGroupId(sectionGroupId, showHidden);
+        const allRecordsBySection = await fetchAllRecords(sections, showHidden);
+        paintChecklist(sections, allRecordsBySection, {
+            startExpanded: false,
+            expandSectionId,
+        });
+        updateAllSectionsCompletion();
+        updateTotalCompletion();
+    }
+
+    function findRecordInCache(recordId) {
+        for (const arr of checklistViewCache.recordsBySection) {
+            if (!Array.isArray(arr)) continue;
+            for (const r of arr) {
+                if (String(r.ID) === String(recordId)) return r;
+            }
+        }
+        return null;
+    }
+
+    const moveRecords = initMoveRecords({
+        gameId,
+        getCurrentSectionGroupId: () => sectionGroupId,
+        getShowHidden: () => showHidden,
+        findRecordById: findRecordInCache,
+        onMoved: () => refreshChecklistAfterRecordChange(),
+    });
+    moveRecords.bind(document.getElementById('grid-checklist-container'));
+    window._moveRecords = moveRecords;
 });
 
 
@@ -662,6 +689,7 @@ function recordsWithDisplayOrder(recordsBySection) {
 
 /** Updates the view cache and paints (applies optional name-only sort for display). */
 function paintChecklist(sections, allRecordsBySection, options = {}) {
+    window._moveRecords?.exitMoveSelectMode();
     checklistViewCache.sections = sections;
     checklistViewCache.recordsBySection = shallowCloneRecordsBySection(allRecordsBySection);
     const { expandSectionIds: _omitExpand, ...persistOptions } = options;
@@ -777,6 +805,7 @@ function renderChecklist(sections, allRecordsBySection, options) {
         const bodyClone = sectionBodyTemplate.content.cloneNode(true);
         const bodyDiv = bodyClone.querySelector('.section');
         bodyDiv.dataset.section = sectionIndex;
+        bodyDiv.dataset.sectionId = section.ID;
         bodyDiv.dataset.cacheSectionIndex = String(pair.cacheSectionIndex);
         bodyDiv.style.display = shouldExpand ? 'block' : 'none';
 
@@ -815,7 +844,7 @@ function createChecklistItem(record, recordIndex, sectionIndex, sectionTitleClea
     const recordNameClean = utils.createSlug(recordName);
 
     const itemDiv = clone.querySelector('.checklist-item');
-    itemDiv.className = 'grid-item-1-row';
+    itemDiv.className = 'grid-item-1-row checklist-item';
     itemDiv.dataset.recordId = record.ID;
 
     // Store descriptions as data attributes for the detail modal
@@ -857,7 +886,7 @@ function createCheckbox(sectionIndex, itemIndex, checkboxNumber, totalCheckboxes
     checkbox.type = 'checkbox';
 
     const checkboxName = createStorageItemName(gameId, sectionTitleClean, itemNameClean, checkboxNumber);
-    checkbox.className = 'checkbox-' + checkboxName;
+    checkbox.className = 'completion-checkbox checkbox-' + checkboxName;
 
     checkbox.dataset.section = sectionIndex;
     checkbox.dataset.item = itemIndex;

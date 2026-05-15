@@ -420,6 +420,40 @@ export async function updateGameRecord(recordId, updateData) {
     }
 }
 
+//************************************ MOVE GAME RECORD (change section — uses dedicated API) ************************************//
+export async function moveGameRecord(recordId, updateData) {
+    if (!recordId || !updateData) {
+        alert("Missing record ID or update data.");
+        return;
+    }
+
+    try {
+        const res = await apiFetch(`/api/db/record/move/${recordId}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(updateData)
+        });
+
+        if (!res || !res.ok) {
+            console.log('No response or response not ok:', res);
+            return [];
+        }
+        const text = await res.text();
+        if (!text) {
+            console.log('Response body empty');
+            return [];
+        }
+        const data = JSON.parse(text);
+        return data;
+    } catch (err) {
+        console.error("Error moving game record:", err);
+        return null;
+    }
+}
+
+
 //************************************ INSERT GAME RECORD ************************************//
 export async function insertGameRecord(recordData) {
     if (!recordData) {
@@ -826,7 +860,13 @@ async function fetchSectionGroupsByGameIdRaw(gameId, hiddenFilterSegment) {
         console.log('Response body empty');
         return [];
     }
-    return JSON.parse(text);
+    try {
+        const data = JSON.parse(text);
+        return Array.isArray(data) ? data : [];
+    } catch (e) {
+        console.error('fetchSectionGroupsByGameIdRaw: invalid JSON', e);
+        return [];
+    }
 }
 
 function mergeSectionGroupsVisibleAndHidden(visible, hidden) {
@@ -845,7 +885,7 @@ function mergeSectionGroupsVisibleAndHidden(visible, hidden) {
 export async function getSectionGroupsByGameId(gameId, hiddenFilter) {
     if (!gameId) {
         alert("Missing game ID in URL.");
-        return;
+        return [];
     }
 
     try {
@@ -861,6 +901,7 @@ export async function getSectionGroupsByGameId(gameId, hiddenFilter) {
         return await fetchSectionGroupsByGameIdRaw(gameId, hiddenFilter);
     } catch (err) {
         console.error("Error fetching SectionGroup data:", err);
+        return [];
     }
 }
 
@@ -876,7 +917,13 @@ async function fetchSectionsBySectionGroupIdRaw(sectionGroupId, hiddenFilterSegm
         console.log('Response body empty');
         return [];
     }
-    return JSON.parse(text);
+    try {
+        const data = JSON.parse(text);
+        return Array.isArray(data) ? data : [];
+    } catch (e) {
+        console.error('fetchSectionsBySectionGroupIdRaw: invalid JSON', e);
+        return [];
+    }
 }
 
 function mergeSectionsVisibleAndHidden(visible, hidden) {
@@ -895,7 +942,7 @@ function mergeSectionsVisibleAndHidden(visible, hidden) {
 export async function getSectionsBySectionGroupId(sectionGroupId, hiddenFilter) {
     if (!sectionGroupId) {
         alert("Missing sectionGroupId in URL.");
-        return;
+        return [];
     }
 
     try {
@@ -914,5 +961,6 @@ export async function getSectionsBySectionGroupId(sectionGroupId, hiddenFilter) 
         return await fetchSectionsBySectionGroupIdRaw(sectionGroupId, hiddenFilter);
     } catch (err) {
         console.error("Error getSectionsBySectionGroupId: ", err);
+        return [];
     }
 }
