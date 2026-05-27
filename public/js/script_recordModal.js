@@ -62,17 +62,13 @@ export function initRecordModal({ gameId, defaultAlreadyCompleted = 0, onSave })
                 <span class="close-modal">&times;</span>
                 <h3 id="modal-section-name" style="margin-bottom: 12px;"></h3>
                 <form id="new-record-form" class="add-record-container">
-                    <label class="switch multi-toggle">
-                        <input type="checkbox" id="multi-mode-toggle">
-                        <span class="slider"></span>Add Multiple
-                    </label>
                     <label class="modern-checkbox add-record">
                         <input type="checkbox" id="preserve-casing">
                         <span class="checkmark"></span>
                         Override auto-casing
                     </label>
-                    <label class="add-record" id="single-name-label">Name:<input type="text" id="recordName" class="add-record" required></label>
-                    <label class="add-record hidden" id="multi-name-label">Names (one per line):<textarea id="recordNames" class="add-record" rows="6" placeholder="Record One&#10;Record Two&#10;Record Three"></textarea></label>
+                    <label class="add-record hidden" id="single-name-label">Name:<input type="text" id="recordName" class="add-record"></label>
+                    <label class="add-record" id="multi-name-label">Name(s) (one per line):<textarea id="recordNames" class="add-record" rows="6" placeholder="Record One&#10;Record Two&#10;Record Three" required></textarea></label>
                     <label class="add-record">Description:<textarea id="description" class="add-record" rows="2"></textarea></label>
                     <div class="add-record-row">
                         <label class="add-record">Number of Checkboxes:<input type="number" id="numberOfCheckboxes" class="add-record default-value" min="0" value="1" required></label>
@@ -102,13 +98,11 @@ export function initRecordModal({ gameId, defaultAlreadyCompleted = 0, onSave })
     const modal = document.getElementById('add-record-modal');
     const form = document.getElementById('new-record-form');
     const closeBtn = modal.querySelector('.close-modal');
-    const multiToggle = document.getElementById('multi-mode-toggle');
     const singleNameLabel = document.getElementById('single-name-label');
     const multiNameLabel = document.getElementById('multi-name-label');
     const recordNameInput = document.getElementById('recordName');
     const recordNamesTextarea = document.getElementById('recordNames');
     const preserveCasingInput = document.getElementById('preserve-casing');
-    const multiToggleLabel = modal.querySelector('.multi-toggle');
     const modalSectionHeading = document.getElementById('modal-section-name');
     const deleteButton = document.getElementById('delete-record-button');
 
@@ -132,31 +126,37 @@ export function initRecordModal({ gameId, defaultAlreadyCompleted = 0, onSave })
         return initialFormState !== null && captureFormState() !== initialFormState;
     }
 
-    // ─── Title Case ──────────────────────────────────────────────
+    // ─── Title Case (only after the user focuses a name field) ───
 
-    recordNameInput.addEventListener('blur', function () {
-        if (preserveCasingInput.checked) return;
-        this.value = toTitleCase(this.value);
-    });
+    let nameFieldTouched = false;
 
-    recordNamesTextarea.addEventListener('blur', function () {
-        if (preserveCasingInput.checked) return;
-        this.value = this.value.split('\n').map(line => {
-            const trimmed = line.trim();
-            return trimmed ? toTitleCase(trimmed) : '';
-        }).join('\n');
-    });
+    function resetNameFieldTouched() {
+        nameFieldTouched = false;
+    }
 
-    // ─── Multi-mode Toggle ───────────────────────────────────────
+    function applyNameTitleCase() {
+        if (preserveCasingInput.checked || !nameFieldTouched) return;
+        if (form.dataset.editId) {
+            recordNameInput.value = toTitleCase(recordNameInput.value.trim());
+        } else {
+            recordNamesTextarea.value = recordNamesTextarea.value.split('\n').map(line => {
+                const trimmed = line.trim();
+                return trimmed ? toTitleCase(trimmed) : '';
+            }).join('\n');
+        }
+    }
 
-    multiToggle.addEventListener('change', () => {
-        const isMulti = multiToggle.checked;
-        singleNameLabel.classList.toggle('hidden', isMulti);
-        multiNameLabel.classList.toggle('hidden', !isMulti);
-        recordNameInput.required = !isMulti;
-        if (isMulti) recordNameInput.value = '';
-        else recordNamesTextarea.value = '';
-    });
+    recordNameInput.addEventListener('focus', () => { nameFieldTouched = true; });
+    recordNamesTextarea.addEventListener('focus', () => { nameFieldTouched = true; });
+    recordNameInput.addEventListener('blur', applyNameTitleCase);
+    recordNamesTextarea.addEventListener('blur', applyNameTitleCase);
+
+    function setAddNameFieldsVisible(isAdd) {
+        singleNameLabel.classList.toggle('hidden', isAdd);
+        multiNameLabel.classList.toggle('hidden', !isAdd);
+        recordNameInput.required = !isAdd;
+        recordNamesTextarea.required = isAdd;
+    }
 
     // ─── Default Value Styling ───────────────────────────────────
 
@@ -169,11 +169,8 @@ export function initRecordModal({ gameId, defaultAlreadyCompleted = 0, onSave })
         document.getElementById('numberAlreadyCompleted').classList.add('default-value');
         document.getElementById('listOrder').classList.add('default-value');
         preserveCasingInput.checked = false;
-        multiToggle.checked = false;
-        singleNameLabel.classList.remove('hidden');
-        multiNameLabel.classList.add('hidden');
-        recordNameInput.required = true;
-        multiToggleLabel.classList.remove('hidden');
+        resetNameFieldTouched();
+        setAddNameFieldsVisible(true);
         deleteButton.classList.add('hidden');
     }
 
@@ -207,6 +204,8 @@ export function initRecordModal({ gameId, defaultAlreadyCompleted = 0, onSave })
     function openForAdd(sectionId, sectionName) {
         currentSectionId = sectionId;
         modalSectionHeading.textContent = 'Add to: ' + sectionName;
+        setAddNameFieldsVisible(true);
+        resetNameFieldTouched();
         modal.classList.remove('hidden');
         initialFormState = captureFormState();
     }
@@ -232,9 +231,9 @@ export function initRecordModal({ gameId, defaultAlreadyCompleted = 0, onSave })
         document.getElementById('numberAlreadyCompleted').classList.remove('default-value');
         document.getElementById('listOrder').classList.remove('default-value');
 
-        // Hide multi toggle when editing, show delete button
-        multiToggleLabel.classList.add('hidden');
+        setAddNameFieldsVisible(false);
         deleteButton.classList.remove('hidden');
+        resetNameFieldTouched();
 
         // Store edit ID
         form.dataset.editId = recordId;
@@ -248,17 +247,8 @@ export function initRecordModal({ gameId, defaultAlreadyCompleted = 0, onSave })
     form.addEventListener('submit', async (event) => {
         event.preventDefault();
 
-        const isMultiMode = multiToggle.checked;
-        if (!preserveCasingInput.checked) {
-            if (isMultiMode && !form.dataset.editId) {
-                recordNamesTextarea.value = recordNamesTextarea.value.split('\n').map(line => {
-                    const trimmed = line.trim();
-                    return trimmed ? toTitleCase(trimmed) : '';
-                }).join('\n');
-            } else {
-                recordNameInput.value = toTitleCase(recordNameInput.value.trim());
-            }
-        }
+        const editId = form.dataset.editId;
+        applyNameTitleCase();
         const description = document.getElementById('description').value.trim();
         const numberOfCheckboxes = parseInt(document.getElementById('numberOfCheckboxes').value);
         const numberAlreadyCompleted = parseInt(document.getElementById('numberAlreadyCompleted').value);
@@ -283,11 +273,12 @@ export function initRecordModal({ gameId, defaultAlreadyCompleted = 0, onSave })
             document.getElementById('numberOfCheckboxes').classList.remove('invalid-input');
         }
 
-        if (isMultiMode && !form.dataset.editId) {
+        if (!editId) {
             const names = recordNamesTextarea.value.split('\n').map(n => n.trim()).filter(n => n.length > 0);
             if (names.length === 0) { alert('Please enter at least one name.'); return; }
-        } else if (!form.dataset.editId) {
-            if (!recordNameInput.value.trim()) { alert('Please enter a name.'); return; }
+        } else if (!recordNameInput.value.trim()) {
+            alert('Please enter a name.');
+            return;
         }
 
         const spinner = document.getElementById('loading-spinner');
@@ -301,12 +292,10 @@ export function initRecordModal({ gameId, defaultAlreadyCompleted = 0, onSave })
 
         try {
             let success;
-            const editId = form.dataset.editId;
             const sectionIdInt = parseInt(currentSectionId);
             const gameIdInt = parseInt(gameId);
 
-            if (isMultiMode && !editId) {
-                // Multi-insert
+            if (!editId) {
                 const names = recordNamesTextarea.value.split('\n').map(n => n.trim()).filter(n => n.length > 0);
                 const records = names.map(name => ({
                     name, description,
@@ -314,22 +303,13 @@ export function initRecordModal({ gameId, defaultAlreadyCompleted = 0, onSave })
                     numberOfCheckboxes, numberAlreadyCompleted, listOrder, longDescription, hidden
                 }));
                 success = await dbUtils.insertMultipleGameRecords(records);
-            } else if (editId) {
-                // Update existing
+            } else {
                 const recordData = {
                     recordName: recordNameInput.value.trim(), description,
                     sectionId: sectionIdInt, gameId: gameIdInt,
                     numberOfCheckboxes, numberAlreadyCompleted, listOrder, longDescription, hidden
                 };
                 success = await dbUtils.updateGameRecord(editId, recordData);
-            } else {
-                // Single insert
-                const recordData = {
-                    recordName: recordNameInput.value.trim(), description,
-                    sectionId: sectionIdInt, gameId: gameIdInt,
-                    numberOfCheckboxes, numberAlreadyCompleted, listOrder, longDescription, hidden
-                };
-                success = await dbUtils.insertGameRecord(recordData);
             }
 
             if (success) {
