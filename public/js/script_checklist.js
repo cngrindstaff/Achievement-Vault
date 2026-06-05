@@ -424,11 +424,6 @@ $(document).ready(async function () {
     $('#container').on('change', '#hide-completed-toggle', applyHideCompletedToDOM);
     $('#container').on('change', '#expand-all-toggle', applyExpandAllToDOM);
 
-    function getHideCompleted() {
-        // checked = show completed, unchecked = hide completed
-        return !$('#hide-completed-toggle').is(':checked');
-    } 
-
     async function applyFilterAndRender() {
         const filterValue = $('#filter-input').val().toLowerCase();
         // Re-fetch sections and records
@@ -461,35 +456,6 @@ $(document).ready(async function () {
         if ($('#expand-all-toggle').is(':checked')) {
             applyExpandAllToDOM();
         }
-    }
-
-    function applyHideCompletedToDOM() {
-        const hideCompleted = getHideCompleted();
-        $('.section').each(function () {
-            $(this).find('.grid-item-1-row, .grid-item-2-row').each(function () {
-                const checkboxes = $(this).find('input[type="checkbox"]');
-                const numTotal = checkboxes.length;
-                const numChecked = checkboxes.filter(':checked').length;
-                if (hideCompleted && numTotal === numChecked) {
-                    $(this).hide();
-                } else {
-                    $(this).show();
-                }
-            });
-        });
-    }
-
-    function applyExpandAllToDOM() {
-        const expandAll = $('#expand-all-toggle').is(':checked');
-        $('.section').each(function () {
-            if (expandAll) {
-                $(this).slideDown(250);
-                $(this).prev('.section-header').addClass('open');
-            } else {
-                $(this).slideUp(250);
-                $(this).prev('.section-header').removeClass('open');
-            }
-        });
     }
 
     // --- ADD/EDIT RECORD MODAL (shared module) ---
@@ -593,6 +559,40 @@ function localeCompareName(a, b) {
 function isDeferCompleteSectionsEnabled() {
     const el = document.getElementById('defer-complete-sections-toggle');
     return !!(el && el.checked);
+}
+
+function getHideCompleted() {
+    // checked = show completed, unchecked = hide completed
+    return !$('#hide-completed-toggle').is(':checked');
+}
+
+function applyHideCompletedToDOM() {
+    const hideCompleted = getHideCompleted();
+    $('.section').each(function () {
+        $(this).find('.grid-item-1-row, .grid-item-2-row').each(function () {
+            const checkboxes = $(this).find('input.completion-checkbox');
+            const numTotal = checkboxes.length;
+            const numChecked = checkboxes.filter(':checked').length;
+            if (hideCompleted && numTotal > 0 && numTotal === numChecked) {
+                $(this).hide();
+            } else {
+                $(this).show();
+            }
+        });
+    });
+}
+
+function applyExpandAllToDOM() {
+    const expandAll = $('#expand-all-toggle').is(':checked');
+    $('.section').each(function () {
+        if (expandAll) {
+            $(this).slideDown(250);
+            $(this).prev('.section-header').addClass('open');
+        } else {
+            $(this).slideUp(250);
+            $(this).prev('.section-header').removeClass('open');
+        }
+    });
 }
 
 /** Section is 100% done when every record that has checkboxes is fully completed. */
@@ -796,6 +796,7 @@ function renderChecklist(sections, allRecordsBySection, options) {
     });
 
     gridContainer.appendChild(fragment);
+    applyHideCompletedToDOM();
 }
 
 
