@@ -1,7 +1,12 @@
+## v3.5 - 2026-06-10
+
+### Added
+- Support to scroll between editing records
+- Support for upserting records via CSV (name, description only)
+
 ## v3.4 - 2026-05-08
 
 ### Added
-
 - Move records between sections from the checklist: select records in a section, then choose a destination section group and section within the same game.
 - Added Audit Logging capability and new SQL table to support it. 
 - Added toggle to re-order records and sections by name.

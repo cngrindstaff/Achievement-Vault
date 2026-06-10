@@ -477,6 +477,16 @@ The record edit modal now shows previous/next arrows when a section has multiple
 
 ---
 
+### Jun 10, 2026 — Import records from CSV
+
+**Files changed:** `public/js/script_recordModal.js`, `public/css/styles.scss`, `public/css/styles.css`, `public/css/styles.css.map`, `README.md`, `agent.md`
+
+The Add Records modal now supports Manual entry or CSV file import. CSV column 1 supplies each record name and column 2 supplies its description. A first row of `name,description` or `title,description` is treated as a header and skipped. Quoted commas, escaped quotes, and quoted multiline fields are supported.
+
+Checkbox counts, completion count, list order, long description, hidden state, and casing preference remain shared modal values applied to every imported record. The CSV panel previews the valid record count and reports skipped non-empty rows without a name. Import uses the existing `insertMultipleGameRecords` API.
+
+---
+
 ## Database Schema Reference (Feb 27, 2026)
 
 SQL dump lives in `sql/Dump20260227.sql`. MySQL 8.0 on DigitalOcean. Database name: `achievement_vault`.

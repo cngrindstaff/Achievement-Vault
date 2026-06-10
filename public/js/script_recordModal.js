@@ -52,6 +52,67 @@ function toTitleCase(str) {
     }).join(' ');
 }
 
+function parseCsvRows(text) {
+    const rows = [];
+    let row = [];
+    let field = '';
+    let inQuotes = false;
+
+    for (let i = 0; i < text.length; i++) {
+        const char = text[i];
+        const next = text[i + 1];
+
+        if (char === '"' && inQuotes && next === '"') {
+            field += '"';
+            i++;
+        } else if (char === '"') {
+            inQuotes = !inQuotes;
+        } else if (char === ',' && !inQuotes) {
+            row.push(field);
+            field = '';
+        } else if ((char === '\n' || char === '\r') && !inQuotes) {
+            if (char === '\r' && next === '\n') i++;
+            row.push(field);
+            rows.push(row);
+            row = [];
+            field = '';
+        } else {
+            field += char;
+        }
+    }
+
+    if (inQuotes) throw new Error('The CSV contains an unclosed quoted field.');
+    if (field.length > 0 || row.length > 0) {
+        row.push(field);
+        rows.push(row);
+    }
+    return rows;
+}
+
+export function recordsFromCsv(text) {
+    const rows = parseCsvRows(text.replace(/^\uFEFF/, ''));
+    if (rows.length > 0) {
+        const first = String(rows[0][0] || '').trim().toLowerCase();
+        const second = String(rows[0][1] || '').trim().toLowerCase();
+        if ((first === 'name' || first === 'title') && second === 'description') {
+            rows.shift();
+        }
+    }
+
+    let skipped = 0;
+    const records = [];
+    for (const row of rows) {
+        const name = String(row[0] || '').trim();
+        const description = String(row[1] || '').trim();
+        if (!name) {
+            if (row.some((field) => String(field || '').trim())) skipped++;
+            continue;
+        }
+        records.push({ name, description });
+    }
+    return { records, skipped };
+}
+
 // ─── Modal Factory ───────────────────────────────────────────────
 
 export function initRecordModal({ gameId, defaultAlreadyCompleted = 0, onSave, getRecordIdsForSection }) {
@@ -74,6 +135,11 @@ export function initRecordModal({ gameId, defaultAlreadyCompleted = 0, onSave, g
                     </div>
                 </div>
                 <form id="new-record-form" class="add-record-container">
+                    <fieldset id="record-add-source" class="record-add-source">
+                        <legend>Add records from</legend>
+                        <label><input type="radio" name="record-add-mode" value="manual" checked> Manual entry</label>
+                        <label><input type="radio" name="record-add-mode" value="csv"> CSV file</label>
+                    </fieldset>
                     <label class="modern-checkbox add-record">
                         <input type="checkbox" id="preserve-casing">
                         <span class="checkmark"></span>
@@ -81,7 +147,14 @@ export function initRecordModal({ gameId, defaultAlreadyCompleted = 0, onSave, g
                     </label>
                     <label class="add-record hidden" id="single-name-label">Name:<input type="text" id="recordName" class="add-record"></label>
                     <label class="add-record" id="multi-name-label">Name(s) (one per line):<textarea id="recordNames" class="add-record" rows="6" placeholder="Record One&#10;Record Two&#10;Record Three" required></textarea></label>
-                    <label class="add-record">Description:<textarea id="description" class="add-record" rows="2"></textarea></label>
+                    <div id="csv-import-panel" class="csv-import-panel hidden">
+                        <label class="add-record">CSV file:
+                            <input type="file" id="record-csv-file" accept=".csv,text/csv">
+                        </label>
+                        <p class="csv-import-help">Column 1: name. Column 2: description. Recognized header rows are skipped.</p>
+                        <p id="csv-import-status" class="csv-import-status">Choose a CSV file to preview the import.</p>
+                    </div>
+                    <label class="add-record" id="shared-description-label">Description:<textarea id="description" class="add-record" rows="2"></textarea></label>
                     <div class="add-record-row">
                         <label class="add-record">Number of Checkboxes:<input type="number" id="numberOfCheckboxes" class="add-record default-value" min="0" value="1" required></label>
                         <label class="add-record">Number Already Completed:<input type="number" id="numberAlreadyCompleted" class="add-record default-value" min="0" value="${defaultAlreadyCompleted}" required></label>
@@ -120,11 +193,19 @@ export function initRecordModal({ gameId, defaultAlreadyCompleted = 0, onSave, g
     const previousButton = document.getElementById('record-edit-previous');
     const nextButton = document.getElementById('record-edit-next');
     const positionText = document.getElementById('record-edit-position');
+    const addSource = document.getElementById('record-add-source');
+    const csvPanel = document.getElementById('csv-import-panel');
+    const csvFileInput = document.getElementById('record-csv-file');
+    const csvStatus = document.getElementById('csv-import-status');
+    const sharedDescriptionLabel = document.getElementById('shared-description-label');
+    const saveButton = document.getElementById('save-record-button');
 
     let currentSectionId = null;
     let initialFormState = null;
     let sectionRecordIds = [];
     let navigationInProgress = false;
+    let csvRecords = [];
+    let csvSkippedRows = 0;
 
     function captureFormState() {
         return JSON.stringify([
@@ -135,7 +216,10 @@ export function initRecordModal({ gameId, defaultAlreadyCompleted = 0, onSave, g
             document.getElementById('numberAlreadyCompleted').value,
             document.getElementById('listOrder').value,
             document.getElementById('longDescription').value,
-            document.getElementById('hidden').checked
+            document.getElementById('hidden').checked,
+            getAddMode(),
+            csvFileInput.value,
+            csvRecords
         ]);
     }
 
@@ -170,9 +254,33 @@ export function initRecordModal({ gameId, defaultAlreadyCompleted = 0, onSave, g
 
     function setAddNameFieldsVisible(isAdd) {
         singleNameLabel.classList.toggle('hidden', isAdd);
-        multiNameLabel.classList.toggle('hidden', !isAdd);
+        multiNameLabel.classList.toggle('hidden', !isAdd || getAddMode() === 'csv');
         recordNameInput.required = !isAdd;
-        recordNamesTextarea.required = isAdd;
+        recordNamesTextarea.required = isAdd && getAddMode() !== 'csv';
+        addSource.classList.toggle('hidden', !isAdd);
+        csvPanel.classList.toggle('hidden', !isAdd || getAddMode() !== 'csv');
+        sharedDescriptionLabel.classList.toggle('hidden', isAdd && getAddMode() === 'csv');
+    }
+
+    function getAddMode() {
+        return form.querySelector('input[name="record-add-mode"]:checked')?.value || 'manual';
+    }
+
+    function resetCsvImport() {
+        csvRecords = [];
+        csvSkippedRows = 0;
+        csvFileInput.value = '';
+        csvStatus.textContent = 'Choose a CSV file to preview the import.';
+        csvStatus.classList.remove('csv-import-status--error');
+    }
+
+    function setAddMode(mode) {
+        const input = form.querySelector(`input[name="record-add-mode"][value="${mode}"]`);
+        if (input) input.checked = true;
+        setAddNameFieldsVisible(!form.dataset.editId);
+        saveButton.textContent = mode === 'csv' && !form.dataset.editId
+            ? 'Import Records'
+            : 'Save Record';
     }
 
     // ─── Default Value Styling ───────────────────────────────────
@@ -190,6 +298,8 @@ export function initRecordModal({ gameId, defaultAlreadyCompleted = 0, onSave, g
         setAddNameFieldsVisible(true);
         deleteButton.classList.add('hidden');
         setRecordNavigation([]);
+        resetCsvImport();
+        setAddMode('manual');
     }
 
     function setRecordNavigation(recordIds, currentRecordId = null) {
@@ -241,9 +351,43 @@ export function initRecordModal({ gameId, defaultAlreadyCompleted = 0, onSave, g
         restoreDefaults();
     });
 
+    addSource.addEventListener('change', () => {
+        setAddMode(getAddMode());
+    });
+
+    csvFileInput.addEventListener('change', async () => {
+        const file = csvFileInput.files?.[0];
+        csvRecords = [];
+        csvSkippedRows = 0;
+        csvStatus.classList.remove('csv-import-status--error');
+        if (!file) {
+            csvStatus.textContent = 'Choose a CSV file to preview the import.';
+            return;
+        }
+
+        try {
+            const parsed = recordsFromCsv(await file.text());
+            csvRecords = parsed.records;
+            csvSkippedRows = parsed.skipped;
+            if (csvRecords.length === 0) {
+                csvStatus.textContent = 'No records with a name were found in this CSV.';
+                csvStatus.classList.add('csv-import-status--error');
+                return;
+            }
+            csvStatus.textContent =
+                `${csvRecords.length} record${csvRecords.length === 1 ? '' : 's'} ready to import` +
+                (csvSkippedRows ? `; ${csvSkippedRows} row${csvSkippedRows === 1 ? '' : 's'} without a name skipped.` : '.');
+        } catch (error) {
+            csvStatus.textContent = error.message || 'Could not read this CSV file.';
+            csvStatus.classList.add('csv-import-status--error');
+        }
+    });
+
     function openForAdd(sectionId, sectionName) {
         currentSectionId = sectionId;
         modalSectionHeading.textContent = 'Add to: ' + sectionName;
+        delete form.dataset.editId;
+        setAddMode('manual');
         setAddNameFieldsVisible(true);
         resetNameFieldTouched();
         modal.classList.remove('hidden');
@@ -404,7 +548,13 @@ export function initRecordModal({ gameId, defaultAlreadyCompleted = 0, onSave, g
             document.getElementById('numberOfCheckboxes').classList.remove('invalid-input');
         }
 
-        if (!editId) {
+        if (!editId && getAddMode() === 'csv') {
+            if (csvRecords.length === 0) {
+                csvStatus.textContent = 'Choose a CSV file containing at least one named record.';
+                csvStatus.classList.add('csv-import-status--error');
+                return;
+            }
+        } else if (!editId) {
             const names = recordNamesTextarea.value.split('\n').map(n => n.trim()).filter(n => n.length > 0);
             if (names.length === 0) { alert('Please enter at least one name.'); return; }
         } else if (!recordNameInput.value.trim()) {
@@ -414,8 +564,6 @@ export function initRecordModal({ gameId, defaultAlreadyCompleted = 0, onSave, g
 
         const spinner = document.getElementById('loading-spinner');
         const successMessage = document.getElementById('success-message');
-        const saveButton = document.getElementById('save-record-button');
-
         saveButton.classList.add('bounce');
         setTimeout(() => saveButton.classList.remove('bounce'), 500);
         spinner.classList.remove('hidden');
@@ -423,16 +571,24 @@ export function initRecordModal({ gameId, defaultAlreadyCompleted = 0, onSave, g
 
         try {
             let success;
+            let savedRecordCount = 1;
             const sectionIdInt = parseInt(currentSectionId);
             const gameIdInt = parseInt(gameId);
 
             if (!editId) {
-                const names = recordNamesTextarea.value.split('\n').map(n => n.trim()).filter(n => n.length > 0);
-                const records = names.map(name => ({
-                    name, description,
+                const isCsvImport = getAddMode() === 'csv';
+                const importedRows = getAddMode() === 'csv'
+                    ? csvRecords
+                    : recordNamesTextarea.value.split('\n')
+                        .map(name => ({ name: name.trim(), description }))
+                        .filter(record => record.name.length > 0);
+                const records = importedRows.map(row => ({
+                    name: isCsvImport && !preserveCasingInput.checked ? toTitleCase(row.name) : row.name,
+                    description: row.description,
                     sectionId: sectionIdInt, gameId: gameIdInt,
                     numberOfCheckboxes, numberAlreadyCompleted, listOrder, longDescription, hidden
                 }));
+                savedRecordCount = records.length;
                 success = await dbUtils.insertMultipleGameRecords(records);
             } else {
                 const recordData = {
@@ -444,6 +600,9 @@ export function initRecordModal({ gameId, defaultAlreadyCompleted = 0, onSave, g
             }
 
             if (success) {
+                successMessage.textContent = savedRecordCount === 1
+                    ? 'Record saved successfully!'
+                    : `${savedRecordCount} records saved successfully!`;
                 successMessage.classList.remove('hidden');
                 setTimeout(async () => {
                     successMessage.classList.add('fade-out');
