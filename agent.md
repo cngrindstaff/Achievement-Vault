@@ -2,15 +2,15 @@ Use this file to reference work you've done previously and post patch notes. Als
 
 ---
 
-## Codebase Overview (Feb 7, 2026)
+## Codebase Overview (Jun 5, 2026)
 
-**Achievement Vault** is a game completion/achievement tracking web app. It uses a Node/Express backend with MySQL (via stored procedures) and a vanilla JS frontend (jQuery, no framework). All HTML is dynamically built by JS files at runtime.
+**Achievement Vault** is a game completion/achievement tracking web app. It uses a Node/Express backend with MySQL (via stored procedures) and a vanilla JS frontend (jQuery, no framework). Page HTML is mostly static shells plus `<template>` elements; JS fetches data and clones templates to build the DOM.
 
 ### Architecture Pattern
-- **HTML files** are minimal shells — just a `<div>` container and a `<script>` tag. They load shared CSS, jQuery, and xlsx library.
-- **JS files** do all the heavy lifting: they call the Node backend API endpoints, get JSON data, loop through it, and dynamically build the DOM using `document.createElement` and jQuery `.append()`.
-- **Backend** (`backend/routes/db.js`) is an Express router that calls MySQL stored procedures and returns JSON. All routes are prefixed with `/api/db/`.
-- **`server.js`** serves static files from `public/` and has custom routes so `.html` extensions are optional (e.g., `/game` serves `game.html`).
+- **HTML files** in `public/` load shared CSS, jQuery, and (on some pages) the xlsx library. Most pages have static headings, controls, and `<template>` elements for repeating UI.
+- **JS files** call `/api/db/...` endpoints, then build the DOM via `template.content.cloneNode(true)`, `document.createElement`, and jQuery.
+- **Backend** (`backend/routes/db.js`) is an Express router that calls MySQL stored procedures and returns JSON. Routes are mounted at `/api` (paths like `/api/db/games`).
+- **`backend/server.js`** serves static files from `public/`, applies session + Basic Auth globally, and registers clean URLs without `.html` (e.g., `/checklist` → `checklist.html`).
 
 ### Data Model (conceptual)
 - **Games** — top-level entities (e.g., a video game)
@@ -20,44 +20,43 @@ Use this file to reference work you've done previously and post patch notes. Als
 - **GameTables / TableRecords** — separate data tables for a game (non-checklist reference data with up to 6 custom fields)
 
 ### Page Flow
-1. **`index.html`** + `script_home.js` — Home page. Fetches all games (`/api/db/games`), displays them as clickable list items. Clicking navigates to `/game?id=X&name=Y`.
-2. **`game.html`** + `script_gamePage.js` — Game landing page. Uses `getGameData()` which returns game info plus counts of tables/section groups. Shows links to: Checklists, Other Tables (if any), Admin.
-3. **`checklistGroups.html`** + `script_checklistGroups.js` — Lists all section groups for a game. Clicking one navigates to `/checklist?gameId=X&sectionGroupId=Y`.
-4. **`checklist.html`** + `script_checklist.js` — The main checklist view. Fetches sections by section group ID, then fetches records for each section in parallel. Builds collapsible sections with checkboxes. Features:
-   - Filter input (search by name/description with highlighting via `<mark>`)
-   - "Show Completed" toggle
-   - "Expand All" toggle  
-   - Completion tracking (per-section and total percentage)
-   - Checkbox changes call `updateRecordCompletion()` to persist to DB
-   - Record ordering handled client-side via `getRecordsBySectionId()` with sort preferences: `order-name`, `completed-order-name`, `completed-name`, `name`
-5. **`table.html`** + `script_tablePage.js` — Displays non-checklist data tables for a game. Fetches game tables by game ID, then table records by table ID. Builds HTML `<table>` elements with sortable columns (click header to sort). Tables are in collapsible sections.
-6. **`manage_sections.html`** + `script_manage_sections.js` — Admin page for reordering sections via drag-and-drop. Each section card has a "Manage Records" button to navigate to record management.
-7. **`manage_sectionRecords.html`** + `script_manage_sectionRecords.js` — Admin page for managing individual records within a section. Supports:
-   - Drag-and-drop reordering
-   - Add new record (modal form)
-   - Edit existing record (populates same modal)
-   - Delete record
-   - Fields: Name, Description, NumberOfCheckboxes, NumberAlreadyCompleted, ListOrder, LongDescription, Hidden
+1. **`index.html`** + `script_home.js` — Home. Lists games, supports adding a new game. Navigates to `/game?id=X&name=Y`.
+2. **`game.html`** + `script_gamePage.js` — Game landing page. Links to Checklists (`/checklistGroups?gameId=`) and Other Tables (`/table?id=`) when the game has tables. No separate Admin page (management is inline on checklist/checklistGroups).
+3. **`checklistGroups.html`** + `script_checklistGroups.js` — Section groups for a game. Add/edit section groups (modal), inline reorder mode. Clicking a group opens `/checklist?gameId=X&sectionGroupId=Y`.
+4. **`checklist.html`** + `script_checklist.js` — Main checklist. Fetches sections + records in parallel, renders collapsible sections with checkboxes. Features:
+   - Filter (name/description, `<mark>` highlight)
+   - **Show Completed Records** toggle (unchecked = hide fully completed rows via `applyHideCompletedToDOM`)
+   - **Show Hidden**, **Expand All**, **Sort by Name**, **Completed Sections Last**
+   - Add/edit/delete sections (section modal on checklist page)
+   - Add/edit/delete records (`script_recordModal.js` shared module)
+   - Move records between sections (`script_moveRecords.js`)
+   - Links to `reorder_sections` and per-section `reorder_records` pages
+   - Checkbox changes call `updateRecordCompletion()`; record ordering is client-side via `getRecordsBySectionIdV2()` with per-section sort preferences
+5. **`table.html`** + `script_tablePage.js` — Non-checklist data tables. Sortable columns, collapsible sections.
+6. **`reorder_sections.html`** + `script_reorder_sections.js` — Drag-and-drop section reorder within a section group; save calls `updateGameSectionsListOrder`.
+7. **`reorder_records.html`** + `script_reorder_records.js` — Drag-and-drop record reorder within a section; save calls `updateSectionRecordsListOrder`. Record add/edit is on the checklist page, not here.
+8. **`changelog.html`** + `script_changelog.js` — Renders `CHANGELOG.md` from `/api/changelog`.
 
 ### Shared JS Modules
-- **`script_db_helper.js`** — Central API layer. All fetch calls to the backend live here. Exports functions like `getGameData()`, `getSectionsByGameId()`, `getRecordsBySectionId()`, `updateRecordCompletion()`, `getGameTablesByGameId()`, `getTableRecordsByTableId()`, `updateGameRecord()`, `insertGameRecord()`, `deleteGameRecord()`, `getSectionGroupsByGameId()`, `getSectionGroupById()`, `getSectionsBySectionGroupId()`, `updateGameSection()`, `insertGameSection()`, `updateGameSectionsListOrder()`, `updateSectionRecordsListOrder()`.
-- **`script_utilities.js`** — Helper functions: `getQueryParam()` (reads URL params), `createSlug()` (converts strings to URL-safe slugs), `trimBeforeParenthesis()`, `removeTrailingSpace()`, `logAllAttributes()`.
+- **`script_db_helper.js`** — Central API layer (`apiFetch`, all `/api/db/...` calls). Key exports: `getGameData`, `insertGame`, `getSectionGroupsByGameId`, `getSectionGroupById`, `getSectionsBySectionGroupId`, `getSectionsByGameId`, `getSectionById`, `getRecordsBySectionIdV2`, `getGameRecordById`, `updateRecordCompletion`, `insertGameRecord`, `insertMultipleGameRecords`, `updateGameRecord`, `moveGameRecord`, `deleteGameRecord`, `updateGameSection`, `insertGameSection`, `insertMultipleGameSections`, `deleteGameSection`, `updateGameSectionsListOrder`, `updateSectionRecordsListOrder`, `insertSectionGroup`, `updateSectionGroup`, `updateSectionGroupsListOrder`, `getGameTablesByGameId`, `getTableRecordsByTableId`.
+- **`script_recordModal.js`** — Shared add/edit/delete record modal (`initRecordModal`).
+- **`script_moveRecords.js`** — Move selected records to another section (`initMoveRecords`).
+- **`script_nav.js`** — Slide-out hamburger navigation (`initNav`).
+- **`script_utilities.js`** — `getQueryParam()`, `createSlug()`, `trimBeforeParenthesis()`, `removeTrailingSpace()`, `logAllAttributes()`.
 
 ### Styling
-- **`styles.scss`** — Main stylesheet compiled to `styles.css`. Uses a teal color scheme (5 teal shades + light/medium/dark font colors). Key classes:
+- **`public/css/styles.scss`** — Main stylesheet (warm neutral palette + teal accents). Key classes:
   - `.game-list-item`, `.section-header` — clickable list/accordion items
   - `.section` — collapsible content (hidden by default)
-  - `.grid-item-1-row`, `.grid-item-2-row` — checklist item layouts (1-row = name only, 2-row = name + description)
-  - `.section-card`, `.record-card` — draggable admin cards
-  - `.modal` — add/edit record modal
-  - `.controls-panel` — filter/toggle controls container
-  - `.filter-input`, `.switch` — custom styled inputs
-- **`mixins.scss`** — SCSS mixins for decorative corner effects and linear gradients.
+  - `.grid-item-1-row`, `.grid-item-2-row` — checklist row layouts (currently all items use `grid-item-1-row`; descriptions open in a detail modal)
+  - `.section-card`, `.record-card` — draggable reorder cards
+  - `.modal`, `.controls-panel`, `.filter-input`, `.switch`
+- **`mixins.scss`** — SCSS mixins (mostly legacy; main styles use design tokens in `styles.scss`).
 
 ### Navigation Pattern
-- Every sub-page has home (house icon) and back (arrow icon) links in a `.link-container` div
-- Navigation uses query parameters: `id`, `gameId`, `sectionId`, `sectionGroupId`
-- `script_home.js` is the only non-module script (no imports/exports); all others use ES6 modules
+- Slide-out nav via `initNav()` in `script_nav.js` (hamburger, overlay, back/home/game/checklist-groups/changelog links)
+- Query parameters: `id` (game), `gameId`, `sectionId`, `sectionGroupId`
+- All page scripts use ES6 modules (`type="module"`)
 
 ### Backend API Routes Summary (`/api/db/...`)
 | Method | Route | Stored Procedure | Purpose |
@@ -81,18 +80,30 @@ Use this file to reference work you've done previously and post patch notes. Als
 | GET | `/tableRecords/:tableId` | `GetAllTableRecordsByTableID(?)` | Table records by table |
 | GET | `/sectionGroups/:gameId/:hiddenFilter` | `GetSectionGroupsByGameID(?,?)` | Section groups by game |
 | GET | `/sectionGroup/:sectionGroupId` | `GetSectionGroupById(?)` | Single section group |
+| POST | `/game/insert` | `InsertGameWithMainSectionGroup(...)` | Create game |
+| POST | `/sections/insertMultiple` | `InsertMultipleGameSections(json)` | Bulk create sections |
+| DELETE | `/section/delete/:sectionId/:gameId` | `DeleteGameSection(...)` | Delete section (no records) |
+| POST | `/records/insertMultiple` | `InsertMultipleGameRecords(json)` | Bulk create records |
+| PUT | `/record/move/:recordId` | `MoveGameRecord(...)` | Move record to another section |
+| POST | `/sectionGroup/insert` | `InsertSectionGroup(...)` | Create section group |
+| PUT | `/sectionGroup/update/:sectionGroupId/:gameId` | `UpdateSectionGroup(...)` | Update section group |
+| PUT | `/sectionGroups/updateListOrder` | `UpdateSectionGroupsListOrder(?,@rowsUpdated)` | Batch reorder section groups |
+
+Also: `GET /api/version`, `GET /api/changelog` (in `server.js`, not `db.js`).
 
 ### Key Libraries
 - jQuery 3.6.0 (CDN)
-- xlsx.js 0.18.5 (CDN) — included but usage not seen in current JS (likely for Excel import/export functionality)
-- Font Awesome 6.0.0-beta3 (CDN) — icons for navigation, chevrons
+- xlsx.js 0.18.5 (CDN) — included on several pages; no active usage in current JS
+- Font Awesome 6.0.0-beta3 (CDN)
 - Google Fonts: Merriweather, Roboto
+- express-session — persists login after Basic Auth
 
 ### Notes / Things to Be Aware Of
-- `script_home.js` is NOT an ES6 module (uses `window.onload`), while all other page scripts use `import`/`export` and `type="module"`.
-- `hiddenFilter` parameter is used across many endpoints to optionally include/exclude hidden sections and records.
-- Drag-and-drop logic is duplicated between `script_manage_sections.js` and `script_manage_sectionRecords.js` (nearly identical `enableDragAndDrop`, `getDragAfterElement`, `updateListOrders`, `highlightChanged*` functions).
-- The `manage_sectionRecords.js` save button has a duplicate event listener — one inside `$(document).ready()` and one inside `initializeGameRecordsReorder()`.
+- **`applyHideCompletedToDOM`, `applyExpandAllToDOM`, `getHideCompleted`** must live at module scope in `script_checklist.js` — `updateCompletion` is module-level and calls them. When hiding completed rows, count only `input.completion-checkbox`, not `input.record-move-select`.
+- **`hiddenFilter` URL segments:** `0`/`false` = visible only, `1` = hidden only, `all`/`true`/null = no filter. `script_db_helper.js` merges `0`+`1` requests when `hiddenFilter === true` because older stored procedures treat NULL as hidden-only for section groups/sections.
+- **Drag-and-drop reorder** logic is duplicated between `script_reorder_sections.js` and `script_reorder_records.js` (similar `enableDragAndDrop`, `getDragAfterElement`, `highlightChanged` patterns).
+- **Audit logging** — `backend/services/auditLog.js` writes to an audit table on many mutating routes (see `sql/audit_log_migration.sql`).
+- **Checklist view cache** — `checklistViewCache` in `script_checklist.js` holds last-painted sections/records so display toggles can repaint without refetching.
 
 ---
 
@@ -403,6 +414,31 @@ Use this file to reference work you've done previously and post patch notes. Als
 
 ---
 
+### Jun 5, 2026 — Fix "Show Completed Records" toggle
+
+**Files changed:** `public/js/script_checklist.js`
+
+**Problems:**
+1. `applyHideCompletedToDOM` was defined inside `$(document).ready()` but called from module-level `updateCompletion` → `ReferenceError` when toggling off or after checkbox changes with "Completed Sections Last" enabled.
+2. Hide logic counted all `input[type="checkbox"]` in each row, including `record-move-select`, so completed rows never matched `numTotal === numChecked`.
+
+**Fixes:**
+- Moved `getHideCompleted`, `applyHideCompletedToDOM`, and `applyExpandAllToDOM` to module scope.
+- Count only `input.completion-checkbox`; require `numTotal > 0`.
+- Call `applyHideCompletedToDOM()` at end of `renderChecklist()` so repaints respect the toggle.
+
+**Lesson:** Helpers called from both `document.ready` callbacks and module-level event handlers must be module-scoped. When counting completion checkboxes, exclude UI-only checkboxes in the same row.
+
+---
+
+### Jun 5, 2026 — Documentation refresh
+
+**Files changed:** `README.md`, `agent.md`
+
+Updated both files to reflect current pages (`reorder_sections`, `reorder_records`, `changelog`), removed references to deleted `manage_sections` / `manage_sectionRecords` pages, documented auth/session setup, checklist features, and expanded API route tables.
+
+---
+
 ## Database Schema Reference (Feb 27, 2026)
 
 SQL dump lives in `sql/Dump20260227.sql`. MySQL 8.0 on DigitalOcean. Database name: `achievement_vault`.
@@ -442,9 +478,15 @@ All foreign keys use ON DELETE CASCADE ON UPDATE CASCADE (except SectionGroupID 
 | `GetAllTableRecordsByTableID(tableId)` | Records for a table |
 | `InsertGameRecord(...)` | Insert single record |
 | `InsertMultipleGameRecords(json)` | Bulk insert via JSON_TABLE |
+| `InsertGameWithMainSectionGroup(...)` | Create game with default section group |
+| `InsertSectionGroup(...)` | Insert section group |
+| `UpdateSectionGroup(...)` | Update section group |
 | `InsertGameSection(...)` | Insert section |
+| `InsertMultipleGameSections(json)` | Bulk insert sections via JSON_TABLE |
+| `DeleteGameSection(...)` | Delete section (must have no records) |
 | `UpdateGameRecord(...)` | Update record (COALESCE for partial updates, validates match count) |
 | `UpdateGameRecordCompletion(id, count)` | Update checkbox progress |
+| `MoveGameRecord(...)` | Move record to another section (see `sql/move_game_record_procedure.sql`) |
 | `UpdateGameSection(...)` | Update section (COALESCE) |
 | `UpdateGameSectionsListOrder(json, OUT)` | Batch reorder sections (WHILE loop) |
 | `UpdateSectionGroupsListOrder(json, OUT)` | Batch reorder section groups (JSON_TABLE) |
@@ -462,8 +504,8 @@ These are unused by the app. Safe to drop at any time.
 | `z_GetAllGameDataByGameID` | Joined game+sections+records in one query (never used by frontend) |
 | `z_GetAllGameRecordsByGameID` | All records for a game (not used) |
 | `z_GetGameSectionById` | Duplicate of `GetSectionById` |
-| `z_InsertSectionGroup` | Insert section group (not exposed via API) |
-| `z_UpdateSectionGroup` | **BUG**: updates `GameSections` table instead of `SectionGroups` |
+| `z_InsertSectionGroup` | Replaced by `InsertSectionGroup` |
+| `z_UpdateSectionGroup` | **BUG**: updates `GameSections` table instead of `SectionGroups`; replaced by `UpdateSectionGroup` |
 | `z_UpdateSectionGroupsListOrder` | Old WHILE loop version, replaced by JSON_TABLE version |
 
 ### Hidden Filter Behavior (important inconsistency)
@@ -472,7 +514,7 @@ Two different patterns exist for the `hiddenFilter` parameter:
 
 1. **`GetGameSectionsByGameID`** — uses `(hiddenFilter IS NULL OR Hidden = hiddenFilter)`. Passing NULL returns all rows. **This is the correct pattern.**
 
-2. **`GetSectionGroupsByGameID` and `GetGameSectionsBySectionGroupID`** — default NULL to TRUE, then filter `WHERE Hidden = hiddenFilter`. This means NULL → `Hidden = 1` → **only returns hidden items**. This is likely a bug; the intent was probably "include everything" but the effect is the opposite. The frontend works around this by always passing `false` (0) which returns non-hidden items.
+2. **`GetSectionGroupsByGameID` and `GetGameSectionsBySectionGroupID`** — default NULL to TRUE, then filter `WHERE Hidden = hiddenFilter`. NULL → `Hidden = 1` → only hidden items. The frontend works around "show all" by passing `hiddenFilter === true`, which `script_db_helper.js` maps to two requests (`0` and `1`) and merges the results. For normal use it passes `false` (visible only).
 
 ### Other Notes
 
