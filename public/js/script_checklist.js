@@ -902,18 +902,25 @@ function updateCompletion() {
     if (debugLogging) console.log('numberOfCheckboxes: ' + numberOfCheckboxes);
 
     let action = '';
+    const recordCheckboxes = $(this)
+        .closest('.grid-item-2-row, .grid-item-1-row')
+        .find('input.completion-checkbox');
 
     if ($(this).is(':checked')) {
         if (debugLogging) console.log('this item is checked. CheckboxNum: ' + checkboxNum);
-        for (let i = 1; i <= checkboxNum; i++) {
-            $(`.checkbox-${sectionIndex}-${itemIndex}-${i}`).prop('checked', true);
-        }
+        recordCheckboxes
+            .filter(function () {
+                return Number($(this).data('numCheckboxClicked')) <= Number(checkboxNum);
+            })
+            .prop('checked', true);
         action = 'added';
     } else {
         if (debugLogging) console.log('this item is not checked. CheckboxNum: ' + checkboxNum);
-        for (let i = checkboxNum; i <= $(`input[data-section="${sectionIndex}"][data-item="${itemIndex}"]`).length; i++) {
-            $(`.checkbox-${sectionIndex}-${itemIndex}-${i}`).prop('checked', false);
-        }
+        recordCheckboxes
+            .filter(function () {
+                return Number($(this).data('numCheckboxClicked')) >= Number(checkboxNum);
+            })
+            .prop('checked', false);
         action = 'removed';
     }
 

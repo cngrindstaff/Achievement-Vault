@@ -112,6 +112,7 @@ Navigation uses a shared slide-out menu (`script_nav.js`). Version history lives
 - **ES modules** — `package.json` sets `"type": "module"`. Page scripts use `import`/`export` with `type="module"` in HTML.
 - **SCSS** — Edit `public/css/styles.scss` and compile to `public/css/styles.css`. If `sass` is not installed globally: `npm install -g sass`. When using a JetBrains File Watcher, set scope to **Current File** ([RIDER-55683](https://youtrack.jetbrains.com/issue/RIDER-55683/Unknown-scope-sign-for-Project-scope-in-SCSS-new-file-watcher)).
 - **Debug logging** — Set `DEBUG_LOGGING=true` in `.env`. For checklist record-fetch diagnostics, run `localStorage.setItem('AV_DEBUG_RECORDS','1')` in DevTools and reload.
+- **Section stored procedures** — Section creation and updates include description and grouping fields. The current signatures are `InsertGameSection(sectionName, gameId, listOrder, recordOrderPreference, hidden, sectionGroupId, description)` and `UpdateGameSection(sectionId, gameId, sectionName, listOrder, recordOrderPreference, hidden, description)`. The historical `sql/Dump20260227.sql` still contains the older six-argument `UpdateGameSection` without `description`; use the current seven-argument version with this backend.
 
 ## Icon
 

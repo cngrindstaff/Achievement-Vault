@@ -2,7 +2,7 @@ Use this file to reference work you've done previously and post patch notes. Als
 
 ---
 
-## Codebase Overview (Jun 5, 2026)
+## Codebase Overview (Jun 10, 2026)
 
 **Achievement Vault** is a game completion/achievement tracking web app. It uses a Node/Express backend with MySQL (via stored procedures) and a vanilla JS frontend (jQuery, no framework). Page HTML is mostly static shells plus `<template>` elements; JS fetches data and clones templates to build the DOM.
 
@@ -66,8 +66,8 @@ Use this file to reference work you've done previously and post patch notes. Als
 | GET | `/sections/:gameId/:hiddenFilter` | `GetGameSectionsByGameID(?,?)` | Sections by game |
 | GET | `/sections/sectionGroupId/:sectionGroupId/:hiddenFilter` | `GetGameSectionsBySectionGroupID(?,?)` | Sections by section group |
 | GET | `/section/:sectionId` | `GetSectionById(?)` | Single section |
-| POST | `/section/insert` | `InsertGameSection(?,?,?,?,?)` | Create section |
-| PUT | `/section/update/:sectionId/:gameId` | `UpdateGameSection(?,?,?,?,?)` | Update section |
+| POST | `/section/insert` | `InsertGameSection(?,?,?,?,?,?,?)` | Create section |
+| PUT | `/section/update/:sectionId/:gameId` | `UpdateGameSection(?,?,?,?,?,?,?)` | Update section |
 | PUT | `/sections/updateListOrder` | `UpdateGameSectionsListOrder(?,@rowsUpdated)` | Batch reorder sections |
 | GET | `/records/v2/:sectionId/hiddenFilter/:filter` | `GetGameRecordsByGameSectionIDV2(?,?)` | Records by section (ordering done client-side) |
 | GET | `/record/:recordId` | `GetGameRecordByRecordID(?)` | Single record |
@@ -439,9 +439,29 @@ Updated both files to reflect current pages (`reorder_sections`, `reorder_record
 
 ---
 
+### Jun 10, 2026 — Fix progressive checkbox cascade and section procedure docs
+
+**Files changed:** `public/js/script_checklist.js`, `README.md`, `agent.md`
+
+**Problems:**
+1. `createCheckbox()` generated slug-based checkbox classes, but `updateCompletion()` tried to cascade checks/unchecks using index-based class selectors that did not exist.
+2. The API route summary documented the old five-argument signatures for `InsertGameSection` and `UpdateGameSection`; both procedures now take seven arguments.
+3. `sql/Dump20260227.sql` still contains the older six-argument `UpdateGameSection` without the `description` parameter.
+
+**Fixes:**
+- Progressive checkbox changes now find `.completion-checkbox` elements within the clicked record row and compare their `data-num-checkbox-clicked` values.
+- Documented the current seven-argument section procedure signatures.
+- Documented that the historical SQL dump's `UpdateGameSection` definition is stale.
+
+**Lesson:** Use stable row-local data attributes for progressive checkbox behavior instead of coupling event logic to presentation-oriented class names.
+
+---
+
 ## Database Schema Reference (Feb 27, 2026)
 
 SQL dump lives in `sql/Dump20260227.sql`. MySQL 8.0 on DigitalOcean. Database name: `achievement_vault`.
+
+**Current-schema caveat:** The dump is historical. Its `UpdateGameSection` procedure takes six arguments and does not update `Description`, while the current backend calls the seven-argument version documented below.
 
 ### Tables
 
@@ -481,13 +501,13 @@ All foreign keys use ON DELETE CASCADE ON UPDATE CASCADE (except SectionGroupID 
 | `InsertGameWithMainSectionGroup(...)` | Create game with default section group |
 | `InsertSectionGroup(...)` | Insert section group |
 | `UpdateSectionGroup(...)` | Update section group |
-| `InsertGameSection(...)` | Insert section |
+| `InsertGameSection(sectionName, gameId, listOrder, recordOrderPreference, hidden, sectionGroupId, description)` | Insert section |
 | `InsertMultipleGameSections(json)` | Bulk insert sections via JSON_TABLE |
 | `DeleteGameSection(...)` | Delete section (must have no records) |
 | `UpdateGameRecord(...)` | Update record (COALESCE for partial updates, validates match count) |
 | `UpdateGameRecordCompletion(id, count)` | Update checkbox progress |
 | `MoveGameRecord(...)` | Move record to another section (see `sql/move_game_record_procedure.sql`) |
-| `UpdateGameSection(...)` | Update section (COALESCE) |
+| `UpdateGameSection(sectionId, gameId, sectionName, listOrder, recordOrderPreference, hidden, description)` | Update section (COALESCE) |
 | `UpdateGameSectionsListOrder(json, OUT)` | Batch reorder sections (WHILE loop) |
 | `UpdateSectionGroupsListOrder(json, OUT)` | Batch reorder section groups (JSON_TABLE) |
 | `UpdateSectionRecordsListOrder(json, OUT)` | Batch reorder records (WHILE loop) |
