@@ -1,87 +1,118 @@
 # Achievement Vault
-This program allows you to track achievements in video games. 
+
+A web app for tracking video game completion — achievements, collectibles, quest steps, and other checklist items. Items can have multiple checkboxes when progress has degrees (for example, Keepsakes in Hades leveling up to 3).
 
 ## How it works
-This uses a MySql Database to maintain records of Games and Trackable Items, such as Achievements. 
 
-These can be separated into sections. Each section will expand into a different area 
-on the page, for organization's sake. 
+Data is stored in **MySQL**. The hierarchy is:
 
-For trackable items that have degrees, more than one checkbox can be added per item. For example, the Keepsakes items in 
-Hades increase in level up to 3 times, so for each of these, there are 3 checkboxes next to each item. 
+**Games** → **Section Groups** → **Sections** → **Records** (checklist rows with checkboxes)
 
-## Node server
-This requires a node server for authentication and database management.
+Games can also have **Game Tables** — separate reference tables with up to six custom columns per row.
 
-## Variables
-This project requires environment variables. See ```sample.env``` for the fields that are needed. 
-Fill them out and rename the file to ```.env``` 
-Alternatively, these can be set up as actual Environment Variables.
+A **Node/Express** server serves the frontend from `public/`, exposes a JSON API under `/api/db/`, and calls MySQL stored procedures for all data access.
 
-## Running Locally
-1. To simply run the server, run the following command: ```node backend/server.js```
-2. Alternatively, use nodemon to make the server automatically restart when files are modified: 
-   * Install nodemon: ```npm install -g nodemon```
-   * Use nodemon to start the server: ```nodemon backend/server.js``` 
-3. Load http://localhost:3000/
+## Prerequisites
 
-The ```runlocal.cmd``` file runs the server and opens Chrome to the localhost page.
+- Node.js
+- MySQL database with the schema and procedures from `sql/`
+- Environment variables (see `sample.env`)
 
+## Setup
 
-## Random notes
-This uses ES Modules instead of CommonJS
-### Rider
-Auto-compile SASS to CSS using a [FileWatch in Jetbrains]( https://www.jetbrains.com/help/rider/Transpiling_SASS_LESS_and_SCSS_to_CSS.html#less_sass_scss_compiling_to_css)
+1. Copy `sample.env` to `.env` and fill in the required values:
+   - `AV_USERNAME` / `AV_PASSWORD` — HTTP Basic Auth credentials
+   - `AV_SESSION_SECRET` — session cookie signing key
+   - `AV_MY_SQL_DB_*` — database connection settings
+2. Install dependencies:
 
-If sass isn't installed, run
-```npm install -g sass```
+```bash
+npm install
+```
 
-Bug: Must set FileWatch Scope to "Current File". [Bug info](https://youtrack.jetbrains.com/issue/RIDER-55683/Unknown-scope-sign-for-Project-scope-in-SCSS-new-file-watcher)
+3. Apply SQL scripts from `sql/` as needed (see `CHANGELOG.md` for recent migrations such as audit logging and move-record support).
 
-## V3
-This now uses a My SQL Database
+## Running locally
 
-Main page is `index.html`. It loads `script_home.js`. The script calls an endpoint in db.js, which calls the GetAllGames stored procedure. It then creates a list of the games and generates links to them. 
+```bash
+npm start
+```
 
-Each item listed will link to the game page - `game?id=${game.ID}`. 
+Or directly:
 
-The `game.html` file creates a landing page for the game. It then calls `script_gamePage.js`, which creates links to the main checklist - `checklist?id=${gameId}` - and the page with additional tables - `tables?id=${gameId}`.
+```bash
+node backend/server.js
+```
 
-**Sorting options:**
-* order-name  = ListOrder ASC, Name ASC
-* name = Name ASC
-* completed-order-name = NumberAlreadyCompleted ASC, ListOrderASC, Name ASC
-* completed-name = NumberAlreadyCompleted ASC, Name ASC
-* null = same as order-name
+Open http://localhost:3000/
 
-# Future Updates
--[ ] Refresh Section Order page on save
--[ ] Allow editing of existing Sections
--[x] Allow editing of existing Records
--[ ] Allow deleting existing Sections
--[x] Allow deleting existing Records
--[ ] Validate checkbox info on Adding records
--[x] Trim beginning/ending whitespace when adding new sections/records
--[ ] Optimize how records/sections are auto-numbered when re-ordering
--[ ] Change New Record/Section pages to modals?
--[x] Auto-fill new Record/Section form with 0 completed, 1 available, and order set to 1
+For auto-restart on file changes:
 
-## Adding a new Route
-1. Create the new HTML file in the root directory
-2. Create the new JS file and put it in js/script_(page).js
-3. Add the path in server.js
+```bash
+npx nodemon backend/server.js
+```
 
-## Pages
-1. index.html - Home page, lists all games
-2. game.html - Game landing page, links to checklist and tables
-3. checklist.html - Main checklist page
-4. table.html - Additional tables page
-5. manage_sectionRecords.html - Page to add a new record
-6. manage_sections.html - Page to add a new section
+On Windows, `runlocal.cmd` opens Chrome and starts the server with `npx nodemon`.
 
-Icon came from https://www.flaticon.com/free-icon/game-controller_8002123?term=controller&page=1&position=12&origin=search&related_id=8002123
+**Authentication:** The app uses HTTP Basic Auth on first visit. After a successful login, `express-session` keeps a cookie so you are not prompted again (default 7 days; set `AV_SESSION_DAYS` in `.env`).
 
-Other Alternatives: 
-* https://www.flaticon.com/free-icon/joystick_8495854
-* https://www.flaticon.com/free-icon/game-console_9052623
-* https://www.flaticon.com/free-icon/joystick_8495842 
+## Project structure
+
+```
+backend/
+  server.js              Express app, static files, auth, API routes
+  routes/db.js           REST API → MySQL stored procedures
+  middleware/            Session + Basic Auth
+  services/auditLog.js   Append-only audit trail
+public/
+  *.html                 Page shells (most UI is built by JS at runtime)
+  js/script_*.js         Page scripts and shared modules
+  css/styles.scss        Main stylesheet (compile to styles.css)
+```
+
+See **`agent.md`** for architecture details, API route tables, database notes, and development patch history.
+
+## Page flow
+
+| Page | URL | Script |
+|------|-----|--------|
+| Home | `/` | `script_home.js` — game list, add game |
+| Game | `/game?id=` | `script_gamePage.js` — links to checklists and tables |
+| Checklist groups | `/checklistGroups?gameId=` | `script_checklistGroups.js` — section groups; add, edit, reorder |
+| Checklist | `/checklist?gameId=&sectionGroupId=` | `script_checklist.js` — main tracking UI |
+| Tables | `/table?id=` | `script_tablePage.js` — reference data tables |
+| Reorder sections | `/reorder_sections?gameId=&sectionGroupId=` | `script_reorder_sections.js` |
+| Reorder records | `/reorder_records?gameId=&sectionId=&sectionGroupId=` | `script_reorder_records.js` |
+| Changelog | `/changelog` | `script_changelog.js` |
+
+Navigation uses a shared slide-out menu (`script_nav.js`). Version history lives in `CHANGELOG.md`.
+
+### Checklist page features
+
+- Filter by name or description (with highlight)
+- **Show Completed Records** — unchecked hides fully completed rows
+- **Show Hidden** — include hidden sections and records
+- **Expand All**
+- **Sort by Name** — sections and records A–Z; incomplete records first within each section
+- **Completed Sections Last** — fully completed sections move to the bottom (faded headers)
+- Add/edit/delete sections and records via modals on the checklist page
+- Move records between sections (`script_moveRecords.js`)
+- Reorder sections or records via dedicated reorder pages
+
+**Record sort preferences** (per section, applied client-side): `order-name`, `name`, `completed-order-name`, `completed-name`. Unset defaults to `order-name`.
+
+## Adding a new route
+
+1. Create `public/yourpage.html` and `public/js/script_yourpage.js`
+2. Register a clean URL in `backend/server.js` (follow the existing `app.get('/checklist', ...)` pattern)
+3. Call `initNav({ currentPage: '...' })` from `script_nav.js` if the page should use the slide-out menu
+
+## Development notes
+
+- **ES modules** — `package.json` sets `"type": "module"`. Page scripts use `import`/`export` with `type="module"` in HTML.
+- **SCSS** — Edit `public/css/styles.scss` and compile to `public/css/styles.css`. If `sass` is not installed globally: `npm install -g sass`. When using a JetBrains File Watcher, set scope to **Current File** ([RIDER-55683](https://youtrack.jetbrains.com/issue/RIDER-55683/Unknown-scope-sign-for-Project-scope-in-SCSS-new-file-watcher)).
+- **Debug logging** — Set `DEBUG_LOGGING=true` in `.env`. For checklist record-fetch diagnostics, run `localStorage.setItem('AV_DEBUG_RECORDS','1')` in DevTools and reload.
+
+## Icon
+
+Game controller icon from [Flaticon](https://www.flaticon.com/free-icon/game-controller_8002123?term=controller&page=1&position=12&origin=search&related_id=8002123).
