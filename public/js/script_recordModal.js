@@ -62,16 +62,16 @@ export function initRecordModal({ gameId, defaultAlreadyCompleted = 0, onSave, g
             <div class="modal-content">
                 <span class="close-modal">&times;</span>
                 <div class="record-modal-heading">
-                    <button type="button" id="record-edit-previous" class="record-edit-nav hidden" aria-label="Edit previous record" title="Previous record">
-                        <i class="fas fa-chevron-left" aria-hidden="true"></i>
-                    </button>
-                    <div>
-                        <h3 id="modal-section-name"></h3>
+                    <h3 id="modal-section-name"></h3>
+                    <div class="record-edit-navigation">
+                        <button type="button" id="record-edit-previous" class="record-edit-nav hidden" aria-label="Edit previous record" title="Previous record">
+                            <i class="fas fa-chevron-left" aria-hidden="true"></i>
+                        </button>
                         <span id="record-edit-position" class="record-edit-position hidden"></span>
+                        <button type="button" id="record-edit-next" class="record-edit-nav hidden" aria-label="Edit next record" title="Next record">
+                            <i class="fas fa-chevron-right" aria-hidden="true"></i>
+                        </button>
                     </div>
-                    <button type="button" id="record-edit-next" class="record-edit-nav hidden" aria-label="Edit next record" title="Next record">
-                        <i class="fas fa-chevron-right" aria-hidden="true"></i>
-                    </button>
                 </div>
                 <form id="new-record-form" class="add-record-container">
                     <label class="modern-checkbox add-record">
