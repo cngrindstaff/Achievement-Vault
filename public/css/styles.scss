@@ -575,14 +575,25 @@ h3 {
 .record-move-select-wrap {
 	display: none;
 	align-items: center;
+	gap: 6px;
 	margin: 0;
 	cursor: pointer;
+	color: $accent-600;
+	font-size: 11px;
+	font-weight: 700;
+	letter-spacing: 0.04em;
+	text-transform: uppercase;
 
 	input {
-		width: 18px;
-		height: 18px;
+		width: 20px;
+		height: 20px;
+		margin: 0;
 		cursor: pointer;
 		accent-color: $accent-500;
+	}
+
+	&::after {
+		content: "Move";
 	}
 }
 
@@ -590,8 +601,33 @@ h3 {
 	display: inline-flex;
 }
 
+.move-select-mode .section.move-select-source .checklist-item {
+	border-left: 3px solid transparent;
+	padding-left: 7px;
+}
+
+.move-select-mode .section.move-select-source .column2 {
+	opacity: 0.2;
+	filter: grayscale(1);
+	transition: opacity $transition-fast, filter $transition-fast;
+}
+
+.move-select-mode .section.move-select-source .completion-checkbox {
+	cursor: not-allowed;
+}
+
+.move-select-mode .section.move-select-source .checklist-edit-btn {
+	opacity: 0;
+	pointer-events: none;
+}
+
 .checklist-item--move-selected {
-	background-color: rgba($accent-500, 0.12);
+	background-color: rgba($accent-500, 0.16);
+	border-left-color: $accent-500 !important;
+
+	.record-move-select-wrap {
+		color: $accent-700;
+	}
 }
 
 .move-records-action-bar {
