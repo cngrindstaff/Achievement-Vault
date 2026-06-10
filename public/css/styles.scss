@@ -1404,10 +1404,6 @@ tr:nth-child(odd) {
 }
 
 .record-modal-heading {
-	display: grid;
-	grid-template-columns: 40px minmax(0, 1fr) 40px;
-	align-items: center;
-	gap: 10px;
 	margin-bottom: 12px;
 	text-align: center;
 
@@ -1415,6 +1411,15 @@ tr:nth-child(odd) {
 		margin: 0;
 		overflow-wrap: anywhere;
 	}
+}
+
+.record-edit-navigation {
+	display: grid;
+	grid-template-columns: 38px minmax(0, 1fr) 38px;
+	align-items: center;
+	gap: 10px;
+	max-width: 230px;
+	margin: 8px auto 0;
 }
 
 .record-edit-nav {
@@ -1449,7 +1454,6 @@ tr:nth-child(odd) {
 
 .record-edit-position {
 	display: block;
-	margin-top: 3px;
 	color: $text-muted;
 	font-size: 12px;
 

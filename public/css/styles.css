@@ -1222,16 +1222,21 @@ tr:nth-child(odd) {
 }
 
 .record-modal-heading {
-  display: grid;
-  grid-template-columns: 40px minmax(0, 1fr) 40px;
-  align-items: center;
-  gap: 10px;
   margin-bottom: 12px;
   text-align: center;
 }
 .record-modal-heading h3 {
   margin: 0;
   overflow-wrap: anywhere;
+}
+
+.record-edit-navigation {
+  display: grid;
+  grid-template-columns: 38px minmax(0, 1fr) 38px;
+  align-items: center;
+  gap: 10px;
+  max-width: 230px;
+  margin: 8px auto 0;
 }
 
 .record-edit-nav {
@@ -1263,7 +1268,6 @@ tr:nth-child(odd) {
 
 .record-edit-position {
   display: block;
-  margin-top: 3px;
   color: #8a9696;
   font-size: 12px;
 }
