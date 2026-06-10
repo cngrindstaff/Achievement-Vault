@@ -7,7 +7,8 @@
  *   const modal = initRecordModal({
  *       gameId: 1,
  *       defaultAlreadyCompleted: 0,   // checklist page uses 0, admin uses 1
- *       onSave: async (sectionId) => { ... refresh your page ... }
+ *       onSave: async (sectionId) => { ... refresh your page ... },
+ *       getRecordIdsForSection: (sectionId) => [1, 2, 3]
  *   });
  * 
  *   modal.openForAdd(sectionId, sectionName);
@@ -53,14 +54,25 @@ function toTitleCase(str) {
 
 // ─── Modal Factory ───────────────────────────────────────────────
 
-export function initRecordModal({ gameId, defaultAlreadyCompleted = 0, onSave }) {
+export function initRecordModal({ gameId, defaultAlreadyCompleted = 0, onSave, getRecordIdsForSection }) {
 
     // Inject modal HTML into the DOM
     const modalHTML = `
         <div id="add-record-modal" class="modal hidden">
             <div class="modal-content">
                 <span class="close-modal">&times;</span>
-                <h3 id="modal-section-name" style="margin-bottom: 12px;"></h3>
+                <div class="record-modal-heading">
+                    <button type="button" id="record-edit-previous" class="record-edit-nav hidden" aria-label="Edit previous record" title="Previous record">
+                        <i class="fas fa-chevron-left" aria-hidden="true"></i>
+                    </button>
+                    <div>
+                        <h3 id="modal-section-name"></h3>
+                        <span id="record-edit-position" class="record-edit-position hidden"></span>
+                    </div>
+                    <button type="button" id="record-edit-next" class="record-edit-nav hidden" aria-label="Edit next record" title="Next record">
+                        <i class="fas fa-chevron-right" aria-hidden="true"></i>
+                    </button>
+                </div>
                 <form id="new-record-form" class="add-record-container">
                     <label class="modern-checkbox add-record">
                         <input type="checkbox" id="preserve-casing">
@@ -105,9 +117,14 @@ export function initRecordModal({ gameId, defaultAlreadyCompleted = 0, onSave })
     const preserveCasingInput = document.getElementById('preserve-casing');
     const modalSectionHeading = document.getElementById('modal-section-name');
     const deleteButton = document.getElementById('delete-record-button');
+    const previousButton = document.getElementById('record-edit-previous');
+    const nextButton = document.getElementById('record-edit-next');
+    const positionText = document.getElementById('record-edit-position');
 
     let currentSectionId = null;
     let initialFormState = null;
+    let sectionRecordIds = [];
+    let navigationInProgress = false;
 
     function captureFormState() {
         return JSON.stringify([
@@ -172,6 +189,24 @@ export function initRecordModal({ gameId, defaultAlreadyCompleted = 0, onSave })
         resetNameFieldTouched();
         setAddNameFieldsVisible(true);
         deleteButton.classList.add('hidden');
+        setRecordNavigation([]);
+    }
+
+    function setRecordNavigation(recordIds, currentRecordId = null) {
+        sectionRecordIds = Array.isArray(recordIds)
+            ? recordIds.map((id) => String(id))
+            : [];
+        const currentIndex = sectionRecordIds.indexOf(String(currentRecordId));
+        const showNavigation = currentIndex >= 0 && sectionRecordIds.length > 1;
+
+        previousButton.classList.toggle('hidden', !showNavigation);
+        nextButton.classList.toggle('hidden', !showNavigation);
+        positionText.classList.toggle('hidden', !showNavigation);
+        previousButton.disabled = !showNavigation || currentIndex === 0;
+        nextButton.disabled = !showNavigation || currentIndex === sectionRecordIds.length - 1;
+        positionText.textContent = showNavigation
+            ? `Record ${currentIndex + 1} of ${sectionRecordIds.length}`
+            : '';
     }
 
     // ─── Open / Close ────────────────────────────────────────────
@@ -195,7 +230,12 @@ export function initRecordModal({ gameId, defaultAlreadyCompleted = 0, onSave })
         if (e.target === modal) closeModal();
     });
 
-    document.getElementById('reset-record-button').addEventListener('click', () => {
+    document.getElementById('reset-record-button').addEventListener('click', async () => {
+        const editId = form.dataset.editId;
+        if (editId) {
+            await openForEdit(editId, sectionRecordIds);
+            return;
+        }
         form.reset();
         delete form.dataset.editId;
         restoreDefaults();
@@ -210,12 +250,12 @@ export function initRecordModal({ gameId, defaultAlreadyCompleted = 0, onSave })
         initialFormState = captureFormState();
     }
 
-    async function openForEdit(recordId) {
+    async function openForEdit(recordId, recordIds = null) {
         const recordData = await dbUtils.getGameRecordById(recordId);
         if (!recordData) return;
 
         currentSectionId = recordData.SectionID;
-        modalSectionHeading.textContent = 'Edit Record';
+        modalSectionHeading.textContent = 'Edit Record: ' + recordData.Name;
 
         // Populate form with existing data
         recordNameInput.value = recordData.Name;
@@ -238,9 +278,100 @@ export function initRecordModal({ gameId, defaultAlreadyCompleted = 0, onSave })
         // Store edit ID
         form.dataset.editId = recordId;
 
+        const ids = recordIds || (
+            typeof getRecordIdsForSection === 'function'
+                ? getRecordIdsForSection(currentSectionId)
+                : []
+        );
+        setRecordNavigation(ids, recordId);
         modal.classList.remove('hidden');
         initialFormState = captureFormState();
     }
+
+    function getEditPayload() {
+        applyNameTitleCase();
+        return {
+            recordName: recordNameInput.value.trim(),
+            description: document.getElementById('description').value.trim(),
+            sectionId: parseInt(currentSectionId),
+            gameId: parseInt(gameId),
+            numberOfCheckboxes: parseInt(document.getElementById('numberOfCheckboxes').value),
+            numberAlreadyCompleted: parseInt(document.getElementById('numberAlreadyCompleted').value),
+            listOrder: parseInt(document.getElementById('listOrder').value),
+            longDescription: document.getElementById('longDescription').value.trim(),
+            hidden: document.getElementById('hidden').checked ? 1 : 0
+        };
+    }
+
+    function editPayloadIsValid(recordData) {
+        if (!form.reportValidity()) return false;
+        if (recordData.numberAlreadyCompleted > recordData.numberOfCheckboxes) {
+            const completedInput = document.getElementById('numberAlreadyCompleted');
+            const checkboxesInput = document.getElementById('numberOfCheckboxes');
+            completedInput.classList.add('invalid-input', 'shake');
+            checkboxesInput.classList.add('invalid-input', 'shake');
+            setTimeout(() => {
+                completedInput.classList.remove('shake');
+                checkboxesInput.classList.remove('shake');
+            }, 300);
+            alert("Error: 'Number Already Completed' cannot be greater than 'Number of Checkboxes'.");
+            return false;
+        }
+        document.getElementById('numberAlreadyCompleted').classList.remove('invalid-input');
+        document.getElementById('numberOfCheckboxes').classList.remove('invalid-input');
+
+        if (!recordData.recordName) {
+            alert('Please enter a name.');
+            return false;
+        }
+        return true;
+    }
+
+    async function saveCurrentEdit() {
+        const editId = form.dataset.editId;
+        if (!editId) return false;
+        const recordData = getEditPayload();
+        if (!editPayloadIsValid(recordData)) return false;
+
+        const success = await dbUtils.updateGameRecord(editId, recordData);
+        if (!success) {
+            alert('Failed to save record. Please try again.');
+            return false;
+        }
+        initialFormState = captureFormState();
+        if (onSave) await onSave(currentSectionId);
+        return true;
+    }
+
+    async function navigateToRecord(offset) {
+        if (navigationInProgress) return;
+        const currentIndex = sectionRecordIds.indexOf(String(form.dataset.editId));
+        const targetId = sectionRecordIds[currentIndex + offset];
+        if (!targetId) return;
+
+        navigationInProgress = true;
+        previousButton.disabled = true;
+        nextButton.disabled = true;
+        try {
+            if (formIsDirty()) {
+                const saved = await saveCurrentEdit();
+                if (!saved) {
+                    setRecordNavigation(sectionRecordIds, form.dataset.editId);
+                    return;
+                }
+            }
+            await openForEdit(targetId, sectionRecordIds);
+        } catch (error) {
+            alert('An error occurred while changing records.');
+            console.error(error);
+            setRecordNavigation(sectionRecordIds, form.dataset.editId);
+        } finally {
+            navigationInProgress = false;
+        }
+    }
+
+    previousButton.addEventListener('click', () => navigateToRecord(-1));
+    nextButton.addEventListener('click', () => navigateToRecord(1));
 
     // ─── Form Submission ─────────────────────────────────────────
 

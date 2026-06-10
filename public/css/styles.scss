@@ -1403,6 +1403,61 @@ tr:nth-child(odd) {
 	}
 }
 
+.record-modal-heading {
+	display: grid;
+	grid-template-columns: 40px minmax(0, 1fr) 40px;
+	align-items: center;
+	gap: 10px;
+	margin-bottom: 12px;
+	text-align: center;
+
+	h3 {
+		margin: 0;
+		overflow-wrap: anywhere;
+	}
+}
+
+.record-edit-nav {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 38px;
+	height: 38px;
+	border: 1px solid $accent-300;
+	border-radius: 50%;
+	background: $bg-surface;
+	color: $accent-600;
+	cursor: pointer;
+	transition: background-color $transition-fast, color $transition-fast, border-color $transition-fast, transform $transition-fast;
+
+	&:hover:not(:disabled) {
+		background: $accent-500;
+		border-color: $accent-500;
+		color: $text-on-accent;
+		transform: translateY(-1px);
+	}
+
+	&:disabled {
+		opacity: 0.3;
+		cursor: default;
+	}
+
+	&.hidden {
+		visibility: hidden;
+	}
+}
+
+.record-edit-position {
+	display: block;
+	margin-top: 3px;
+	color: $text-muted;
+	font-size: 12px;
+
+	&.hidden {
+		visibility: hidden;
+	}
+}
+
 
 // ==================== CONTROLS PANEL (filter, toggles) ====================
 

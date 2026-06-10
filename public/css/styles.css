@@ -1221,6 +1221,56 @@ tr:nth-child(odd) {
   opacity: 1;
 }
 
+.record-modal-heading {
+  display: grid;
+  grid-template-columns: 40px minmax(0, 1fr) 40px;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+  text-align: center;
+}
+.record-modal-heading h3 {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.record-edit-nav {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  border: 1px solid #6ad6dc;
+  border-radius: 50%;
+  background: #f2efeb;
+  color: #175f63;
+  cursor: pointer;
+  transition: background-color 0.15s ease, color 0.15s ease, border-color 0.15s ease, transform 0.15s ease;
+}
+.record-edit-nav:hover:not(:disabled) {
+  background: #1f7f84;
+  border-color: #1f7f84;
+  color: #edf9f9;
+  transform: translateY(-1px);
+}
+.record-edit-nav:disabled {
+  opacity: 0.3;
+  cursor: default;
+}
+.record-edit-nav.hidden {
+  visibility: hidden;
+}
+
+.record-edit-position {
+  display: block;
+  margin-top: 3px;
+  color: #8a9696;
+  font-size: 12px;
+}
+.record-edit-position.hidden {
+  visibility: hidden;
+}
+
 .controls-panel {
   display: flex;
   flex-direction: column;
