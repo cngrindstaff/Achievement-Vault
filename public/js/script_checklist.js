@@ -124,8 +124,10 @@ $(document).ready(async function () {
                     <label class="add-record" id="section-multi-names-row">Name(s) (one per line):<textarea id="section-edit-names" class="add-record" rows="6" required></textarea></label>
                     <label class="add-record">Description:<textarea id="section-edit-description" class="add-record" rows="3" maxlength="250"></textarea></label>
                     <label class="add-record">List Order:<input type="number" id="section-edit-listorder" class="add-record" min="0" required></label>
-                    <label class="add-record">
-                        <input type="checkbox" id="section-edit-hidden"> Hidden
+                    <label class="modern-checkbox add-record">
+                        <input type="checkbox" id="section-edit-hidden">
+                        <span class="checkmark"></span>
+                        Hidden
                     </label>
                     <div class="button-container">
                         <button type="submit" class="save-button">Save</button>
