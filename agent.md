@@ -330,7 +330,7 @@ Also: `GET /api/version`, `GET /api/changelog` (in `server.js`, not `db.js`).
 **Solution:** Extracted into a single shared module `public/js/script_recordModal.js`.
 
 **How it works:**
-- `initRecordModal({ gameId, defaultAlreadyCompleted, onSave })` — factory function
+- `initRecordModal({ gameId, defaultAlreadyCompleted, onSave, getRecordIdsForSection })` — factory function; `getRecordIdsForSection` is optional and enables previous/next edit navigation
   - Injects the modal HTML into the DOM via `insertAdjacentHTML`
   - Sets up all event listeners (title case, multi-toggle, default-value styling, close/reset, submit)
   - Returns `{ openForAdd(sectionId, sectionName), openForEdit(recordId), closeModal() }`
@@ -464,6 +464,16 @@ Updated both files to reflect current pages (`reorder_sections`, `reorder_record
 When selecting records to move, the temporary selection checkboxes are now larger and labeled "Move". Disabled completion checkboxes remain visible for context but are faded and desaturated, edit buttons are suppressed, and selected rows receive a stronger accent highlight.
 
 **Lesson:** Temporary selection controls should be visually dominant while unrelated controls remain recognizable but clearly inactive.
+
+---
+
+### Jun 10, 2026 — Navigate and autosave records in the edit modal
+
+**Files changed:** `public/js/script_recordModal.js`, `public/js/script_checklist.js`, `public/css/styles.scss`, `public/css/styles.css`, `public/css/styles.css.map`
+
+The record edit modal now shows previous/next arrows when a section has multiple records. Arrow navigation follows the section's current client-side record order. If the current form changed, clicking an arrow validates and saves the record, refreshes the checklist behind the modal, then opens the adjacent record. Unchanged records navigate without an update request.
+
+`initRecordModal` now accepts an optional `getRecordIdsForSection(sectionId)` callback so consuming pages can define the navigation order.
 
 ---
 

@@ -96,6 +96,7 @@ Navigation uses a shared slide-out menu (`script_nav.js`). Version history lives
 - **Sort by Name** — sections and records A–Z; incomplete records first within each section
 - **Completed Sections Last** — fully completed sections move to the bottom (faded headers)
 - Add/edit/delete sections and records via modals on the checklist page
+- Use previous/next arrows in the record edit modal to move through a section; changed records auto-save before navigation
 - Move records between sections (`script_moveRecords.js`)
 - Reorder sections or records via dedicated reorder pages
 

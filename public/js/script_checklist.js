@@ -464,7 +464,15 @@ $(document).ready(async function () {
         defaultAlreadyCompleted: 0,
         onSave: async (savedSectionId) => {
             await refreshChecklistAfterRecordChange(savedSectionId);
-        }
+        },
+        getRecordIdsForSection: (recordSectionId) => {
+            const sectionIndex = checklistViewCache.sections.findIndex(
+                (section) => String(section.ID) === String(recordSectionId)
+            );
+            if (sectionIndex < 0) return [];
+            const displayRecords = recordsWithDisplayOrder(checklistViewCache.recordsBySection);
+            return (displayRecords[sectionIndex] || []).map((record) => record.ID);
+        },
     });
 
     // Wire up the + button in section headers
