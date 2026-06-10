@@ -457,6 +457,16 @@ Updated both files to reflect current pages (`reorder_sections`, `reorder_record
 
 ---
 
+### Jun 10, 2026 — Clarify record selection during move mode
+
+**Files changed:** `public/css/styles.scss`, `public/css/styles.css`, `public/css/styles.css.map`
+
+When selecting records to move, the temporary selection checkboxes are now larger and labeled "Move". Disabled completion checkboxes remain visible for context but are faded and desaturated, edit buttons are suppressed, and selected rows receive a stronger accent highlight.
+
+**Lesson:** Temporary selection controls should be visually dominant while unrelated controls remain recognizable but clearly inactive.
+
+---
+
 ## Database Schema Reference (Feb 27, 2026)
 
 SQL dump lives in `sql/Dump20260227.sql`. MySQL 8.0 on DigitalOcean. Database name: `achievement_vault`.
