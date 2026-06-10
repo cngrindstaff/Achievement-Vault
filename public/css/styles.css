@@ -1032,6 +1032,67 @@ tr:nth-child(odd) {
   color: #8a9696 !important;
 }
 
+.record-add-source {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 18px;
+  margin: 0 0 12px;
+  padding: 10px 12px;
+  border: 1px solid #d4d1cb;
+  border-radius: 10px;
+}
+.record-add-source legend {
+  padding: 0 5px;
+  color: #556565;
+  font-size: 13px;
+  font-weight: 600;
+}
+.record-add-source label {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  margin: 0;
+  color: #1c2b2d;
+  font-size: 13px;
+  cursor: pointer;
+}
+.record-add-source input[type=radio] {
+  accent-color: #1f7f84;
+  cursor: pointer;
+}
+
+.csv-import-panel {
+  margin-bottom: 14px;
+  padding: 12px;
+  border: 1px dashed #2fbfc6;
+  border-radius: 10px;
+  background: rgba(208, 240, 242, 0.35);
+}
+.csv-import-panel input[type=file] {
+  margin-top: 7px;
+  max-width: 100%;
+  color: #556565;
+  font-family: "Roboto", -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: 13px;
+}
+
+.csv-import-help,
+.csv-import-status {
+  margin: 7px 0 0;
+  color: #8a9696;
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.csv-import-status {
+  color: #104042;
+  font-weight: 600;
+}
+
+.csv-import-status--error {
+  color: #d94452;
+}
+
 .add-record input[type=text],
 .add-record input[type=number],
 .add-record textarea {

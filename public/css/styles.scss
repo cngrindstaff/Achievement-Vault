@@ -1188,6 +1188,71 @@ tr:nth-child(odd) {
 	color: $text-muted !important;
 }
 
+.record-add-source {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 8px 18px;
+	margin: 0 0 12px;
+	padding: 10px 12px;
+	border: 1px solid #d4d1cb;
+	border-radius: $radius-md;
+
+	legend {
+		padding: 0 5px;
+		color: $text-secondary;
+		font-size: 13px;
+		font-weight: 600;
+	}
+
+	label {
+		display: inline-flex;
+		align-items: center;
+		gap: 7px;
+		margin: 0;
+		color: $text-primary;
+		font-size: 13px;
+		cursor: pointer;
+	}
+
+	input[type="radio"] {
+		accent-color: $accent-500;
+		cursor: pointer;
+	}
+}
+
+.csv-import-panel {
+	margin-bottom: 14px;
+	padding: 12px;
+	border: 1px dashed $accent-400;
+	border-radius: $radius-md;
+	background: rgba($accent-100, 0.35);
+
+	input[type="file"] {
+		margin-top: 7px;
+		max-width: 100%;
+		color: $text-secondary;
+		font-family: $font-body;
+		font-size: 13px;
+	}
+}
+
+.csv-import-help,
+.csv-import-status {
+	margin: 7px 0 0;
+	color: $text-muted;
+	font-size: 12px;
+	line-height: 1.4;
+}
+
+.csv-import-status {
+	color: $accent-700;
+	font-weight: 600;
+}
+
+.csv-import-status--error {
+	color: $danger;
+}
+
 
 .add-record input[type="text"],
 .add-record input[type="number"],
